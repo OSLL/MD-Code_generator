@@ -79,9 +79,8 @@ fun printFun(a: Int, b: Int, c: String) {
     println("   return a $c b;")
     println("}")
 
-    val fileName = "data.c"
+    val fileName = "function.c"
     var file = File(fileName)
-    // create a new file
     file.writeText("Какое значение вернёт функция $funcName, если a = $a, b = $b?\n\nint $funcName(int a, int b) {\n    return a $c b;\n}\n")
 }
 
