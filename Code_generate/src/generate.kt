@@ -81,10 +81,10 @@ fun printFun(a: Int, b: Int, c: String) {
 
     val fileName = "function.c"
     var file = File(fileName)
-    file.writeText("Какое значение вернёт функция $funcName, если a = $a, b = $b?\n\nint $funcName(int a, int b) {\n    return a $c b;\n}\n")
+    file.writeText("int $funcName(int a, int b) {\n    return a $c b;\n}\n")
 }
 
-//поправить %
+//%
 fun calc(a: Int, b: Int, c: String): Int {
     var q = a - b
     if ( c == SUBTRACTION ) {
