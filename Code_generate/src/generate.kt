@@ -6,24 +6,6 @@ import java.util.*
 const val MAX_VALUE: Int = 1000
 const val MIN_VALUE: Int = -1000
 
-val TYPE: List<String> = listOf("int ", "bool ", "void ", "float ", "double ")
-val MODIFIER: List<String> = listOf("short ", "long ", "unsigned ")
-val FUNCNAME: List<String> = listOf("main ", "subtraction ", "addition ", "multiply ", "div ", "mod ")
-val ARITHMETIC_OPERATIONS: List<String> = listOf("+ ", "- ", "/ ", "% ")
-val LOGICAL_OPERATIONS: List<String> = listOf("!", "&& ", "|| ")
-val RELATIONAL_OPERATIONS: List<String> = listOf("< ", "> ", "<= ", ">= ", "== ", "!= ")
-val SPECIAL_OPERATIONS: List<String> = listOf("++", "--")
-val IDENTIFIER: List<String> = listOf("a", "b")
-val CARRIAGE_RETURN = "\n"
-val LIBRARY: List<String> = listOf("stdio.h", "join.h", "h.h", "lhl.h")
-val INCLUDE: List<String> = listOf("#include <", ">")
-
-fun Include(program: String) : String {
-    if ( randBool() )
-        return Include("$program${INCLUDE[0]}${LIBRARY[ rand(0, LIBRARY.size) ]}${INCLUDE[1]}$CARRIAGE_RETURN")
-    return "$program${INCLUDE[0]}${LIBRARY[ rand(0, LIBRARY.size) ]}${INCLUDE[1]}$CARRIAGE_RETURN"
-}
-
 const val SPACE = ""
 const val SUBTRACTION = "-"
 const val ADDITION = "+"
@@ -37,19 +19,73 @@ const val MULTIPLICATION_FUNC_NAME: String = "multiply"
 const val DIV_FUNC_NAME: String = "div"
 const val MOD_FUNC_NAME: String = "mod"
 
+val TYPE: List<String> = listOf("void", "int", "bool", "float", "double")
+val MODIFIER: List<String> = listOf("short", "long", "unsigned")
+val FUNCNAME: List<String> = listOf("main", "subtraction", "addition", "multiply", "div", "mod")
+val ARITHMETIC_OPERATIONS: List<String> = listOf("+", "-", "/", "%")
+val LOGICAL_OPERATIONS: List<String> = listOf("!", "&&", "||")
+val RELATIONAL_OPERATIONS: List<String> = listOf("<", ">", "<=", ">=", "==", "!=")
+val SPECIAL_OPERATIONS: List<String> = listOf("++", "--")
+val IDENTIFIER: List<String> = listOf("a", "b", "c")
+val CARRIAGE_RETURN = "\n"
+val EQUALLY = "="
+val COMMA = ","
+val DOT = "."
+val SEMICOLON = ";"
+val COLON = ":"
+val LIBRARY: List<String> = listOf("stdio.h")
+val INCLUDE: List<String> = listOf("#include <", ">")
+val BRACKETS: List<String> = listOf("(", ")", "{", "}", "[", "]")
+val TAB = " "
+
+//пофиксить повторное подключение либов
+fun Include(program: String) : String {
+    if ( randBool() )
+        return Include("$program${INCLUDE[0]}${LIBRARY[rand(0, LIBRARY.size)]}${INCLUDE[1]}$CARRIAGE_RETURN")
+    return "$program${INCLUDE[0]}${LIBRARY[ rand(0, LIBRARY.size) ]}${INCLUDE[1]}$CARRIAGE_RETURN"
+}
+
+fun Arguments(program: String) : String {
+    if ( randBool() )
+        return Arguments("$program${TYPE[ rand(1, TYPE.size) ]} ${IDENTIFIER[ rand(0, IDENTIFIER.size) ]}$COMMA ")
+    return "$program${TYPE[ rand(1, TYPE.size) ]} ${IDENTIFIER[ rand(0, IDENTIFIER.size) ]}"
+}
+
+fun ArithmeticExceptionAddition(program: String) : String {
+    if ( randBool() )
+        return ArithmeticExceptionAddition("$program ${ARITHMETIC_OPERATIONS[ rand(0, ARITHMETIC_OPERATIONS.size) ]} ${IDENTIFIER[ rand(0, IDENTIFIER.size) ]}")
+    return "$program ${ARITHMETIC_OPERATIONS[ rand(0, ARITHMETIC_OPERATIONS.size) ]} ${IDENTIFIER[ rand(0, IDENTIFIER.size) ]}"
+}
+
+fun ArithmeticExpression(program: String) : String {
+    var prog = "$program ${IDENTIFIER[ rand(0, IDENTIFIER.size) ]} $EQUALLY ${IDENTIFIER[ rand(0, IDENTIFIER.size) ]}"
+    if ( randBool() )
+        ArithmeticExceptionAddition(prog)
+    return "$prog$SEMICOLON"
+}
+
+fun Code(program: String) : String {
+    if ( randBool() )
+        return Code(program)
+    return ArithmeticExpression(program)
+}
+
+fun Function(program: String) : String {
+    return "$program$CARRIAGE_RETURN${TYPE[ rand(0, TYPE.size) ]} ${FUNCNAME[ rand(1, FUNCNAME.size) ]}${BRACKETS[0]}${Arguments(SPACE)}${BRACKETS[1]} ${BRACKETS[2]}${CARRIAGE_RETURN}$TAB${Code(SPACE)}$CARRIAGE_RETURN${BRACKETS[3]}"
+}
+
 fun rand(from: Int, to: Int) : Int {
     val random = Random()
     return random.nextInt(to - from) + from
 }
 
 fun randBool() : Boolean {
-    val numb = rand(0, 2)
     if ( rand(0, 2).equals(1) )
         return true
     return false
 }
 
-fun operator(): String {
+fun operator() : String {
     val c = rand(0, 5)
     var r = (SPACE)
     if (c.equals(0)) {
@@ -75,7 +111,7 @@ fun operator(): String {
     return r
 }
 
-fun funcName(r: String): String {
+fun funcName(r: String) : String {
     var q = SPACE
     if ( r == SUBTRACTION ) {
         q = SUBTRACTION_FUNC_NAME
@@ -101,14 +137,9 @@ fun funcName(r: String): String {
 }
 
 fun printFun(a: Int, b: Int, c: String) {
-    val funcName = funcName(c)
-    println("Какое значение вернёт функция $funcName, если a = $a, b = $b?\n")
-    println("int $funcName(int a, int b) {")
-    println("   return a $c b;")
-    println("}")
-
     var program = SPACE
     program = Include(program)
+    program = Function(program)
 
 //    val time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss"))
 //    var file = File("func_$time.c")
@@ -116,6 +147,8 @@ fun printFun(a: Int, b: Int, c: String) {
 //    file.writeText("#include <stdio.h>\n\nint $funcName(int a, int b) {\n    return a $c b;\n}\n\nint main() {\n    return $funcName($a, $b);\n}")
     file.writeText(program)
 
+//    val funcName = funcName(c)
+    println(program)
 /*    val x: String = time as String
     val exec: Execute = Execute()
 
@@ -124,7 +157,7 @@ fun printFun(a: Int, b: Int, c: String) {
 }
 
 //%
-fun calc(a: Int, b: Int, c: String): Int {
+fun calc(a: Int, b: Int, c: String) : Int {
 
     var q = a - b
     if ( c == SUBTRACTION ) {
