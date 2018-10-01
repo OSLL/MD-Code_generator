@@ -1,14 +1,35 @@
-import java.util.Random
 import java.io.File
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.*
+
 const val MAX_VALUE: Int = 1000
 const val MIN_VALUE: Int = -1000
 
-const val SPACE: String = ""
-const val SUBTRACTION: String = "-"
-const val ADDITION: String = "+"
-const val MULTIPLICATION: String = "*"
-const val DIV: String = "/"
-const val MOD: String = "%"
+val TYPE: List<String> = listOf("int ", "bool ", "void ", "float ", "double ")
+val MODIFIER: List<String> = listOf("short ", "long ", "unsigned ")
+val FUNCNAME: List<String> = listOf("main ", "subtraction ", "addition ", "multiply ", "div ", "mod ")
+val ARITHMETIC_OPERATIONS: List<String> = listOf("+ ", "- ", "/ ", "% ")
+val LOGICAL_OPERATIONS: List<String> = listOf("!", "&& ", "|| ")
+val RELATIONAL_OPERATIONS: List<String> = listOf("< ", "> ", "<= ", ">= ", "== ", "!= ")
+val SPECIAL_OPERATIONS: List<String> = listOf("++", "--")
+val IDENTIFIER: List<String> = listOf("a", "b")
+val CARRIAGE_RETURN = "\n"
+val LIBRARY: List<String> = listOf("stdio.h", "join.h", "h.h", "lhl.h")
+val INCLUDE: List<String> = listOf("#include <", ">")
+
+fun Include(program: String) : String {
+    if ( randBool() )
+        return Include("$program${INCLUDE[0]}${LIBRARY[ rand(0, LIBRARY.size) ]}${INCLUDE[1]}$CARRIAGE_RETURN")
+    return "$program${INCLUDE[0]}${LIBRARY[ rand(0, LIBRARY.size) ]}${INCLUDE[1]}$CARRIAGE_RETURN"
+}
+
+const val SPACE = ""
+const val SUBTRACTION = "-"
+const val ADDITION = "+"
+const val MULTIPLICATION = "*"
+const val DIV = "/"
+const val MOD = "%"
 
 const val SUBTRACTION_FUNC_NAME: String = "subtraction"
 const val ADDITION_FUNC_NAME: String = "addition"
@@ -19,6 +40,13 @@ const val MOD_FUNC_NAME: String = "mod"
 fun rand(from: Int, to: Int) : Int {
     val random = Random()
     return random.nextInt(to - from) + from
+}
+
+fun randBool() : Boolean {
+    val numb = rand(0, 2)
+    if ( rand(0, 2).equals(1) )
+        return true
+    return false
 }
 
 fun operator(): String {
@@ -79,13 +107,25 @@ fun printFun(a: Int, b: Int, c: String) {
     println("   return a $c b;")
     println("}")
 
-    val fileName = "function.c"
-    var file = File(fileName)
-    file.writeText("int $funcName(int a, int b) {\n    return a $c b;\n}\n")
+    var program = SPACE
+    program = Include(program)
+
+//    val time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss"))
+//    var file = File("func_$time.c")
+    var file = File("func.c")
+//    file.writeText("#include <stdio.h>\n\nint $funcName(int a, int b) {\n    return a $c b;\n}\n\nint main() {\n    return $funcName($a, $b);\n}")
+    file.writeText(program)
+
+/*    val x: String = time as String
+    val exec: Execute = Execute()
+
+    exec.Execut(x)
+*/
 }
 
 //%
 fun calc(a: Int, b: Int, c: String): Int {
+
     var q = a - b
     if ( c == SUBTRACTION ) {
         q = a - b
