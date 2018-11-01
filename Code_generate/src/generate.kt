@@ -78,7 +78,7 @@ fun Include(libr_numb: Int) : MutableList<String> {
     return program_
 }
 
-fun Arguments(program: MutableList<String>) : MutableList<String> {
+/*fun Arguments(program: MutableList<String>) : MutableList<String> {
     val program_: MutableList<String> = mutableListOf()
     if (randBool()) {
         program_.addAll(Arguments(program_))
@@ -86,7 +86,7 @@ fun Arguments(program: MutableList<String>) : MutableList<String> {
     }
     program_.add("${TYPE[ rand(1, TYPE.size) ]} ${IDENTIFIER[ rand(0, IDENTIFIER.size) ]}")
     return program_
-}
+}*/
 
 fun Brackets(program: MutableList<String>, args: Array<String>, count: Int) : MutableList<String> {
     val program_: MutableList<String> = mutableListOf()
@@ -204,6 +204,53 @@ fun printFun(args: Array<String>) {
     }
 }
 
+//temporary function
+fun taskNumb() : String {
+    print( "task number: " )
+    val task_numb = readLine()!!
+    return task_numb
+}
+
+//temporary function
+fun argsNumb() : String {
+    print( "number of arguments: " )
+    val args_numb = readLine()!!
+    return args_numb
+}
+
+//temporary function
+fun linesNumb() : String {
+    print( "number of lines: " )
+    val lines_numb = readLine()!!
+    return lines_numb
+}
+
+//temporary function
+fun operationsNumb() : String {
+    print( "number of operations: " )
+    val operations_numb = readLine()!!
+    return operations_numb
+}
+
+//temporary function
+fun operation() : String {
+    print( "math operation: " )
+    val operation = readLine()!!
+    return operation
+}
+
 fun main(args: Array<String>) {
-    printFun(args)
+    var args_: MutableList<String> = mutableListOf()
+    args_.add(taskNumb())
+    args_.add(argsNumb())
+    args_.add(linesNumb())
+    args_.add(operationsNumb())
+
+    var op = operation()
+    while (op != ".") {
+        args_.add(op)
+        op = operation()
+    }
+
+    printFun(args_.toTypedArray())
 }
