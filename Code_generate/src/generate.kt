@@ -75,7 +75,7 @@ fun printfStamp(program: MutableList<String>, args: Array<String>) : MutableList
 
 fun OperationType(args: Array<String>) : MutableList<String> {
     val OPERATIONS_TYPE: MutableList<String> = mutableListOf()
-    for ( i: Int in 5..(args.size - 1) )
+    for ( i: Int in 6..(args.size - 1) )
         OPERATIONS_TYPE.add( args[i] )
     return OPERATIONS_TYPE
 }
@@ -158,17 +158,16 @@ fun Expression(program: MutableList<String>, args: Array<String>, count: Int) : 
     return program_
 }
 
+//включено переопределение = 1
 fun Statement(program: MutableList<String>, args: Array<String>, count: Int, count_: Int) : MutableList<String> {
     val program_: MutableList<String> = mutableListOf()
     if ( check(count, 2, args) ) {
         program_.add(TAB)
         program_.add("${IDENTIFIER[rand(0, parseInt(args[1]))]} ${EQUALLY}")
         program_.add(" ")
-        program.addAll(program_)
         program_.addAll( Expression(program, args, 0) )
         program_.add(END_OF_LINE)
         program.addAll(program_)
-        //if ( (count + 1) % (parseInt(args[4]) - 1) == 0 && count_ < (parseInt(args[4]) - 1) ) {
         if ( count_ == 0 ) {
             program_.addAll(printfStamp(program, args))
             program.addAll(program_)
@@ -180,6 +179,35 @@ fun Statement(program: MutableList<String>, args: Array<String>, count: Int, cou
     return program_
 }
 
+//выключено переопределение = 0
+fun Statement_(program: MutableList<String>, args: Array<String>, count: Int, count_: Int) : MutableList<String> {
+    val program_: MutableList<String> = mutableListOf()
+    if ( check(count, 2, args) ) {
+        program_.add(TAB)
+        val index = rand(0, parseInt(args[1]))
+        program_.add("${IDENTIFIER[index]} ${EQUALLY}")
+        program_.add(" ")
+        program.addAll(program_)
+        if ( checkIdentifier(program, index) ) {
+            program_.addAll( Identifier(index) )
+            program.addAll(program_)
+            program_.addAll( ExpressionAddition(program, args, 1) )
+        }
+        else
+            program_.addAll( Expression(program, args, 0) )
+        program_.add(END_OF_LINE)
+        program.addAll(program_)
+        if ( count_ == 0 ) {
+            program_.addAll(printfStamp(program, args))
+            program.addAll(program_)
+            program_.addAll( Statement_(program, args, count + 1, parseInt(args[2]) / parseInt(args[4])) )
+        }
+        else
+            program_.addAll( Statement_(program, args, count + 1, count_ - 1) )
+    }
+    return program_
+}
+
 fun firstTask(args: Array<String>) : MutableList<String> {
     val program_: MutableList<String> = mutableListOf()
     program_.addAll(Include(0))
@@ -187,7 +215,7 @@ fun firstTask(args: Array<String>) : MutableList<String> {
     val initialized_args = rand(0, parseInt(args[1]) - 1)   //номера инициализированных переменных
     val uninitialized_args = parseInt(args[1]) - 2          //номера неинициализированных переменных
 
-    for ( i in 0..initialized_args ) {
+    for (i in 0..initialized_args) {
         program_.add("${TAB}${MODIFIER[2]} ${TYPE[1]} ")
         program_.add("${IDENTIFIER[i]} ${EQUALLY}")
         program_.add(" ${rand(0, MAX_VALUE)}")
@@ -196,22 +224,36 @@ fun firstTask(args: Array<String>) : MutableList<String> {
 
     var i = initialized_args + 1
     program_.add("${TAB}${MODIFIER[2]} ${TYPE[1]}")
-    for ( j: Int in i..uninitialized_args ) {
+    for (j: Int in i..uninitialized_args) {
         program_.add(" ${IDENTIFIER[j]}${COMMA}")
         i++
     }
     program_.add(" ${IDENTIFIER[i]}${END_OF_LINE}")
     val program: MutableList<String> = mutableListOf()
     program.addAll(program_)
-    if ( parseInt(args[4]) == 0 )
-        program_.addAll( Statement(program, args, 0, -1) )
-    if ( parseInt(args[4]) == 1 ) {
-        program_.addAll( Statement(program, args, 0, -1) )
-        program_.addAll( printfStamp(program, args) )
+    if ( args[5] == "1" ) { //включено переопределение = 1
+        if (parseInt(args[4]) == 0)
+            program_.addAll(Statement(program, args, 0, -1))
+        if (parseInt(args[4]) == 1) {
+            program_.addAll(Statement(program, args, 0, -1))
+            program_.addAll(printfStamp(program, args))
+        }
+        if (parseInt(args[4]) != 0 && parseInt(args[4]) != 1) {
+            program_.addAll(Statement(program, args, 0, parseInt(args[2]) / parseInt(args[4])))
+            program_.addAll(printfStamp(program, args))
+        }
     }
-    if ( parseInt(args[4]) != 0 && parseInt(args[4]) != 1 ) {
-        program_.addAll(Statement(program, args, 0, parseInt(args[2]) / parseInt(args[4])))
-        program_.addAll( printfStamp(program, args) )
+    else { //выключено переопределение = 0
+        if (parseInt(args[4]) == 0)
+            program_.addAll(Statement_(program, args, 0, -1))
+        if (parseInt(args[4]) == 1) {
+            program_.addAll(Statement_(program, args, 0, -1))
+            program_.addAll(printfStamp(program, args))
+        }
+        if (parseInt(args[4]) != 0 && parseInt(args[4]) != 1) {
+            program_.addAll(Statement_(program, args, 0, parseInt(args[2]) / parseInt(args[4])))
+            program_.addAll(printfStamp(program, args))
+        }
     }
     program_.add("${TAB}${RETURN} 0${END_OF_LINE}")
     program_.add(BRACKETS[3])
@@ -234,10 +276,10 @@ fun printFun(args: Array<String>) {
     if ( parseInt(args[0]).equals(1) ) {
         program.addAll( firstTask(args) )
 
-//        val time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss"))
-//        var file = File("func_$time.c")
+        val time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss"))
+        var file = File("func_$time.c")
 
-        var file = File("func.c")
+//        var file = File("func.c")
         file.writeText(program.joinToString(SPACE))
         println(program.joinToString(SPACE))
     }
@@ -273,7 +315,14 @@ fun operationsNumb() : String {
 
 //temporary function
 fun printfNumb() : String {
-    print( "number printf: " )
+    print( "number of output instructions: " )
+    val printf_numb = readLine()!!
+    return printf_numb
+}
+
+//temporary function
+fun enableOverride() : String {
+    print( "enable variable override: " )
     val printf_numb = readLine()!!
     return printf_numb
 }
@@ -286,12 +335,13 @@ fun operation() : String {
 }
 
 fun main(args: Array<String>) {
-    /*var args_: MutableList<String> = mutableListOf()
+    var args_: MutableList<String> = mutableListOf()
     args_.add(taskNumb())
     args_.add(argsNumb())
     args_.add(linesNumb())
     args_.add(operationsNumb())
     args_.add(printfNumb())
+    args_.add(enableOverride())
 
     var op = operation()
     while (op != ".") {
@@ -299,6 +349,6 @@ fun main(args: Array<String>) {
         op = operation()
     }
 
-    printFun(args_.toTypedArray())*/
-    printFun(args)
+    printFun(args_.toTypedArray())
+    //printFun(args)
 }
