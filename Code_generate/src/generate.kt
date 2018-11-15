@@ -18,22 +18,35 @@ val SPECIAL_OPERATIONS: List<String> = listOf("++", "--")
 val BITWISE_OPERATIONS: List<String> = listOf("<<", ">>", "|", "&")
 val IDENTIFIER: List<String> = listOf("a", "b", "c", "d", "e", "f", "g")
 val CARRIAGE_RETURN = "\n"
+val CARRIAGE_RETURN_ = "\\n"
 val EQUALLY = "="
 val COMMA = ","
 val DOT = "."
 val SEMICOLON = ";"
 val COLON = ":"
+val QUOTES = "\""
 val END_OF_LINE = "${SEMICOLON}${CARRIAGE_RETURN}"
 val LIBRARY: List<String> = listOf("stdio.h")
 val INCLUDE: List<String> = listOf("#include <", ">")
 val BRACKETS: List<String> = listOf("(", ")", "{", "}", "[", "]")
 val TAB = "    "
 val RETURN = "return"
+val SERVICE_WORDS: List<String> = listOf("printf")
 
 fun Identifier(index: Int) : MutableList<String> {
     val program_: MutableList<String> = mutableListOf()
     program_.add(IDENTIFIER[index])
     return program_
+}
+
+fun checkIdentifier(program: MutableList<String>, index: Int) : Boolean {
+    val value = "${IDENTIFIER[index]} $EQUALLY"
+    for (i: Int in 0..(program.size - 1))
+        if (program[i] == value)
+            for (j: Int in (i + 1)..(program.size - 1))
+                if (program[j] == END_OF_LINE)
+                    return true
+    return false
 }
 
 fun Identifier(program: MutableList<String>, args: Array<String>) : MutableList<String> {
@@ -50,9 +63,19 @@ fun Identifier(program: MutableList<String>, args: Array<String>) : MutableList<
     return Identifier(program, args)
 }
 
+fun printfStamp(program: MutableList<String>, args: Array<String>) : MutableList<String> {
+    val program_: MutableList<String> = mutableListOf()
+    var index = rand(0, parseInt(args[1]))
+    while ( !checkIdentifier(program, index) )
+        index = rand(0, parseInt(args[1]))
+    program_.add("$TAB${SERVICE_WORDS[0]}${BRACKETS[0]}${QUOTES}%i${CARRIAGE_RETURN_}${QUOTES}${COMMA} ${IDENTIFIER[index]}${BRACKETS[1]}")
+    program_.add(END_OF_LINE)
+    return program_
+}
+
 fun OperationType(args: Array<String>) : MutableList<String> {
     val OPERATIONS_TYPE: MutableList<String> = mutableListOf()
-    for ( i: Int in 4..(args.size - 1) )
+    for ( i: Int in 5..(args.size - 1) )
         OPERATIONS_TYPE.add( args[i] )
     return OPERATIONS_TYPE
 }
@@ -99,7 +122,7 @@ fun Brackets(program: MutableList<String>, args: Array<String>, count: Int) : Mu
 fun Atom(program: MutableList<String>, args: Array<String>, count: Int) : MutableList<String> {
     val program_: MutableList<String> = mutableListOf()
     if ( check(count, 3, args) )
-        if ( randBool() && check(count + 2, 2, args))
+        if ( randBool() && check(count + 2, 3, args))
             program_.addAll(Brackets(program, args, count))
         else
             if ( randBool() )
@@ -135,7 +158,7 @@ fun Expression(program: MutableList<String>, args: Array<String>, count: Int) : 
     return program_
 }
 
-fun Statement(program: MutableList<String>, args: Array<String>, count: Int) : MutableList<String> {
+fun Statement(program: MutableList<String>, args: Array<String>, count: Int, count_: Int) : MutableList<String> {
     val program_: MutableList<String> = mutableListOf()
     if ( check(count, 2, args) ) {
         program_.add(TAB)
@@ -145,7 +168,14 @@ fun Statement(program: MutableList<String>, args: Array<String>, count: Int) : M
         program_.addAll( Expression(program, args, 0) )
         program_.add(END_OF_LINE)
         program.addAll(program_)
-        program_.addAll( Statement(program, args, count + 1) )
+        //if ( (count + 1) % (parseInt(args[4]) - 1) == 0 && count_ < (parseInt(args[4]) - 1) ) {
+        if ( count_ == 0 ) {
+            program_.addAll(printfStamp(program, args))
+            program.addAll(program_)
+            program_.addAll( Statement(program, args, count + 1, parseInt(args[2]) / parseInt(args[4])) )
+        }
+        else
+            program_.addAll( Statement(program, args, count + 1, count_ - 1) )
     }
     return program_
 }
@@ -173,7 +203,16 @@ fun firstTask(args: Array<String>) : MutableList<String> {
     program_.add(" ${IDENTIFIER[i]}${END_OF_LINE}")
     val program: MutableList<String> = mutableListOf()
     program.addAll(program_)
-    program_.addAll( Statement(program, args, 0) )
+    if ( parseInt(args[4]) == 0 )
+        program_.addAll( Statement(program, args, 0, -1) )
+    if ( parseInt(args[4]) == 1 ) {
+        program_.addAll( Statement(program, args, 0, -1) )
+        program_.addAll( printfStamp(program, args) )
+    }
+    if ( parseInt(args[4]) != 0 && parseInt(args[4]) != 1 ) {
+        program_.addAll(Statement(program, args, 0, parseInt(args[2]) / parseInt(args[4])))
+        program_.addAll( printfStamp(program, args) )
+    }
     program_.add("${TAB}${RETURN} 0${END_OF_LINE}")
     program_.add(BRACKETS[3])
     return program_
@@ -195,10 +234,10 @@ fun printFun(args: Array<String>) {
     if ( parseInt(args[0]).equals(1) ) {
         program.addAll( firstTask(args) )
 
-        val time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss"))
-        var file = File("func_$time.c")
+//        val time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss"))
+//        var file = File("func_$time.c")
 
-//        var file = File("func.c")
+        var file = File("func.c")
         file.writeText(program.joinToString(SPACE))
         println(program.joinToString(SPACE))
     }
@@ -233,6 +272,13 @@ fun operationsNumb() : String {
 }
 
 //temporary function
+fun printfNumb() : String {
+    print( "number printf: " )
+    val printf_numb = readLine()!!
+    return printf_numb
+}
+
+//temporary function
 fun operation() : String {
     print( "math operation: " )
     val operation = readLine()!!
@@ -240,11 +286,12 @@ fun operation() : String {
 }
 
 fun main(args: Array<String>) {
-    var args_: MutableList<String> = mutableListOf()
+    /*var args_: MutableList<String> = mutableListOf()
     args_.add(taskNumb())
     args_.add(argsNumb())
     args_.add(linesNumb())
     args_.add(operationsNumb())
+    args_.add(printfNumb())
 
     var op = operation()
     while (op != ".") {
@@ -252,5 +299,6 @@ fun main(args: Array<String>) {
         op = operation()
     }
 
-    printFun(args_.toTypedArray())
+    printFun(args_.toTypedArray())*/
+    printFun(args)
 }
