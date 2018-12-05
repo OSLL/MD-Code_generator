@@ -33,13 +33,13 @@ val TAB = "    "
 val RETURN = "return"
 val SERVICE_WORDS: List<String> = listOf("printf")
 
-fun Identifier(index: Int) : MutableList<String> {
+fun Identifier(index: Int): MutableList<String> {
     val program_: MutableList<String> = mutableListOf()
     program_.add(IDENTIFIER[index])
     return program_
 }
 
-fun checkIdentifier(program: MutableList<String>, index: Int) : Boolean {
+fun checkIdentifier(program: MutableList<String>, index: Int): Boolean {
     val value = "${IDENTIFIER[index]} $EQUALLY"
     for (i: Int in 0..(program.size - 1))
         if (program[i] == value)
@@ -49,7 +49,7 @@ fun checkIdentifier(program: MutableList<String>, index: Int) : Boolean {
     return false
 }
 
-fun Identifier(program: MutableList<String>, args: Array<String>) : MutableList<String> {
+fun Identifier(program: MutableList<String>, args: MutableList<String>): MutableList<String> {
     val program_: MutableList<String> = mutableListOf()
     val index = rand(0, parseInt(args[1]))
     val value = "${IDENTIFIER[index]} $EQUALLY"
@@ -63,55 +63,55 @@ fun Identifier(program: MutableList<String>, args: Array<String>) : MutableList<
     return Identifier(program, args)
 }
 
-fun printfStamp(program: MutableList<String>, args: Array<String>) : MutableList<String> {
+fun printfStamp(program: MutableList<String>, args: MutableList<String>): MutableList<String> {
     val program_: MutableList<String> = mutableListOf()
     var index = rand(0, parseInt(args[1]))
-    while ( !checkIdentifier(program, index) )
+    while (!checkIdentifier(program, index))
         index = rand(0, parseInt(args[1]))
     program_.add("$TAB${SERVICE_WORDS[0]}${BRACKETS[0]}${QUOTES}%i${CARRIAGE_RETURN_}${QUOTES}${COMMA} ${IDENTIFIER[index]}${BRACKETS[1]}")
     program_.add(END_OF_LINE)
     return program_
 }
 
-fun OperationType(args: Array<String>) : MutableList<String> {
+fun OperationType(args: MutableList<String>): MutableList<String> {
     val OPERATIONS_TYPE: MutableList<String> = mutableListOf()
-    for ( i: Int in 6..(args.size - 1) )
-        OPERATIONS_TYPE.add( args[i] )
+    for (i: Int in 6..(args.size - 1))
+        OPERATIONS_TYPE.add(args[i])
     return OPERATIONS_TYPE
 }
 
-fun Operation(args: Array<String>) : MutableList<String> {
+fun Operation(args: MutableList<String>): MutableList<String> {
     val OPERATIONS_TYPE: MutableList<String> = mutableListOf()
-    OPERATIONS_TYPE.addAll( OperationType(args) )
+    OPERATIONS_TYPE.addAll(OperationType(args))
 
     val program_: MutableList<String> = mutableListOf()
     program_.add(" ${OPERATIONS_TYPE[rand(0, OPERATIONS_TYPE.size)]} ")
     return program_
 }
 
-fun check(count: Int, index: Int, args: Array<String>) : Boolean {
-    if ( count < parseInt(args[index]) )
+fun check(count: Int, index: Int, args: MutableList<String>): Boolean {
+    if (count < parseInt(args[index]))
         return true
     return false
 }
 
-fun Include(libr_numb: Int) : MutableList<String> {
+fun Include(libr_numb: Int): MutableList<String> {
     val program_: MutableList<String> = mutableListOf()
     program_.add("${INCLUDE[0]}${LIBRARY[libr_numb]}${INCLUDE[1]}$CARRIAGE_RETURN")
     return program_
 }
 
 /*fun Arguments(program: MutableList<String>) : MutableList<String> {
-    val program_: MutableList<String> = mutableListOf()
-    if (randBool()) {
-        program_.addAll(Arguments(program_))
-        program_.add("$COMMA ")
-    }
-    program_.add("${TYPE[ rand(1, TYPE.size) ]} ${IDENTIFIER[ rand(0, IDENTIFIER.size) ]}")
-    return program_
+val program_: MutableList<String> = mutableListOf()
+if (randBool()) {
+    program_.addAll(Arguments(program_))
+    program_.add("$COMMA ")
+}
+program_.add("${TYPE[ rand(1, TYPE.size) ]} ${IDENTIFIER[ rand(0, IDENTIFIER.size) ]}")
+return program_
 }*/
 
-fun Brackets(program: MutableList<String>, args: Array<String>, count: Int) : MutableList<String> {
+fun Brackets(program: MutableList<String>, args: MutableList<String>, count: Int): MutableList<String> {
     val program_: MutableList<String> = mutableListOf()
     program_.add(BRACKETS[0])
     program_.addAll(Expression(program, args, count))
@@ -119,74 +119,72 @@ fun Brackets(program: MutableList<String>, args: Array<String>, count: Int) : Mu
     return program_
 }
 
-fun Atom(program: MutableList<String>, args: Array<String>, count: Int) : MutableList<String> {
+fun Atom(program: MutableList<String>, args: MutableList<String>, count: Int): MutableList<String> {
     val program_: MutableList<String> = mutableListOf()
-    if ( check(count, 3, args) )
-        if ( randBool() && check(count + 2, 3, args))
+    if (check(count, 3, args))
+        if (randBool() && check(count + 2, 3, args))
             program_.addAll(Brackets(program, args, count))
         else
-            if ( randBool() )
+            if (randBool())
                 program_.addAll(Identifier(program, args))
             else
                 program_.add("${rand(1, MAX_VALUE)}")
     return program_
 }
 
-fun ExpressionAddition(program: MutableList<String>, args: Array<String>, count: Int) : MutableList<String> {
+fun ExpressionAddition(program: MutableList<String>, args: MutableList<String>, count: Int): MutableList<String> {
     val program_: MutableList<String> = mutableListOf()
-    if ( check(count, 3, args) ) {
+    if (check(count, 3, args)) {
         program_.addAll(Operation(args))
         program.addAll(program_)
         program_.addAll(Atom(program, args, count))
         val count_ = count + 1
-        if ( randBool() )
+        if (randBool())
             program_.addAll(ExpressionAddition(program, args, count_ + 1))
     }
     return program_
 }
 
-fun Expression(program: MutableList<String>, args: Array<String>, count: Int) : MutableList<String> {
+fun Expression(program: MutableList<String>, args: MutableList<String>, count: Int): MutableList<String> {
     val program_: MutableList<String> = mutableListOf()
-    if ( count.equals(0) || check(count, 3, args) ) {
-        if ( randBool() )
+    if (count.equals(0) || check(count, 3, args)) {
+        if (randBool())
             program_.addAll(Identifier(program, args))
         else
             program_.add("${rand(1, MAX_VALUE)}")
         program.addAll(program_)
-        program_.addAll( ExpressionAddition(program, args, count + 1) )
+        program_.addAll(ExpressionAddition(program, args, count + 1))
     }
     return program_
 }
 
-fun Statement(program: MutableList<String>, args: Array<String>, count: Int, count_: Int) : MutableList<String> {
+fun Statement(program: MutableList<String>, args: MutableList<String>, count: Int, count_: Int): MutableList<String> {
     val program_: MutableList<String> = mutableListOf()
-    if ( check(count, 2, args) ) {
+    if (check(count, 2, args)) {
         program_.add(TAB)
         val index = rand(0, parseInt(args[1]))
         program_.add("${IDENTIFIER[index]} ${EQUALLY}")
         program_.add(" ")
         program.addAll(program_)
-        if ( checkIdentifier(program, index) && args[5] == "0" ) { //выключено переопределение = 0
-            program_.addAll( Identifier(index) )
+        if (checkIdentifier(program, index) && args[5] == "0") { //выключено переопределение = 0
+            program_.addAll(Identifier(index))
             program.addAll(program_)
-            program_.addAll( ExpressionAddition(program, args, 1) )
-        }
-        else
-            program_.addAll( Expression(program, args, 0) )
+            program_.addAll(ExpressionAddition(program, args, 1))
+        } else
+            program_.addAll(Expression(program, args, 0))
         program_.add(END_OF_LINE)
         program.addAll(program_)
-        if ( count_ == 0 ) {
+        if (count_ == 0) {
             program_.addAll(printfStamp(program, args))
             program.addAll(program_)
-            program_.addAll( Statement(program, args, count + 1, parseInt(args[2]) / parseInt(args[4])) )
-        }
-        else
-            program_.addAll( Statement(program, args, count + 1, count_ - 1) )
+            program_.addAll(Statement(program, args, count + 1, parseInt(args[2]) / parseInt(args[4])))
+        } else
+            program_.addAll(Statement(program, args, count + 1, count_ - 1))
     }
     return program_
 }
 
-fun firstTask(args: Array<String>) : MutableList<String> {
+fun firstTask(args: MutableList<String>): MutableList<String> {
     val program_: MutableList<String> = mutableListOf()
     program_.addAll(Include(0))
     program_.add("$CARRIAGE_RETURN${TYPE[1]} ${FUNCNAME[0]}${BRACKETS[0]}${BRACKETS[1]} ${BRACKETS[2]}$CARRIAGE_RETURN")
@@ -200,7 +198,7 @@ fun firstTask(args: Array<String>) : MutableList<String> {
         program_.add(END_OF_LINE)
     }
 
-    if ( uninitialized_args > -1 ) {
+    if (uninitialized_args > -1) {
         var i = initialized_args + 1
         program_.add("${TAB}${MODIFIER[2]} ${TYPE[1]}")
         for (j: Int in i..uninitialized_args) {
@@ -228,23 +226,23 @@ fun firstTask(args: Array<String>) : MutableList<String> {
     return program_
 }
 
-fun rand(from: Int, to: Int) : Int {
+fun rand(from: Int, to: Int): Int {
     val random = Random()
-    if ( from == to )
+    if (from == to)
         return from
     return random.nextInt(to - from) + from
 }
 
-fun randBool() : Boolean {
-    if ( rand(0, 2).equals(1) )
+fun randBool(): Boolean {
+    if (rand(0, 2).equals(1))
         return true
     return false
 }
 
-fun printFun(args: Array<String>) {
+fun printFun(args: MutableList<String>) {
     val program: MutableList<String> = mutableListOf()
-    if ( parseInt(args[0]).equals(1) ) {
-        program.addAll( firstTask(args) )
+    if (parseInt(args[0]).equals(1)) {
+        program.addAll(firstTask(args))
 
         val time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss"))
         var file = File("func_$time.c")
@@ -255,70 +253,28 @@ fun printFun(args: Array<String>) {
     }
 }
 
-//temporary function
-fun taskNumb() : String {
-    print( "task number: " )
-    val task_numb = readLine()!!
-    return task_numb
-}
-
-//temporary function
-fun argsNumb() : String {
-    print( "number of variables: " )
-    val args_numb = readLine()!!
-    return args_numb
-}
-
-//temporary function
-fun linesNumb() : String {
-    print( "number of lines: " )
-    val lines_numb = readLine()!!
-    return lines_numb
-}
-
-//temporary function
-fun operationsNumb() : String {
-    print( "number of operations: " )
-    val operations_numb = readLine()!!
-    return operations_numb
-}
-
-//temporary function
-fun printfNumb() : String {
-    print( "number of output instructions: " )
-    val printf_numb = readLine()!!
-    return printf_numb
-}
-
-//temporary function
-fun enableOverride() : String {
-    print( "enable variable override: " )
-    val printf_numb = readLine()!!
-    return printf_numb
-}
-
-//temporary function
-fun operation() : String {
-    print( "math operation: " )
-    val operation = readLine()!!
-    return operation
-}
-
 fun main(args: Array<String>) {
-    var args_: MutableList<String> = mutableListOf()
-    args_.add(taskNumb())
-    args_.add(argsNumb())
-    args_.add(linesNumb())
-    args_.add(operationsNumb())
-    args_.add(printfNumb())
-    args_.add(enableOverride())
+    val args_: MutableList<String> = mutableListOf()
 
-    var op = operation()
-    while (op != ".") {
-        args_.add(op)
-        op = operation()
+    var str : String
+    str = args[0]
+    var i = 0
+    while ( i < str.length - 1 ) {
+        if ( str[i].toString() == " " )
+            i += 1
+        else {
+            if (str[i + 1].toString() == " " ) {
+                args_.add(str[i].toString())
+                i += 1
+            } else {
+                args_.add("${str[i]}${str[i + 1]}")
+                i += 2
+            }
+        }
     }
 
-    printFun(args_.toTypedArray())
-//    printFun(args)
+    args_.add(str[i].toString())
+    i += 1
+
+    printFun(args_)
 }
