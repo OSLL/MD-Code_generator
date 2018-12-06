@@ -244,10 +244,10 @@ fun printFun(args: MutableList<String>) {
     if (parseInt(args[0]).equals(1)) {
         program.addAll(firstTask(args))
 
-        val time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss"))
-        var file = File("func_$time.c")
+//        val time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss"))
+//        var file = File("func_$time.c")
 
-//        var file = File("func.c")
+        var file = File("func.c")
         file.writeText(program.joinToString(SPACE))
         println(program.joinToString(SPACE))
     }
@@ -255,26 +255,6 @@ fun printFun(args: MutableList<String>) {
 
 fun main(args: Array<String>) {
     val args_: MutableList<String> = mutableListOf()
-
-    var str : String
-    str = args[0]
-    var i = 0
-    while ( i < str.length - 1 ) {
-        if ( str[i].toString() == " " )
-            i += 1
-        else {
-            if (str[i + 1].toString() == " " ) {
-                args_.add(str[i].toString())
-                i += 1
-            } else {
-                args_.add("${str[i]}${str[i + 1]}")
-                i += 2
-            }
-        }
-    }
-
-    args_.add(str[i].toString())
-    i += 1
-
+    args_.addAll(args[0].split(' '))
     printFun(args_)
 }
