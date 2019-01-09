@@ -49,6 +49,14 @@ fun checkIdentifier(program: MutableList<String>, index: Int): Boolean {
     return false
 }
 
+fun checkOperator(program: MutableList<String>): Boolean {
+    val value_0 = " ${BITWISE_OPERATIONS[0]} "
+    val value_1 = " ${BITWISE_OPERATIONS[1]} "
+    if (program[program.size - 1] == value_0 || program[program.size - 1] == value_1)
+        return true
+    return false
+}
+
 fun Identifier(program: MutableList<String>, args: MutableList<String>): MutableList<String> {
     val program_: MutableList<String> = mutableListOf()
     val index = rand(0, parseInt(args[1]))
@@ -137,6 +145,10 @@ fun ExpressionAddition(program: MutableList<String>, args: MutableList<String>, 
     if (check(count, 3, args)) {
         program_.addAll(Operation(args))
         program.addAll(program_)
+        if (checkOperator(program)) {
+            program_.add("${rand(1, MAX_VALUE)}")
+            return program_
+        }
         program_.addAll(Atom(program, args, count))
         val count_ = count + 1
         if (randBool())
@@ -148,12 +160,17 @@ fun ExpressionAddition(program: MutableList<String>, args: MutableList<String>, 
 fun Expression(program: MutableList<String>, args: MutableList<String>, count: Int): MutableList<String> {
     val program_: MutableList<String> = mutableListOf()
     if (count.equals(0) || check(count, 3, args)) {
-        if (randBool())
-            program_.addAll(Identifier(program, args))
-        else
+        if (checkOperator(program))
             program_.add("${rand(1, MAX_VALUE)}")
-        program.addAll(program_)
-        program_.addAll(ExpressionAddition(program, args, count + 1))
+        else {
+            if (randBool())
+                program_.addAll(Identifier(program, args))
+            else
+                program_.add("${rand(1, MAX_VALUE)}")
+
+            program.addAll(program_)
+            program_.addAll(ExpressionAddition(program, args, count + 1))
+        }
     }
     return program_
 }
@@ -173,6 +190,10 @@ fun Statement(program: MutableList<String>, args: MutableList<String>, count: In
         } else
             program_.addAll(Expression(program, args, 0))
         program_.add(END_OF_LINE)
+
+        //print("> ")
+        //println(program_.joinToString(SPACE))
+
         program.addAll(program_)
         if (count_ == 0) {
             program_.addAll(printfStamp(program, args))
@@ -191,6 +212,7 @@ fun firstTask(args: MutableList<String>): MutableList<String> {
     val initialized_args = rand(0, parseInt(args[1]) - 1)   //номера инициализированных переменных
     val uninitialized_args = parseInt(args[1]) - 2          //номера неинициализированных переменных
 
+    //инициализация переменных
     for (i in 0..initialized_args) {
         program_.add("${TAB}${MODIFIER[2]} ${TYPE[1]} ")
         program_.add("${IDENTIFIER[i]} ${EQUALLY}")
