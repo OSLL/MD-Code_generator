@@ -7,6 +7,8 @@ import java.util.*
 const val MAX_VALUE: Int = 20
 const val MIN_VALUE: Int = -MAX_VALUE
 
+
+//val RandomSeed = 42
 val SPACE = ""
 val TYPE: List<String> = listOf("void", "int", "bool", "float", "double")
 val MODIFIER: List<String> = listOf("short", "long", "unsigned")
@@ -59,7 +61,7 @@ fun checkOperator(program: MutableList<String>): Boolean {
 
 fun Identifier(program: MutableList<String>, args: MutableList<String>): MutableList<String> {
     val program_: MutableList<String> = mutableListOf()
-    val index = rand(0, parseInt(args[1]))
+    val index = rand(0, parseInt(args[2]), parseInt(args[1]))
     val value = "${IDENTIFIER[index]} $EQUALLY"
     for (i: Int in 0..(program.size - 1))
         if (program[i] == value)
@@ -73,9 +75,9 @@ fun Identifier(program: MutableList<String>, args: MutableList<String>): Mutable
 
 fun printfStamp(program: MutableList<String>, args: MutableList<String>): MutableList<String> {
     val program_: MutableList<String> = mutableListOf()
-    var index = rand(0, parseInt(args[1]))
+    var index = rand(0, parseInt(args[2]), parseInt(args[1]))
     while (!checkIdentifier(program, index))
-        index = rand(0, parseInt(args[1]))
+        index = rand(0, parseInt(args[2]), parseInt(args[1]))
     program_.add("$TAB${SERVICE_WORDS[0]}${BRACKETS[0]}${QUOTES}%i${CARRIAGE_RETURN_}${QUOTES}${COMMA} ${IDENTIFIER[index]}${BRACKETS[1]}")
     program_.add(END_OF_LINE)
     return program_
@@ -83,7 +85,7 @@ fun printfStamp(program: MutableList<String>, args: MutableList<String>): Mutabl
 
 fun OperationType(args: MutableList<String>): MutableList<String> {
     val OPERATIONS_TYPE: MutableList<String> = mutableListOf()
-    for (i: Int in 6..(args.size - 1))
+    for (i: Int in 7..(args.size - 1))
         OPERATIONS_TYPE.add(args[i])
     return OPERATIONS_TYPE
 }
@@ -93,7 +95,7 @@ fun Operation(args: MutableList<String>): MutableList<String> {
     OPERATIONS_TYPE.addAll(OperationType(args))
 
     val program_: MutableList<String> = mutableListOf()
-    program_.add(" ${OPERATIONS_TYPE[rand(0, OPERATIONS_TYPE.size)]} ")
+    program_.add(" ${OPERATIONS_TYPE[rand(0, OPERATIONS_TYPE.size, parseInt(args[1]))]} ")
     return program_
 }
 
@@ -129,29 +131,29 @@ fun Brackets(program: MutableList<String>, args: MutableList<String>, count: Int
 
 fun Atom(program: MutableList<String>, args: MutableList<String>, count: Int): MutableList<String> {
     val program_: MutableList<String> = mutableListOf()
-    if (check(count, 3, args))
-        if (randBool() && check(count + 2, 3, args))
+    if (check(count, 4, args))
+        if (randBool(parseInt(args[1])) && check(count + 2, 4, args))
             program_.addAll(Brackets(program, args, count))
         else
-            if (randBool())
+            if (randBool(parseInt(args[1])))
                 program_.addAll(Identifier(program, args))
             else
-                program_.add("${rand(1, MAX_VALUE)}")
+                program_.add("${rand(1, MAX_VALUE, parseInt(args[1]))}")
     return program_
 }
 
 fun ExpressionAddition(program: MutableList<String>, args: MutableList<String>, count: Int): MutableList<String> {
     val program_: MutableList<String> = mutableListOf()
-    if (check(count, 3, args)) {
+    if (check(count, 4, args)) {
         program_.addAll(Operation(args))
         program.addAll(program_)
         if (checkOperator(program)) {
-            program_.add("${rand(1, MAX_VALUE)}")
+            program_.add("${rand(1, MAX_VALUE, parseInt(args[1]))}")
             return program_
         }
         program_.addAll(Atom(program, args, count))
         val count_ = count + 1
-        if (randBool())
+        if (randBool(parseInt(args[1])))
             program_.addAll(ExpressionAddition(program, args, count_ + 1))
     }
     return program_
@@ -159,14 +161,14 @@ fun ExpressionAddition(program: MutableList<String>, args: MutableList<String>, 
 
 fun Expression(program: MutableList<String>, args: MutableList<String>, count: Int): MutableList<String> {
     val program_: MutableList<String> = mutableListOf()
-    if (count.equals(0) || check(count, 3, args)) {
+    if (count.equals(0) || check(count, 4, args)) {
         if (checkOperator(program))
-            program_.add("${rand(1, MAX_VALUE)}")
+            program_.add("${rand(1, MAX_VALUE, parseInt(args[1]))}")
         else {
-            if (randBool())
+            if (randBool(parseInt(args[1])))
                 program_.addAll(Identifier(program, args))
             else
-                program_.add("${rand(1, MAX_VALUE)}")
+                program_.add("${rand(1, MAX_VALUE, parseInt(args[1]))}")
 
             program.addAll(program_)
             program_.addAll(ExpressionAddition(program, args, count + 1))
@@ -177,13 +179,13 @@ fun Expression(program: MutableList<String>, args: MutableList<String>, count: I
 
 fun Statement(program: MutableList<String>, args: MutableList<String>, count: Int, count_: Int): MutableList<String> {
     val program_: MutableList<String> = mutableListOf()
-    if (check(count, 2, args)) {
+    if (check(count, 3, args)) {
         program_.add(TAB)
-        val index = rand(0, parseInt(args[1]))
+        val index = rand(0, parseInt(args[2]), parseInt(args[1]))
         program_.add("${IDENTIFIER[index]} ${EQUALLY}")
         program_.add(" ")
         program.addAll(program_)
-        if (checkIdentifier(program, index) && args[5] == "0") { //выключено переопределение = 0
+        if (checkIdentifier(program, index) && args[6] == "0") { //выключено переопределение = 0
             program_.addAll(Identifier(index))
             program.addAll(program_)
             program_.addAll(ExpressionAddition(program, args, 1))
@@ -209,14 +211,14 @@ fun firstTask(args: MutableList<String>): MutableList<String> {
     val program_: MutableList<String> = mutableListOf()
     program_.addAll(Include(0))
     program_.add("$CARRIAGE_RETURN${TYPE[1]} ${FUNCNAME[0]}${BRACKETS[0]}${BRACKETS[1]} ${BRACKETS[2]}$CARRIAGE_RETURN")
-    val initialized_args = rand(0, parseInt(args[1]) - 1)   //номера инициализированных переменных
-    val uninitialized_args = parseInt(args[1]) - 2          //номера неинициализированных переменных
+    val initialized_args = rand(0, parseInt(args[2]) - 1, parseInt(args[1]))   //номера инициализированных переменных
+    val uninitialized_args = parseInt(args[2]) - 2          //номера неинициализированных переменных
 
     //инициализация переменных
     for (i in 0..initialized_args) {
         program_.add("${TAB}${MODIFIER[2]} ${TYPE[1]} ")
         program_.add("${IDENTIFIER[i]} ${EQUALLY}")
-        program_.add(" ${rand(0, MAX_VALUE)}")
+        program_.add(" ${rand(0, MAX_VALUE, parseInt(args[1]))}")
         program_.add(END_OF_LINE)
     }
 
@@ -232,14 +234,14 @@ fun firstTask(args: MutableList<String>): MutableList<String> {
     val program: MutableList<String> = mutableListOf()
     program.addAll(program_)
 
-    if (parseInt(args[4]) == 0)
+    if (parseInt(args[5]) == 0)
         program_.addAll(Statement(program, args, 0, -1))
-    if (parseInt(args[4]) == 1) {
+    if (parseInt(args[5]) == 1) {
         program_.addAll(Statement(program, args, 0, -1))
         program_.addAll(printfStamp(program, args))
     }
-    if (parseInt(args[4]) != 0 && parseInt(args[4]) != 1) {
-        program_.addAll(Statement(program, args, 0, parseInt(args[2]) / parseInt(args[4])))
+    if (parseInt(args[5]) != 0 && parseInt(args[5]) != 1) {
+        program_.addAll(Statement(program, args, 0, parseInt(args[3]) / parseInt(args[5])))
         program_.addAll(printfStamp(program, args))
     }
 
@@ -248,15 +250,15 @@ fun firstTask(args: MutableList<String>): MutableList<String> {
     return program_
 }
 
-fun rand(from: Int, to: Int): Int {
-    val random = Random()
+fun rand(from: Int, to: Int, randSeed: Int): Int {
+    val random = Random(randSeed.toLong())
     if (from == to)
         return from
     return random.nextInt(to - from) + from
 }
 
-fun randBool(): Boolean {
-    if (rand(0, 2).equals(1))
+fun randBool(randSeed: Int): Boolean {
+    if (rand(0, 2, randSeed).equals(1))
         return true
     return false
 }
