@@ -200,7 +200,7 @@ fun Statement(program: MutableList<String>, args: MutableList<String>, count: In
         if (count_ == 0) {
             program_.addAll(printfStamp(program, args))
             program.addAll(program_)
-            program_.addAll(Statement(program, args, count + 1, parseInt(args[2]) / parseInt(args[4])))
+            program_.addAll(Statement(program, args, count + 1, parseInt(args[3]) / parseInt(args[5])))
         } else
             program_.addAll(Statement(program, args, count + 1, count_ - 1))
     }
