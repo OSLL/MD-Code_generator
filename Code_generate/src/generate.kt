@@ -1,7 +1,5 @@
 import java.io.File
 import java.lang.Integer.parseInt
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import java.util.*
 
 const val MAX_VALUE: Int = 20
@@ -61,9 +59,9 @@ fun checkOperator(program: MutableList<String>): Boolean {
 }
 
 //добавляет ранее инициализированную переменную в контейнер
-fun Identifier(program: MutableList<String>, from: Int, to: Int, randSeed: Int): MutableList<String> {
+fun Identifier(program: MutableList<String>, randList: MutableList<Int>): MutableList<String> {
     val program_: MutableList<String> = mutableListOf()
-    val index = rand(from, to, randSeed)
+    val index = randListPop(randList)
     val value = "${IDENTIFIER[index]} $EQUALLY"
     for (i: Int in 0..(program.size - 1))
         if (program[i] == value)
@@ -72,16 +70,15 @@ fun Identifier(program: MutableList<String>, from: Int, to: Int, randSeed: Int):
                     program_.addAll(Identifier(index))
                     return program_
                 }
-    return Identifier(program, from, to, randSeed)
+    return Identifier(program, randList)
 }
 
 //печатает инструкцию вывода
-fun printfStamp(program: MutableList<String>, from: Int, to: Int, randSeed: Int): MutableList<String> {
+fun printfStamp(program: MutableList<String>, randList: MutableList<Int>): MutableList<String> {
     val program_: MutableList<String> = mutableListOf()
-    var index = rand(from, to, randSeed)
-    while (!checkIdentifier(program, index))
-        index = rand(from, to, randSeed)
-    program_.add("$TAB${SERVICE_WORDS[0]}${BRACKETS[0]}${QUOTES}%i${CARRIAGE_RETURN_}${QUOTES}${COMMA} ${IDENTIFIER[index]}${BRACKETS[1]}")
+    while (!checkIdentifier(program, randList.first()))
+        randList.remove(randList.first())
+    program_.add("$TAB${SERVICE_WORDS[0]}${BRACKETS[0]}${QUOTES}%i${CARRIAGE_RETURN_}${QUOTES}${COMMA} ${IDENTIFIER[randListPop(randList)]}${BRACKETS[1]}")
     program_.add(END_OF_LINE)
     return program_
 }
@@ -95,18 +92,11 @@ fun OperationType(args: MutableList<String>, operationIndex: Int): MutableList<S
 }
 
 //выбирает случайный мат опретаор из контейнера мат операторов
-fun Operation(operation: MutableList<String>, from: Int, randSeed: Int): MutableList<String> {
+fun Operation(operation: MutableList<String>, randList: MutableList<Int>): MutableList<String> {
     val program_: MutableList<String> = mutableListOf()
-    program_.add(" ${operation[rand(from, operation.size, randSeed)]} ")
+    program_.add(" ${operation[randListPop(randList)]} ")
     return program_
 }
-
-//проверяет не превышает ли счётчик заданный аргумент
-/*fun check(count: Int, index: Int, args: MutableList<String>): Boolean {
-    if (count < parseInt(args[index]))
-        return true
-    return false
-}*/
 
 //добавляет в контейнер заданную библиотеку
 fun Include(libr_numb: Int): MutableList<String> {
@@ -126,142 +116,148 @@ return program_
 }*/
 
 //обрамляет выражение круглыми скобками
-fun Brackets(program: MutableList<String>, operation: MutableList<String>, from: Int, to: Int,
-             randSeed: Int, argumentsNum: Int, count: Int): MutableList<String> {
+fun Brackets(program: MutableList<String>, operation: MutableList<String>, randList1: MutableList<Int>, randList2: MutableList<Int>,
+             randList3: MutableList<Int>, randListBool: MutableList<Int>, argNum: Int, count: Int): MutableList<String> {
     val program_: MutableList<String> = mutableListOf()
     program_.add(BRACKETS[0])
-    program_.addAll(Expression(program, operation, from, to, randSeed, argumentsNum, count))
+    program_.addAll(Expression(program, operation, randList1, randList2, randList3, randListBool, argNum, count))
     program_.add(BRACKETS[1])
     return program_
 }
 
 //добавляет либо скобки, либо переменную или число
-fun Atom(program: MutableList<String>, operation: MutableList<String>, from: Int, to: Int,
-         randSeed: Int, argumentsNum: Int, count: Int): MutableList<String> {
+fun Atom(program: MutableList<String>, operation: MutableList<String>, randList1: MutableList<Int>, randList2: MutableList<Int>,
+         randList3: MutableList<Int>, randListBool: MutableList<Int>, argNum: Int, count: Int): MutableList<String> {
     val program_: MutableList<String> = mutableListOf()
-    if (count < argumentsNum)
-        if (randBool(randSeed) && count + 2 < argumentsNum)
-            program_.addAll(Brackets(program, operation, from, to, randSeed, argumentsNum, count))
+    if (count < argNum)
+        if (randListBoolPop(randListBool) && count + 2 < argNum)
+            program_.addAll(Brackets(program, operation, randList1, randList2, randList3, randListBool, argNum, count))
         else
-            if (randBool(randSeed))
-                program_.addAll(Identifier(program, from, to, randSeed))
+            if (randListBoolPop(randListBool))
+                program_.addAll(Identifier(program, randList1))
             else
-                program_.add("${rand(1, MAX_VALUE, randSeed)}")
+                program_.add("${randListPop(randList3)}")
     return program_
 }
 
 //добавляет мат оператор и аргумент в строку-выражение
-fun ExpressionAddition(program: MutableList<String>, operation: MutableList<String>, from: Int, to: Int,
-                       randSeed: Int, argumentsNum: Int, count: Int): MutableList<String> {
+fun ExpressionAddition(program: MutableList<String>, operation: MutableList<String>, randList1: MutableList<Int>, randList2: MutableList<Int>,
+                       randList3: MutableList<Int>, randListBool: MutableList<Int>, argNum: Int, count: Int): MutableList<String> {
     val program_: MutableList<String> = mutableListOf()
-    if (count < argumentsNum) {
-        program_.addAll(Operation(operation, from, randSeed))
+    if (count < argNum) {
+        program_.addAll(Operation(operation, randList2))
         program.addAll(program_)
         if (checkOperator(program)) { //проверяет наличие операторов сдвига (<<, >>) в контейнере
-            program_.add("${rand(1, MAX_VALUE, randSeed)}")
+            program_.add("${randListPop(randList3)}")
             return program_
         }
-        program_.addAll(Atom(program, operation, from, to, randSeed, argumentsNum, count))
+        program_.addAll(Atom(program, operation, randList1, randList2, randList3, randListBool, argNum, count))
         val count_ = count + 1
-        if (randBool(randSeed))
-            program_.addAll(ExpressionAddition(program, operation, from, to, randSeed, argumentsNum, count_ + 1))
+        if (randListBoolPop(randListBool))
+            program_.addAll(ExpressionAddition(program, operation, randList1, randList2, randList3, randListBool, argNum, count_ + 1))
     }
     return program_
 }
 
 //добавляет аргумент в строку-выражение
-fun Expression(program: MutableList<String>, operation: MutableList<String>, from: Int, to: Int,
-               randSeed: Int, argumentsNum: Int, count: Int): MutableList<String> {
+fun Expression(program: MutableList<String>, operation: MutableList<String>, randList1: MutableList<Int>, randList2: MutableList<Int>,
+               randList3: MutableList<Int>, randListBool: MutableList<Int>, argNum: Int, count: Int): MutableList<String> {
     val program_: MutableList<String> = mutableListOf()
-    if (count == 0 || count < argumentsNum) {
+    if (count == 0 || count < argNum) {
         if (checkOperator(program)) //проверяет наличие операторов сдвига (<<, >>) в контейнере
-            program_.add("${rand(1, MAX_VALUE, randSeed)}")
+            program_.add("${randListPop(randList3)}")
         else {
-            if (randBool(randSeed))
-                program_.addAll(Identifier(program, from, to, randSeed))
+            if (randListBoolPop(randListBool))
+                program_.addAll(Identifier(program, randList1))
             else
-                program_.add("${rand(1, MAX_VALUE, randSeed)}")
+                program_.add("${randListPop(randList3)}")
             program.addAll(program_)
-            program_.addAll(ExpressionAddition(program, operation, from, to, randSeed, argumentsNum, count + 1))
+            program_.addAll(ExpressionAddition(program, operation, randList1, randList2, randList3, randListBool, argNum, count + 1))
         }
     }
     return program_
 }
 
 //добавляет строку-выражение в контейнер
-fun Statement(program: MutableList<String>, operation: MutableList<String>, from: Int, to: Int, randSeed: Int, variablesNum: Int,
-              statementsNum: Int, argumentsNum: Int, printfNum: Int, redefinitonVar: Int, count: Int, count_: Int): MutableList<String> {
-    val program_: MutableList<String> = mutableListOf()
-    if (count < statementsNum) {
-        program_.add(TAB)
-        val index = rand(0, variablesNum, randSeed)
-        program_.add("${IDENTIFIER[index]} ${EQUALLY}")
-        program_.add(" ")
-        program.addAll(program_)
-        if (checkIdentifier(program, index) && redefinitonVar == 0) { //выключено переопределение = 0
-            program_.addAll(Identifier(index))
-            program.addAll(program_)
-            program_.addAll(ExpressionAddition(program, operation, from, to, randSeed, argumentsNum, 1))
+fun State(prog: MutableList<String>, operation: MutableList<String>, List1: MutableList<Int>, List2: MutableList<Int>, List3: MutableList<Int>,
+          ListBool: MutableList<Int>, varNum: Int, stateNum: Int, argNum: Int, printfNum: Int, redefinitonVar: Int, count: Int, count_: Int): MutableList<String> {
+    val prog_: MutableList<String> = mutableListOf()
+    if (count < stateNum) {
+        prog_.add(TAB)
+        val index = randListPop(List1)
+        prog_.add("${IDENTIFIER[index]} ${EQUALLY}")
+        prog_.add(" ")
+        prog.addAll(prog_)
+        if (checkIdentifier(prog, index) && redefinitonVar == 0) { //выключено переопределение = 0
+            prog_.addAll(Identifier(index))
+            prog.addAll(prog_)
+            prog_.addAll(ExpressionAddition(prog, operation, List1, List2, List3, ListBool, argNum, 1))
         } else
-            program_.addAll(Expression(program, operation, from, to, randSeed, argumentsNum, 0))
-        program_.add(END_OF_LINE)
+            prog_.addAll(Expression(prog, operation, List1, List2, List3, ListBool, argNum, 0))
+        prog_.add(END_OF_LINE)
 
-        program.addAll(program_)
+        prog.addAll(prog_)
         if (count_ == 0) {
-            program_.addAll(printfStamp(program, from, to, randSeed))
-            program.addAll(program_)
-            program_.addAll(Statement(program, operation, from, to, randSeed, variablesNum, statementsNum, argumentsNum, printfNum, redefinitonVar, count + 1, statementsNum / printfNum))
+            prog_.addAll(printfStamp(prog, List1))
+            prog.addAll(prog_)
+            prog_.addAll(State(prog, operation, List1, List2, List3, ListBool, varNum, stateNum, argNum, printfNum, redefinitonVar, count + 1, stateNum / printfNum))
         }
         else
-            program_.addAll(Statement(program, operation, from, to, randSeed, variablesNum, statementsNum, argumentsNum, printfNum, redefinitonVar, count + 1, count_ - 1))
+            prog_.addAll(State(prog, operation, List1, List2, List3, ListBool, varNum, stateNum, argNum, printfNum, redefinitonVar, count + 1, count_ - 1))
     }
-    return program_
+    return prog_
 }
 
-fun firstTask(operation: MutableList<String>, randSeed: Int, variablesNum: Int,
-              statementsNum: Int, argumentsNum: Int, printfNum: Int, redefinitonVar: Int): MutableList<String> {
+fun firstTask(operation: MutableList<String>, randSeed: Int, varNum: Int, stateNum: Int, argNum: Int, printfNum: Int, redefinitonVar: Int): MutableList<String> {
     val from = 0
-    val to = variablesNum
-    val program_: MutableList<String> = mutableListOf()
-    program_.addAll(Include(0))
-    program_.add("$CARRIAGE_RETURN${TYPE[1]} ${FUNCNAME[0]}${BRACKETS[0]}${BRACKETS[1]} ${BRACKETS[2]}$CARRIAGE_RETURN")
-    val initialized_args = rand(0, variablesNum - 1, randSeed)   //номера инициализированных переменных
-    val uninitialized_args = variablesNum - 2          //номера неинициализированных переменных
+    val to = varNum
 
+    val List1 = randList(Random(randSeed.toLong()), from, to, 100)
+    val List2 = randList(Random(randSeed.toLong()), from, operation.size, 100)
+    val List3 = randList(Random(randSeed.toLong()), from + 1, MAX_VALUE, 100)
+    val ListBool = randList(Random(randSeed.toLong()), 0, 2, 100)
+
+    val prog_: MutableList<String> = mutableListOf()
+    prog_.addAll(Include(0))
+    prog_.add("$CARRIAGE_RETURN${TYPE[1]} ${FUNCNAME[0]}${BRACKETS[0]}${BRACKETS[1]} ${BRACKETS[2]}$CARRIAGE_RETURN")
+    val initialized_args = rand(from, to - 1, randSeed)   //номера инициализированных переменных
+    val uninitialized_args = varNum - 2          //номера неинициализированных переменных
+
+    val randList4 = randList(Random(randSeed.toLong()), from, MAX_VALUE, initialized_args + 1)
     //инициализация переменных
     for (i in 0..initialized_args) {
-        program_.add("${TAB}${MODIFIER[2]} ${TYPE[1]} ")
-        program_.add("${IDENTIFIER[i]} ${EQUALLY}")
-        program_.add(" ${rand(0, MAX_VALUE, randSeed)}")
-        program_.add(END_OF_LINE)
+        prog_.add("${TAB}${MODIFIER[2]} ${TYPE[1]} ")
+        prog_.add("${IDENTIFIER[i]} ${EQUALLY}")
+        prog_.add(" ${randListPop(randList4)}")
+        prog_.add(END_OF_LINE)
     }
 
     if (uninitialized_args > -1) {
         var i = initialized_args + 1
-        program_.add("${TAB}${MODIFIER[2]} ${TYPE[1]}")
+        prog_.add("${TAB}${MODIFIER[2]} ${TYPE[1]}")
         for (j: Int in i..uninitialized_args) {
-            program_.add(" ${IDENTIFIER[j]}${COMMA}")
+            prog_.add(" ${IDENTIFIER[j]}${COMMA}")
             i++
         }
-        program_.add(" ${IDENTIFIER[i]}${END_OF_LINE}")
+        prog_.add(" ${IDENTIFIER[i]}${END_OF_LINE}")
     }
 
-    val program: MutableList<String> = mutableListOf()
-    program.addAll(program_)
+    val prog: MutableList<String> = mutableListOf()
+    prog.addAll(prog_)
 
     if (printfNum != 0 && printfNum != 1) {
-        program_.addAll(Statement(program, operation, from, to, randSeed, variablesNum, statementsNum, argumentsNum, printfNum, redefinitonVar, 0, statementsNum / printfNum))
-        program_.addAll(printfStamp(program, from, to, randSeed))
+        prog_.addAll(State(prog, operation, List1, List2, List3, ListBool, varNum, stateNum, argNum, printfNum, redefinitonVar, 0, stateNum / printfNum))
+        prog_.addAll(printfStamp(prog, List1))
     }
     else {
-        program_.addAll(Statement(program, operation, from, to, randSeed, variablesNum, statementsNum, argumentsNum, printfNum, redefinitonVar,0, -1))
+        prog_.addAll(State(prog, operation, List1, List2, List3, ListBool, varNum, stateNum, argNum, printfNum, redefinitonVar,0, -1))
         if (printfNum == 1)
-            program_.addAll(printfStamp(program, from, to, randSeed))
+            prog_.addAll(printfStamp(prog, List1))
     }
 
-    program_.add("${TAB}${RETURN} 0${END_OF_LINE}")
-    program_.add(BRACKETS[3])
-    return program_
+    prog_.add("${TAB}${RETURN} 0${END_OF_LINE}")
+    prog_.add(BRACKETS[3])
+    return prog_
 }
 
 //генерирует число в диапазоне [from; to] с зерном randSeed
@@ -272,9 +268,23 @@ fun rand(from: Int, to: Int, randSeed: Int): Int {
     return random.nextInt(to - from) + from
 }
 
-//генерирует true или false
-fun randBool(randSeed: Int): Boolean {
-    if (rand(0, 2, randSeed).equals(1))
+//генерирует последовательность в диапазоне [from; to] с зерном randSeed
+fun randList(random: Random, from: Int, to: Int, size: Int): MutableList<Int> = MutableList(size) {
+    random.nextInt(to - from) + from
+}
+
+//возвращает первое число из списка и удаляет его Int
+fun randListPop(randList: MutableList<Int>) : Int {
+    val index = randList.first()
+    randList.remove(index)
+    return index
+}
+
+//возвращает первое число из списка и удаляет его Boolean
+fun randListBoolPop(randListBool: MutableList<Int>) : Boolean {
+    val flag = randListBool.first()
+    randListBool.remove(randListBool.first())
+    if (flag == 1)
         return true
     return false
 }
