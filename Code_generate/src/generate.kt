@@ -9,7 +9,7 @@ import io.ktor.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 */
-const val MAX_VALUE: Int = 20
+const val MAX_VALUE: Int = 7
 const val MIN_VALUE: Int = -MAX_VALUE
 
 val SPACE = ""
@@ -218,11 +218,12 @@ fun State(prog: MutableList<String>, operation: MutableList<String>, List1: Muta
 fun firstTask(operation: MutableList<String>, randSeed: Int, varNum: Int, stateNum: Int, argNum: Int, printfNum: Int, redefinitonVar: Int): MutableList<String> {
     val from = 0
     val to = varNum
+    val size = 200
 
-    val List1 = randList(Random(randSeed.toLong()), from, to, 500)
-    val List2 = randList(Random(randSeed.toLong()), from, operation.size, 500)
-    val List3 = randList(Random(randSeed.toLong()), from + 1, MAX_VALUE, 500)
-    val ListBool = randList(Random(randSeed.toLong()), 0, 2, 500)
+    val List1 = randList(Random(randSeed.toLong()), from, to, size)
+    val List2 = randList(Random(randSeed.toLong()), from, operation.size, size)
+    val List3 = randList(Random(randSeed.toLong()), from + 1, MAX_VALUE, size)
+    val ListBool = randList(Random(randSeed.toLong()), 0, 2, size)
 
     val prog_: MutableList<String> = mutableListOf()
     prog_.addAll(Include(0))
