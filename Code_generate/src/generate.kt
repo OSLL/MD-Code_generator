@@ -1,7 +1,14 @@
 import java.io.File
 import java.lang.Integer.parseInt
 import java.util.*
-
+/*
+import io.ktor.application.*
+import io.ktor.http.*
+import io.ktor.response.*
+import io.ktor.routing.*
+import io.ktor.server.engine.*
+import io.ktor.server.netty.*
+*/
 const val MAX_VALUE: Int = 20
 const val MIN_VALUE: Int = -MAX_VALUE
 
@@ -212,10 +219,10 @@ fun firstTask(operation: MutableList<String>, randSeed: Int, varNum: Int, stateN
     val from = 0
     val to = varNum
 
-    val List1 = randList(Random(randSeed.toLong()), from, to, 100)
-    val List2 = randList(Random(randSeed.toLong()), from, operation.size, 100)
-    val List3 = randList(Random(randSeed.toLong()), from + 1, MAX_VALUE, 100)
-    val ListBool = randList(Random(randSeed.toLong()), 0, 2, 100)
+    val List1 = randList(Random(randSeed.toLong()), from, to, 500)
+    val List2 = randList(Random(randSeed.toLong()), from, operation.size, 500)
+    val List3 = randList(Random(randSeed.toLong()), from + 1, MAX_VALUE, 500)
+    val ListBool = randList(Random(randSeed.toLong()), 0, 2, 500)
 
     val prog_: MutableList<String> = mutableListOf()
     prog_.addAll(Include(0))
@@ -317,4 +324,15 @@ fun main(args: Array<String>) {
     val args_: MutableList<String> = mutableListOf()
     args_.addAll(args[0].split(' '))
     printFun(args_)
+/*    val server = embeddedServer(Netty, port = 8080) {
+        routing {
+            get("/") {
+                call.respondText("Hello World!", ContentType.Text.Plain)
+            }
+            get("/demo") {
+                call.respondText("HELLO WORLD!")
+            }
+        }
+    }
+    server.start(wait = true)*/
 }
