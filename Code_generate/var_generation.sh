@@ -1,12 +1,14 @@
 #!/bin/bash
+set -e # Immidiately fail in case of any error
+
 kotlinc src/generate.kt -include-runtime -d generate.jar
 randSeed=0
-varNum=35
-if ! [ -d variants ]; then
-    mkdir variants
-fi
-while [[ $randSeed != $varNum ]]
+varNum=${1:-35} # Read from first command line argument OR use 35 as default value
+mkdir -p variants # do the same as check with if
+
+while [[ "$randSeed" != "$varNum" ]]
 do
+    echo "Generating ${randSeed}th variant" 
     echo variant_${randSeed} > variants/var${randSeed}.docx
     echo variant_${randSeed} > variants/answer${randSeed}.docx
     
