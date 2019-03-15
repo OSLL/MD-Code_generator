@@ -6,37 +6,34 @@ randSeed=0
 varNum=${1:-35} # Read from first command line argument OR use 35 as default value
 mkdir -p variants # do the same as check with if
 
+separator="______________________________________"
+
 while [[ "$randSeed" != "$varNum" ]]
 do
+    first_task="1 $randSeed 2 4 2 1 1 * +"
+    second_task="1 $randSeed 3 4 4 2 0 | & << >>"
+    third_task="1 $randSeed 2 4 7 2 0 >> << | & * +"
+    variant_file="variants/var${randSeed}.docx"
+    answer_file="variants/answer${randSeed}.docx"
+
     echo "Generating ${randSeed}th variant" 
-    echo variant_${randSeed} > variants/var${randSeed}.docx
-    echo variant_${randSeed} > variants/answer${randSeed}.docx
+    echo variant_${randSeed} > "$variant_file"
+    echo variant_${randSeed} > "$answer_file"
     
-    echo | tee -a variants/var${randSeed}.docx >> variants/answer${randSeed}.docx
-    echo "1 $randSeed 2 4 2 1 1 * +" >> variants/answer${randSeed}.docx
-    echo >> variants/answer${randSeed}.docx
-    java -jar generate.jar "1 $randSeed 2 4 2 1 1 * +" | tee -a variants/var${randSeed}.docx >> variants/answer${randSeed}.docx
-    gcc func.c -o func
-    echo >> variants/answer${randSeed}.docx
-    ./func >> variants/answer${randSeed}.docx
-    echo "______________________________________"| tee -a variants/var${randSeed}.docx >> variants/answer${randSeed}.docx
-    
-    echo | tee -a variants/var${randSeed}.docx >> variants/answer${randSeed}.docx
-    echo "1 $randSeed 4 8 4 2 0 | & * +" >> variants/answer${randSeed}.docx
-    echo >> variants/answer${randSeed}.docx
-    java -jar generate.jar "1 $randSeed 4 8 4 2 0 | & * +" | tee -a variants/var${randSeed}.docx >> variants/answer${randSeed}.docx
-    gcc func.c -o func
-    echo >> variants/answer${randSeed}.docx
-    ./func >> variants/answer${randSeed}.docx
-    echo "______________________________________"| tee -a variants/var${randSeed}.docx >> variants/answer${randSeed}.docx
-    
-    echo | tee -a variants/var${randSeed}.docx >> variants/answer${randSeed}.docx
-    echo "1 $randSeed 2 12 7 3 0 >> << | & * +" >> variants/answer${randSeed}.docx
-    echo >> variants/answer${randSeed}.docx
-    java -jar generate.jar "1 $randSeed 2 12 7 3 0 >> << | & * +" | tee -a variants/var${randSeed}.docx >> variants/answer${randSeed}.docx
-    gcc func.c -o func
-    echo >> variants/answer${randSeed}.docx
-    ./func >> variants/answer${randSeed}.docx
+    for i in "$first_task" "$second_task" "$third_task"
+    do
+        echo | tee -a "$variant_file" >> "$answer_file"
+        echo "$i" >> "$answer_file"
+        echo >> "$answer_file"
+        java -jar generate.jar "$i" | tee -a "$variant_file" >> "$answer_file"
+        gcc func.c -o func
+        echo >> "$answer_file"
+        ./func >> "$answer_file"
+        if [[ "$i" != "$third_task" ]]
+        then
+            echo "$separator"| tee -a "$variant_file" >> "$answer_file"
+        fi
+    done
     
     let "randSeed += 1"
 done
