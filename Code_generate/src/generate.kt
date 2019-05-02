@@ -64,21 +64,25 @@ fun Identifier(program: MutableList<String>, randList: MutableList<Int>): Mutabl
     val value = "${IDENTIFIER[index]} $EQUALLY"
     for (i: Int in 0..(program.size - 1))
         if (program[i] == value)
-            for (j: Int in (i + 1)..(program.size - 1))
+            for (j: Int in (i + 1)..(program.size - 1)) {
                 if (program[j] == END_OF_LINE) {
                     program_.addAll(Identifier(index))
                     return program_
                 }
+                else
+                    randList.add(index)
+            }
     return Identifier(program, randList)
 }
 
 //печатает инструкцию вывода
 fun printfStamp(program: MutableList<String>, randList: MutableList<Int>): MutableList<String> {
     val program_: MutableList<String> = mutableListOf()
-    while (!checkIdentifier(program, randList.first()))
-        randList.remove(randList.first())
-    program_.add("$TAB${SERVICE_WORDS[0]}${BRACKETS[0]}${QUOTES}%i${CARRIAGE_RETURN_}${QUOTES}${COMMA} ${IDENTIFIER[randListPop(randList)]}${BRACKETS[1]}")
-    program_.add(END_OF_LINE)
+    while (!checkIdentifier(program, randList.first())) {
+        randList.add(randList.first())
+        randListPop(randList)
+    }
+    program_.add("$TAB${SERVICE_WORDS[0]}${BRACKETS[0]}${QUOTES}%i${CARRIAGE_RETURN_}${QUOTES}${COMMA} ${IDENTIFIER[randListPop(randList)]}${BRACKETS[1]}$END_OF_LINE")
     return program_
 }
 
@@ -188,10 +192,8 @@ fun State(prog: MutableList<String>, operation: MutableList<String>, List1: Muta
           ListBool: MutableList<Int>, varNum: Int, stateNum: Int, argNum: Int, printfNum: Int, redefinitonVar: Int, count: Int, count_: Int): MutableList<String> {
     val prog_: MutableList<String> = mutableListOf()
     if (count < stateNum) {
-        prog_.add(TAB)
         val index = randListPop(List1)
-        prog_.add("${IDENTIFIER[index]} ${EQUALLY}")
-        prog_.add(" ")
+        prog_.add("$TAB${IDENTIFIER[index]} $EQUALLY ")
         prog.addAll(prog_)
         if (checkIdentifier(prog, index) && redefinitonVar == 0) { //выключено переопределение = 0
             prog_.addAll(Identifier(index))
@@ -216,7 +218,7 @@ fun State(prog: MutableList<String>, operation: MutableList<String>, List1: Muta
 fun firstTask(operation: MutableList<String>, randSeed: Int, varNum: Int, stateNum: Int, argNum: Int, printfNum: Int, redefinitonVar: Int): MutableList<String> {
     val from = 0
     val to = varNum
-    val size = 200
+    val size = 70
 
     val List1 = randList(Random(randSeed.toLong()), from, to, size)
     val List2 = randList(Random(randSeed.toLong()), from, operation.size, size)
@@ -308,10 +310,12 @@ fun Init(index: Int, randSeed: Int, varNum: Int, from: Int, to: Int): MutableLis
     }
 
     if (index == 2) {
-        val randList = randListFloat(Random(randSeed.toLong()), 1, 4)
+        val randList = randListFloat(Random(randSeed.toLong()), 0, 4)
+        val randList_ = randList(Random(randSeed.toLong()), from + 1, MAX_VALUE, 10)
         //инициализация переменных
         for (i in 0..1) {
-            prog_.add("$TAB${TYPE[1]} ${IDENTIFIER[i]} $EQUALLY ${randListFloatPop(randList)} + ${randListFloatPop(randList)}$END_OF_LINE")
+            prog_.add("$TAB${TYPE[1]} ${IDENTIFIER[i]} $EQUALLY ${randListFloatPop(randList) + randListPop(randList_)} " +
+                    "+ ${randListFloatPop(randList) + randListPop(randList_)}$END_OF_LINE")
         }
     }
     return prog_
@@ -371,25 +375,34 @@ fun randListFloat(random: Random, from: Int, size: Int): MutableList<Float> = Mu
 
 //возвращает первое число из списка int и удаляет его Int
 fun randListPop(randList: MutableList<Int>) : Int {
-    val index = randList.first()
-    randList.remove(index)
-    return index
+    if (!randList.isEmpty()) {
+        val index = randList.first()
+        randList.remove(index)
+        return index
+    }
+    return 0
 }
 
 //возвращает первое число из списка float и удаляет его
 fun randListFloatPop(randList: MutableList<Float>) : Float {
-    val index = randList.first()
-    randList.remove(index)
-    return index
+    if (!randList.isEmpty()) {
+        val value = randList.first()
+        randList.remove(value)
+        return value
+    }
+    return 0F
 }
 
 //возвращает первое число из списка и удаляет его Boolean
 fun randListBoolPop(randListBool: MutableList<Int>) : Boolean {
-    val flag = randListBool.first()
-    randListBool.remove(randListBool.first())
-    if (flag == 1)
-        return true
-    return false
+    if (!randListBool.isEmpty()) {
+        val flag = randListBool.first()
+        randListBool.remove(randListBool.first())
+        if (flag == 1)
+            return true
+        return false
+    }
+    return true
 }
 
 fun programGenerate(args: MutableList<String>) : MutableList<String> {
