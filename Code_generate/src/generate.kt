@@ -1,14 +1,13 @@
+import java.awt.Color
+import java.awt.Font
+import java.awt.RenderingHints
+import java.awt.image.BufferedImage
 import java.io.File
+import java.io.IOException
 import java.lang.Integer.parseInt
 import java.util.*
-/*
-import io.ktor.application.*
-import io.ktor.http.*
-import io.ktor.response.*
-import io.ktor.routing.*
-import io.ktor.server.engine.*
-import io.ktor.server.netty.*
-*/
+import javax.imageio.ImageIO
+
 const val MAX_VALUE: Int = 7
 const val MIN_VALUE: Int = -MAX_VALUE
 
@@ -34,9 +33,9 @@ val END_OF_LINE = "${SEMICOLON}${CARRIAGE_RETURN}"
 val LIBRARY: List<String> = listOf("stdio.h")
 val INCLUDE: List<String> = listOf("#include <", ">")
 val BRACKETS: List<String> = listOf("(", ")", "{", "}", "[", "]")
-val TAB = "    "
+val TAB = "\t"
 val RETURN = "return"
-val SERVICE_WORDS: List<String> = listOf("printf")
+val SERVICE_WORDS: List<String> = listOf("printf", "if", "else", "while", "do", "for")
 
 //добавляет в контейнер переменную по индексу
 fun Identifier(index: Int): MutableList<String> {
@@ -109,6 +108,12 @@ fun Operation(operation: MutableList<String>, randList: MutableList<Int>): Mutab
 fun Include(libr_numb: Int): MutableList<String> {
     val program_: MutableList<String> = mutableListOf()
     program_.add("${INCLUDE[0]}${LIBRARY[libr_numb]}${INCLUDE[1]}$CARRIAGE_RETURN")
+    return program_
+}
+
+fun Return(index: Int): MutableList<String> {
+    val program_: MutableList<String> = mutableListOf()
+    program_.add("${TAB}${RETURN} ${index}${END_OF_LINE}")
     return program_
 }
 
@@ -263,8 +268,72 @@ fun firstTask(operation: MutableList<String>, randSeed: Int, varNum: Int, stateN
             prog_.addAll(printfStamp(prog, List1))
     }
 
-    prog_.add("${TAB}${RETURN} 0${END_OF_LINE}")
+    prog_.addAll(Return(0))
     prog_.add(BRACKETS[3])
+    return prog_
+}
+
+fun itemSelection(prog: MutableList<String>, args: MutableList<String>) : MutableList<String> {
+    val prog_: MutableList<String> = mutableListOf()
+    if (parseInt(args[0]) == 1) {
+        val randSeed = parseInt(args[1])
+        val variablesNum = parseInt(args[2])
+        val statementsNum = parseInt(args[3])
+        val argumentsNum = parseInt(args[4])
+        val printfNum = parseInt(args[5])
+        val redefinitonVar = parseInt(args[6])
+        val operationIndex = 7
+
+        val OPERATIONS_TYPE: MutableList<String> = mutableListOf()
+        OPERATIONS_TYPE.addAll(OperationType(args, operationIndex))
+        prog_.addAll(firstTask(OPERATIONS_TYPE, randSeed, variablesNum, statementsNum, argumentsNum, printfNum, redefinitonVar))
+    }
+    if (parseInt(args[0]) == 2) {
+        val randSeed = parseInt(args[1])
+
+        prog_.addAll(Branching(randSeed))
+    }
+    return prog_
+}
+
+fun Main(prog: MutableList<String>, args: MutableList<String>): MutableList<String> {
+    val prog_: MutableList<String> = mutableListOf()
+    prog_.add("$CARRIAGE_RETURN${TYPE[1]} ${FUNCNAME[0]}${BRACKETS[0]}${BRACKETS[1]} ${BRACKETS[2]}$CARRIAGE_RETURN")
+
+    prog_.addAll(itemSelection(prog, args))
+
+    prog_.addAll(Return(0))
+    prog_.add(BRACKETS[3])
+    return prog_
+}
+
+fun Init(randSeed: Int): MutableList<String> {
+    val prog_: MutableList<String> = mutableListOf()
+
+    val randList = randListFloat(Random(randSeed.toLong()), 1, 4)
+    //инициализация переменных
+    for (i in 0..1) {
+        prog_.add("${TAB}${TYPE[1]} ")
+        prog_.add("${IDENTIFIER[i]} ${EQUALLY}")
+        prog_.add(" ${randListFloatPop(randList)} + ${randListFloatPop(randList)}")
+        prog_.add(END_OF_LINE)
+    }
+    return prog_
+}
+
+fun Branching(randSeed: Int): MutableList<String> {
+    val prog_: MutableList<String> = mutableListOf()
+
+    prog_.addAll(Init(randSeed))
+    prog_.add("$TAB${SERVICE_WORDS[1]} ${BRACKETS[0]}${IDENTIFIER[rand(0, 2, randSeed)]}${BRACKETS[1]} ${BRACKETS[2]}$CARRIAGE_RETURN")
+//    prog_.add("$TAB$TAB$CARRIAGE_RETURN")
+    prog_.add("$TAB$TAB${SERVICE_WORDS[0]}${BRACKETS[0]}$QUOTES[1]$CARRIAGE_RETURN_$QUOTES${BRACKETS[1]}$END_OF_LINE")
+
+    prog_.add("$TAB${BRACKETS[3]}$CARRIAGE_RETURN")
+    prog_.add("$TAB${SERVICE_WORDS[2]} ${BRACKETS[2]}${CARRIAGE_RETURN}")
+    prog_.add("$TAB$TAB${SERVICE_WORDS[0]}${BRACKETS[0]}$QUOTES[2]$CARRIAGE_RETURN_$QUOTES${BRACKETS[1]}$END_OF_LINE")
+    prog_.add("$TAB${BRACKETS[3]}$CARRIAGE_RETURN")
+
     return prog_
 }
 
@@ -276,13 +345,25 @@ fun rand(from: Int, to: Int, randSeed: Int): Int {
     return random.nextInt(to - from) + from
 }
 
-//генерирует последовательность в диапазоне [from; to] с зерном randSeed
+//генерирует последовательность int в диапазоне [from; to] с зерном randSeed
 fun randList(random: Random, from: Int, to: Int, size: Int): MutableList<Int> = MutableList(size) {
     random.nextInt(to - from) + from
 }
 
-//возвращает первое число из списка и удаляет его Int
+//генерирует последовательность float в диапазоне [from; to] с зерном randSeed
+fun randListFloat(random: Random, from: Int, size: Int): MutableList<Float> = MutableList(size) {
+    random.nextFloat() + from
+}
+
+//возвращает первое число из списка int и удаляет его Int
 fun randListPop(randList: MutableList<Int>) : Int {
+    val index = randList.first()
+    randList.remove(index)
+    return index
+}
+
+//возвращает первое число из списка float и удаляет его
+fun randListFloatPop(randList: MutableList<Float>) : Float {
     val index = randList.first()
     randList.remove(index)
     return index
@@ -297,43 +378,24 @@ fun randListBoolPop(randListBool: MutableList<Int>) : Boolean {
     return false
 }
 
+fun programGenerate(args: MutableList<String>) : MutableList<String> {
+    val prog_: MutableList<String> = mutableListOf()
+    prog_.addAll(Include(0))
+    prog_.addAll(Main(prog_, args))
+    return prog_
+}
+
 fun printFun(args: MutableList<String>) {
-    val program: MutableList<String> = mutableListOf()
-    if (parseInt(args[0]) == 1) {
-        val randSeed = parseInt(args[1])
-        val variablesNum = parseInt(args[2])
-        val statementsNum = parseInt(args[3])
-        val argumentsNum = parseInt(args[4])
-        val printfNum = parseInt(args[5])
-        val redefinitonVar = parseInt(args[6])
-        val operationIndex = 7
+//    val time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss"))
+//    var file = File("func_$time.c")
 
-        val OPERATIONS_TYPE: MutableList<String> = mutableListOf()
-        OPERATIONS_TYPE.addAll(OperationType(args, operationIndex))
-        program.addAll(firstTask(OPERATIONS_TYPE, randSeed, variablesNum, statementsNum, argumentsNum, printfNum, redefinitonVar))
-
-//        val time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss"))
-//        var file = File("func_$time.c")
-
-        var file = File("func.c")
-        file.writeText(program.joinToString(SPACE))
-        println(program.joinToString(SPACE))
-    }
+    var file = File("func.c")
+    file.writeText(programGenerate(args).joinToString(""))
+    println(programGenerate(args).joinToString(""))
 }
 
 fun main(args: Array<String>) {
     val args_: MutableList<String> = mutableListOf()
     args_.addAll(args[0].split(' '))
     printFun(args_)
-/*    val server = embeddedServer(Netty, port = 8080) {
-        routing {
-            get("/") {
-                call.respondText("Hello World!", ContentType.Text.Plain)
-            }
-            get("/demo") {
-                call.respondText("HELLO WORLD!")
-            }
-        }
-    }
-    server.start(wait = true)*/
 }
