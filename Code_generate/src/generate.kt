@@ -340,10 +340,15 @@ fun WhileLoop(randSeed: Int): MutableList<String> {
     val prog_: MutableList<String> = mutableListOf()
 
     prog_.addAll(Init(2, randSeed, 0, 0, 0))
+
     prog_.add("$TAB${SERVICE_WORDS[3]} ${BRACKETS[0]}${IDENTIFIER[rand(0, 2, randSeed)]} % 4${BRACKETS[1]} ${BRACKETS[2]}$CARRIAGE_RETURN")
     prog_.add("$TAB$TAB${SERVICE_WORDS[0]}${BRACKETS[0]}$QUOTES[check while loop] %d$CARRIAGE_RETURN_$QUOTES$COMMA ++${IDENTIFIER[rand(0, 2, randSeed)]}${BRACKETS[1]}$END_OF_LINE")
-
     prog_.add("$TAB${BRACKETS[3]}$CARRIAGE_RETURN")
+
+    prog_.add("$TAB${SERVICE_WORDS[4]} ${BRACKETS[2]}$CARRIAGE_RETURN")
+    prog_.add("$TAB$TAB${SERVICE_WORDS[0]}${BRACKETS[0]}$QUOTES[check do while loop] %d$CARRIAGE_RETURN_$QUOTES$COMMA ++${IDENTIFIER[rand(0, 2, randSeed)]}${BRACKETS[1]}$END_OF_LINE")
+    prog_.add("$TAB${BRACKETS[3]} ${SERVICE_WORDS[3]} ${BRACKETS[0]}${IDENTIFIER[rand(0, 2, randSeed)]} % 5${BRACKETS[1]}$END_OF_LINE")
+
     return prog_
 }
 
