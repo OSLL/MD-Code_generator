@@ -1,18 +1,11 @@
-import java.awt.Color
-import java.awt.Font
-import java.awt.RenderingHints
-import java.awt.image.BufferedImage
 import java.io.File
-import java.io.IOException
 import java.lang.Integer.parseInt
 import java.util.*
-import javax.imageio.ImageIO
 
 const val MAX_VALUE: Int = 7
 const val MIN_VALUE: Int = -MAX_VALUE
 
-val SPACE = ""
-val TYPE: List<String> = listOf("void", "int", "bool", "float", "double")
+val TYPE: List<String> = listOf("void", "int", "bool", "float", "double", "size_t")
 val MODIFIER: List<String> = listOf("short", "long", "unsigned")
 val FUNCNAME: List<String> = listOf("main", "subtraction", "addition", "multiply", "div", "mod")
 val ARITHMETIC_OPERATIONS: List<String> = listOf("+", "-", "/", "%")
@@ -231,29 +224,8 @@ fun firstTask(operation: MutableList<String>, randSeed: Int, varNum: Int, stateN
     val ListBool = randList(Random(randSeed.toLong()), 0, 2, size)
 
     val prog_: MutableList<String> = mutableListOf()
-    prog_.addAll(Include(0))
-    prog_.add("$CARRIAGE_RETURN${TYPE[1]} ${FUNCNAME[0]}${BRACKETS[0]}${BRACKETS[1]} ${BRACKETS[2]}$CARRIAGE_RETURN")
-    val initialized_args = rand(from, to - 1, randSeed)   //номера инициализированных переменных
-    val uninitialized_args = varNum - 2          //номера неинициализированных переменных
 
-    val randList4 = randList(Random(randSeed.toLong()), from, MAX_VALUE, initialized_args + 1)
-    //инициализация переменных
-    for (i in 0..initialized_args) {
-        prog_.add("${TAB}${MODIFIER[2]} ${TYPE[1]} ")
-        prog_.add("${IDENTIFIER[i]} ${EQUALLY}")
-        prog_.add(" ${randListPop(randList4)}")
-        prog_.add(END_OF_LINE)
-    }
-
-    if (uninitialized_args > -1) {
-        var i = initialized_args + 1
-        prog_.add("${TAB}${MODIFIER[2]} ${TYPE[1]}")
-        for (j: Int in i..uninitialized_args) {
-            prog_.add(" ${IDENTIFIER[j]}${COMMA}")
-            i++
-        }
-        prog_.add(" ${IDENTIFIER[i]}${END_OF_LINE}")
-    }
+    prog_.addAll(Init(1, randSeed, varNum, from, to))
 
     val prog: MutableList<String> = mutableListOf()
     prog.addAll(prog_)
@@ -268,15 +240,14 @@ fun firstTask(operation: MutableList<String>, randSeed: Int, varNum: Int, stateN
             prog_.addAll(printfStamp(prog, List1))
     }
 
-    prog_.addAll(Return(0))
-    prog_.add(BRACKETS[3])
     return prog_
 }
 
 fun itemSelection(prog: MutableList<String>, args: MutableList<String>) : MutableList<String> {
     val prog_: MutableList<String> = mutableListOf()
+    val randSeed = parseInt(args[1])
+
     if (parseInt(args[0]) == 1) {
-        val randSeed = parseInt(args[1])
         val variablesNum = parseInt(args[2])
         val statementsNum = parseInt(args[3])
         val argumentsNum = parseInt(args[4])
@@ -289,9 +260,13 @@ fun itemSelection(prog: MutableList<String>, args: MutableList<String>) : Mutabl
         prog_.addAll(firstTask(OPERATIONS_TYPE, randSeed, variablesNum, statementsNum, argumentsNum, printfNum, redefinitonVar))
     }
     if (parseInt(args[0]) == 2) {
-        val randSeed = parseInt(args[1])
-
         prog_.addAll(Branching(randSeed))
+    }
+    if (parseInt(args[0]) == 3) {
+        prog_.addAll(WhileLoop(randSeed))
+    }
+    if (parseInt(args[0]) == 4) {
+        prog_.addAll(ForLoop(3))
     }
     return prog_
 }
@@ -299,24 +274,45 @@ fun itemSelection(prog: MutableList<String>, args: MutableList<String>) : Mutabl
 fun Main(prog: MutableList<String>, args: MutableList<String>): MutableList<String> {
     val prog_: MutableList<String> = mutableListOf()
     prog_.add("$CARRIAGE_RETURN${TYPE[1]} ${FUNCNAME[0]}${BRACKETS[0]}${BRACKETS[1]} ${BRACKETS[2]}$CARRIAGE_RETURN")
-
     prog_.addAll(itemSelection(prog, args))
-
     prog_.addAll(Return(0))
     prog_.add(BRACKETS[3])
     return prog_
 }
 
-fun Init(randSeed: Int): MutableList<String> {
+//инициализация переменных
+fun Init(index: Int, randSeed: Int, varNum: Int, from: Int, to: Int): MutableList<String> {
     val prog_: MutableList<String> = mutableListOf()
 
-    val randList = randListFloat(Random(randSeed.toLong()), 1, 4)
-    //инициализация переменных
-    for (i in 0..1) {
-        prog_.add("${TAB}${TYPE[1]} ")
-        prog_.add("${IDENTIFIER[i]} ${EQUALLY}")
-        prog_.add(" ${randListFloatPop(randList)} + ${randListFloatPop(randList)}")
-        prog_.add(END_OF_LINE)
+    if (index == 1) { //*
+        val initialized_args = rand(from, to - 1, randSeed)   //номера инициализированных переменных
+        val uninitialized_args = varNum - 2          //номера неинициализированных переменных
+
+        val randList4 = randList(Random(randSeed.toLong()), from, MAX_VALUE, initialized_args + 1)
+        for (i in 0..initialized_args) {
+            prog_.add("${TAB}${MODIFIER[2]} ${TYPE[1]} ")
+            prog_.add("${IDENTIFIER[i]} $EQUALLY")
+            prog_.add(" ${randListPop(randList4)}")
+            prog_.add(END_OF_LINE)
+        }
+
+        if (uninitialized_args > -1) {
+            var i = initialized_args + 1
+            prog_.add("$TAB${MODIFIER[2]} ${TYPE[1]}")
+            for (j: Int in i..uninitialized_args) {
+                prog_.add(" ${IDENTIFIER[j]}$COMMA")
+                i++
+            }
+            prog_.add(" ${IDENTIFIER[i]}$END_OF_LINE")
+        }
+    }
+
+    if (index == 2) {
+        val randList = randListFloat(Random(randSeed.toLong()), 1, 4)
+        //инициализация переменных
+        for (i in 0..1) {
+            prog_.add("$TAB${TYPE[1]} ${IDENTIFIER[i]} $EQUALLY ${randListFloatPop(randList)} + ${randListFloatPop(randList)}$END_OF_LINE")
+        }
     }
     return prog_
 }
@@ -324,9 +320,8 @@ fun Init(randSeed: Int): MutableList<String> {
 fun Branching(randSeed: Int): MutableList<String> {
     val prog_: MutableList<String> = mutableListOf()
 
-    prog_.addAll(Init(randSeed))
+    prog_.addAll(Init(2, randSeed, 0, 0, 0))
     prog_.add("$TAB${SERVICE_WORDS[1]} ${BRACKETS[0]}${IDENTIFIER[rand(0, 2, randSeed)]}${BRACKETS[1]} ${BRACKETS[2]}$CARRIAGE_RETURN")
-//    prog_.add("$TAB$TAB$CARRIAGE_RETURN")
     prog_.add("$TAB$TAB${SERVICE_WORDS[0]}${BRACKETS[0]}$QUOTES[1]$CARRIAGE_RETURN_$QUOTES${BRACKETS[1]}$END_OF_LINE")
 
     prog_.add("$TAB${BRACKETS[3]}$CARRIAGE_RETURN")
@@ -334,6 +329,25 @@ fun Branching(randSeed: Int): MutableList<String> {
     prog_.add("$TAB$TAB${SERVICE_WORDS[0]}${BRACKETS[0]}$QUOTES[2]$CARRIAGE_RETURN_$QUOTES${BRACKETS[1]}$END_OF_LINE")
     prog_.add("$TAB${BRACKETS[3]}$CARRIAGE_RETURN")
 
+    return prog_
+}
+
+fun WhileLoop(randSeed: Int): MutableList<String> {
+    val prog_: MutableList<String> = mutableListOf()
+
+    prog_.addAll(Init(2, randSeed, 0, 0, 0))
+    prog_.add("$TAB${SERVICE_WORDS[3]} ${BRACKETS[0]}${IDENTIFIER[rand(0, 2, randSeed)]} % 4${BRACKETS[1]} ${BRACKETS[2]}$CARRIAGE_RETURN")
+    prog_.add("$TAB$TAB${SERVICE_WORDS[0]}${BRACKETS[0]}$QUOTES[check while loop] %d$CARRIAGE_RETURN_$QUOTES$COMMA ++${IDENTIFIER[rand(0, 2, randSeed)]}${BRACKETS[1]}$END_OF_LINE")
+
+    prog_.add("$TAB${BRACKETS[3]}$CARRIAGE_RETURN")
+    return prog_
+}
+
+fun ForLoop(size: Int): MutableList<String> {
+    val prog_: MutableList<String> = mutableListOf()
+    prog_.add("$TAB${SERVICE_WORDS[5]} ${BRACKETS[0]}${TYPE[5]} i $EQUALLY 0$SEMICOLON i < $size$SEMICOLON i++${BRACKETS[1]} ${BRACKETS[2]}$CARRIAGE_RETURN")
+    prog_.add("$TAB$TAB${SERVICE_WORDS[0]}${BRACKETS[0]}$QUOTES[check for loop] %li$CARRIAGE_RETURN_$QUOTES$COMMA i${BRACKETS[1]}$END_OF_LINE")
+    prog_.add("$TAB${BRACKETS[3]}$CARRIAGE_RETURN")
     return prog_
 }
 
