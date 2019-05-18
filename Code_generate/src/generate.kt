@@ -149,8 +149,9 @@ fun Atom(program: MutableList<String>, operation: MutableList<String>, randList1
 }
 
 //добавляет мат оператор и аргумент в строку-выражение
-fun ExpressionAddition(program: MutableList<String>, operation: MutableList<String>, randList1: MutableList<Int>, randList2: MutableList<Int>,
-                       randList3: MutableList<Int>, randListBool: MutableList<Int>, argNum: Int, count: Int): MutableList<String> {
+fun ExpressionAddition(program: MutableList<String>, operation: MutableList<String>, randList1: MutableList<Int>,
+                       randList2: MutableList<Int>, randList3: MutableList<Int>, randListBool: MutableList<Int>,
+                       argNum: Int, count: Int): MutableList<String> {
     val program_: MutableList<String> = mutableListOf()
     if (count < argNum) {
         program_.addAll(Operation(operation, randList2))
@@ -216,7 +217,8 @@ fun State(prog: MutableList<String>, task: Int, operation: MutableList<String>, 
     return prog_
 }
 
-fun firstTask(task: Int, operation: MutableList<String>, randSeed: Int, nestingLevel: Int, varNum: Int, stateNum: Int, argNum: Int, printfNum: Int, redefinitonVar: Boolean, id: Int): MutableList<String> {
+fun firstTask(task: Int, operation: MutableList<String>, randSeed: Int, nestingLevel: Int, varNum: Int,
+              stateNum: Int, argNum: Int, printfNum: Int, redefinitonVar: Boolean, id: Int): MutableList<String> {
     val from = 0
     val to = varNum
     val size = 70
@@ -274,53 +276,41 @@ fun itemSelection(args: MutableList<String>, nestingLevel: Int) : MutableList<St
 
             prog_.addAll(firstTask(task, OPERATIONS_TYPE, randSeed, nestingLevel, variablesNum, statementsNum, argumentsNum, printfNum, redefinitonVar, 1))
         }
-        2 -> { //if block
+        else -> {
             val printfNum = parseInt(args[3])
             var nesting = false
             if (parseInt(args[4]) == 1)
                 nesting = true
-
             val ListBool = randList(Random(randSeed.toLong()), 0, 2, size)
-            println(nesting)
-            println(ListBool)
-
-            prog_.addAll(Init(2, randSeed, nestingLevel, 0, 0, 0))
-
             var index = 1
-            for (i in 0..printfNum - 1) {
-                prog_.addAll(If(program, randList, task, randSeed, index++, printfNum, nesting, nestingLevel, ListBool))
-            }
-        }
-        3 -> { //switch block
-
-        }
-        4 -> { //while block
-            val printfNum = parseInt(args[3])
-//            val nesting = args[4].toBoolean()
-
-            val ListBool = randList(Random(randSeed.toLong()), 0, 2, size)
-            println(ListBool)
-
             prog_.addAll(Init(2, randSeed, nestingLevel, 0, 0, 0))
 
-            var index = 1
-            for (i in 0..printfNum - 1) {
-                prog_.addAll(While(program, randList, task, randSeed, index++, nestingLevel, ListBool))
+            when (task) {
+                2 -> { //if block
+                    for (i in 0..printfNum - 1) {
+                        prog_.addAll(If(program, randList, task, randSeed, index++, printfNum, nesting, nestingLevel, ListBool))
+                    }
+                }
+                3 -> {
+                    //switch block
+
+                }
+                4 -> { //while block
+                    for (i in 0..printfNum - 1) {
+                        prog_.addAll(While(program, randList, task, randSeed, index++, printfNum, nesting, nestingLevel, ListBool))
+                    }
+                }
+                5 -> { //do while block
+                    for (i in 0..printfNum - 1) {
+                        prog_.addAll(DoWhile(program, randList, task, randSeed, index++, printfNum, nesting, nestingLevel, ListBool))
+                    }
+                }
+                6 -> { //for block
+                    for (i in 0..printfNum - 1) {
+                        prog_.addAll(ForLoop(program, randList, task, randSeed, index++, printfNum, nesting, nestingLevel, ListBool, 3))
+                    }
+                }
             }
-
-        }
-        5 -> { //do while block
-//            val printfNum = parseInt(args[3])
-//            val nesting = args[4].toBoolean()
-            prog_.addAll(Init(2, randSeed, nestingLevel, 0, 0, 0))
-
-            prog_.addAll(DoWhile(program, randList, task, randSeed, 1, nestingLevel))
-        }
-        6 -> {//for block
-//            val printfNum = parseInt(args[3])
-//            val nesting = args[4].toBoolean()
-
-            prog_.addAll(ForLoop(program, randList, task, randSeed, nestingLevel, 3))
         }
     }
     return prog_
@@ -408,12 +398,8 @@ fun Printf(program: MutableList<String>, randList: MutableList<Int>, index: Int,
             }
             prog_.add("%i${BRACKETS[5]}${CARRIAGE_RETURN_}$QUOTES$COMMA ${IDENTIFIER[randListPop(randList)]}")
         }
-        2 -> {
-            prog_.add("$count${BRACKETS[5]}$CARRIAGE_RETURN_$QUOTES")
-        }
-        3 -> {
-            prog_.add("else - $count${BRACKETS[5]}$CARRIAGE_RETURN_$QUOTES")
-        }
+        2 -> prog_.add("$nestingLevel${BRACKETS[5]}$CARRIAGE_RETURN_$QUOTES")
+        3 -> prog_.add("else - $count${BRACKETS[5]}$CARRIAGE_RETURN_$QUOTES")
         //3 -> prog_.add("")
         4 -> prog_.add("check while loop - $count] %d$CARRIAGE_RETURN_$QUOTES$COMMA ++${IDENTIFIER[rand(0, 2, randSeed)]}")
         5 -> prog_.add("check do while loop - $count] %d$CARRIAGE_RETURN_$QUOTES$COMMA ++${IDENTIFIER[rand(0, 2, randSeed)]}")
@@ -423,59 +409,75 @@ fun Printf(program: MutableList<String>, randList: MutableList<Int>, index: Int,
     return prog_
 }
 
-fun If(program: MutableList<String>, randList: MutableList<Int>, task: Int, randSeed: Int, index: Int, printfNum: Int, nesting: Boolean, nestingLevel: Int, ListBool: MutableList<Int>): MutableList<String> {
+fun If(program: MutableList<String>, randList: MutableList<Int>, task: Int, randSeed: Int, index: Int,
+       printfNum: Int, nesting: Boolean, nestingLevel: Int, ListBool: MutableList<Int>): MutableList<String> {
     val prog_: MutableList<String> = mutableListOf()
     prog_.addAll(Tab(nestingLevel))
     prog_.add("$IF ${BRACKETS[0]}${IDENTIFIER[rand(0, 2, randSeed)]}${BRACKETS[1]} ${BRACKETS[2]}$CARRIAGE_RETURN")
     prog_.addAll(Printf(program, randList, task, randSeed, nestingLevel + 1, index))
-    if (nesting && randListBoolPop(ListBool) && index < printfNum)
-        prog_.addAll(If(program, randList, task, randSeed, index + 1, printfNum, nesting, nestingLevel, ListBool))
+
+    if (nesting && randListBoolPop(ListBool) && nestingLevel < printfNum)
+        prog_.addAll(If(program, randList, task, randSeed, index + 1, printfNum, nesting, nestingLevel + 1, ListBool))
     prog_.addAll(Tab(nestingLevel))
     prog_.add("${BRACKETS[3]}$CARRIAGE_RETURN")
+
     if (randListBoolPop(ListBool))
         prog_.addAll(Else(program, randList, task, randSeed, index, printfNum, nesting, nestingLevel, ListBool))
     return prog_
 }
 
-fun Else(program: MutableList<String>, randList: MutableList<Int>, task: Int, randSeed: Int, index: Int, printfNum: Int, nesting: Boolean, nestingLevel: Int, ListBool: MutableList<Int>): MutableList<String> {
+fun Else(program: MutableList<String>, randList: MutableList<Int>, task: Int, randSeed: Int, index: Int,
+         printfNum: Int, nesting: Boolean, nestingLevel: Int, ListBool: MutableList<Int>): MutableList<String> {
     val prog_: MutableList<String> = mutableListOf()
     prog_.addAll(Tab(nestingLevel))
     prog_.add("$ELSE ${BRACKETS[2]}$CARRIAGE_RETURN")
     prog_.addAll(Printf(program, randList, task, randSeed, nestingLevel + 1, index))
-    if (nesting && randListBoolPop(ListBool) && index < printfNum)
-        prog_.addAll(If(program, randList, task, randSeed, index + 1, printfNum, nesting, nestingLevel, ListBool))
+    if (nesting && randListBoolPop(ListBool) && nestingLevel < printfNum)
+        prog_.addAll(If(program, randList, task, randSeed, index + 1, printfNum, nesting, nestingLevel + 1, ListBool))
     prog_.addAll(Tab(nestingLevel))
     prog_.add("${BRACKETS[3]}$CARRIAGE_RETURN")
     return prog_
 }
 
-fun While(program: MutableList<String>, randList: MutableList<Int>, task: Int, randSeed: Int, index: Int, nestingLevel: Int, ListBool: MutableList<Int>): MutableList<String> {
+fun While(program: MutableList<String>, randList: MutableList<Int>, task: Int, randSeed: Int, index: Int,
+          printfNum: Int, nesting: Boolean, nestingLevel: Int, ListBool: MutableList<Int>): MutableList<String> {
     val prog_: MutableList<String> = mutableListOf()
-    prog_.add("$TAB$WHILE ${BRACKETS[0]}${IDENTIFIER[rand(0, 2, randSeed)]} % 4${BRACKETS[1]} ${BRACKETS[2]}$CARRIAGE_RETURN")
+    prog_.addAll(Tab(nestingLevel))
+    prog_.add("$WHILE ${BRACKETS[0]}${IDENTIFIER[rand(0, 2, randSeed)]} % 4${BRACKETS[1]} ${BRACKETS[2]}$CARRIAGE_RETURN")
     prog_.addAll(Printf(program, randList, task, randSeed, nestingLevel + 1, index))
-    prog_.add("$TAB${BRACKETS[3]}$CARRIAGE_RETURN")
 
-    if (randListBoolPop(ListBool))
-        prog_.addAll(DoWhile(program, randList, task + 1, randSeed, index, nestingLevel))
+    if (nesting && randListBoolPop(ListBool) && nestingLevel < printfNum)
+        prog_.addAll(While(program, randList, task, randSeed, index + 1, printfNum, nesting, nestingLevel + 1, ListBool))
+    prog_.addAll(Tab(nestingLevel))
+    prog_.add("${BRACKETS[3]}$CARRIAGE_RETURN")
 
     return prog_
 }
 
-fun DoWhile(program: MutableList<String>, randList: MutableList<Int>, task: Int, randSeed: Int, index: Int, nestingLevel: Int): MutableList<String> {
+fun DoWhile(program: MutableList<String>, randList: MutableList<Int>, task: Int, randSeed: Int, index: Int,
+            printfNum: Int, nesting: Boolean, nestingLevel: Int, ListBool: MutableList<Int>): MutableList<String> {
     val prog_: MutableList<String> = mutableListOf()
-    prog_.add("$TAB$DO ${BRACKETS[2]}$CARRIAGE_RETURN")
+    prog_.addAll(Tab(nestingLevel))
+    prog_.add("$DO ${BRACKETS[2]}$CARRIAGE_RETURN")
     prog_.addAll(Printf(program, randList, task, randSeed, nestingLevel + 1, index))
-    prog_.add("$TAB${BRACKETS[3]} $WHILE ${BRACKETS[0]}${IDENTIFIER[rand(0, 2, randSeed)]} % 5${BRACKETS[1]}$END_OF_LINE")
+
+    if (nesting && randListBoolPop(ListBool) && nestingLevel < printfNum)
+        prog_.addAll(DoWhile(program, randList, task, randSeed, index + 1, printfNum, nesting, nestingLevel + 1, ListBool))
+    prog_.addAll(Tab(nestingLevel))
+    prog_.add("${BRACKETS[3]} $WHILE ${BRACKETS[0]}${IDENTIFIER[rand(0, 2, randSeed)]} % 5${BRACKETS[1]}$END_OF_LINE")
 
     return prog_
 }
 
-fun ForLoop(program: MutableList<String>, randList: MutableList<Int>, task: Int, randSeed: Int, nestingLevel: Int, size: Int): MutableList<String> {
+fun ForLoop(program: MutableList<String>, randList: MutableList<Int>, task: Int, randSeed: Int, index: Int,
+            printfNum: Int, nesting: Boolean, nestingLevel: Int, ListBool: MutableList<Int>, size: Int): MutableList<String> {
     val prog_: MutableList<String> = mutableListOf()
-    var index = 1
     prog_.addAll(Tab(nestingLevel))
     prog_.add("$FOR ${BRACKETS[0]}${TYPE[5]} i $EQUALLY 0$SEMICOLON i < $size$SEMICOLON i++${BRACKETS[1]} ${BRACKETS[2]}$CARRIAGE_RETURN")
     prog_.addAll(Printf(program, randList, task, randSeed, nestingLevel + 1, index))
+
+    if (nesting && randListBoolPop(ListBool) && nestingLevel < printfNum)
+        prog_.addAll(ForLoop(program, randList, task, randSeed, index + 1, printfNum, nesting, nestingLevel + 1, ListBool, size))
     prog_.addAll(Tab(nestingLevel))
     prog_.add("${BRACKETS[3]}$CARRIAGE_RETURN")
     return prog_
