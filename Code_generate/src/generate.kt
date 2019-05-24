@@ -34,6 +34,8 @@ val LIBRARY: List<String> = listOf("stdio.h")
 val INCLUDE: List<String> = listOf("#include <", ">")
 val BRACKETS: List<String> = listOf("(", ")", "{", "}", "[", "]")
 val TAB = "\t"
+val BREAK = "break"
+val CONTINUE = "continue"
 val RETURN = "return"
 val PRINTF = "printf"
 val IF = "if"
@@ -309,7 +311,7 @@ fun itemSelection(args: MutableList<String>) : MutableList<String> {
                 }
                 6 -> { //for block
                     for (i in 0..printfNum - 1) {
-                        prog_.addAll(ForLoop(program, randList, task, randSeed, index++, printfNum, nestingLevel, ListBool, 3))
+                        prog_.addAll(ForLoop(program, randList, task, randSeed, index++, printfNum, nestingLevel, ListBool, 10))
                     }
                 }
             }
@@ -430,6 +432,7 @@ fun While(program: MutableList<String>, randList: MutableList<Int>, task: Int, r
     val prog_: MutableList<String> = mutableListOf()
     prog_.add("$WHILE ${BRACKETS[0]}${IDENTIFIER[rand(0, 2, randSeed)]} % 4${BRACKETS[1]} ${BRACKETS[2]}$CARRIAGE_RETURN")
     prog_.addAll(Printf(program, randList, task, randSeed, index))
+    prog_.addAll(ExitPoint(ListBool))
 
     if (randListBoolPop(ListBool) && nestingLevel > 0)
         prog_.addAll(While(program, randList, task, randSeed, index + 1, printfNum, nestingLevel - 1, ListBool))
@@ -443,6 +446,7 @@ fun DoWhile(program: MutableList<String>, randList: MutableList<Int>, task: Int,
     val prog_: MutableList<String> = mutableListOf()
     prog_.add("$DO ${BRACKETS[2]}$CARRIAGE_RETURN")
     prog_.addAll(Printf(program, randList, task, randSeed, index))
+    prog_.addAll(ExitPoint(ListBool))
 
     if (randListBoolPop(ListBool) && nestingLevel > 0)
         prog_.addAll(DoWhile(program, randList, task, randSeed, index + 1, printfNum, nestingLevel - 1, ListBool))
@@ -456,10 +460,24 @@ fun ForLoop(program: MutableList<String>, randList: MutableList<Int>, task: Int,
     val prog_: MutableList<String> = mutableListOf()
     prog_.add("$FOR ${BRACKETS[0]}${TYPE[5]} i $EQUALLY 0$SEMICOLON i < $size$SEMICOLON i++${BRACKETS[1]} ${BRACKETS[2]}$CARRIAGE_RETURN")
     prog_.addAll(Printf(program, randList, task, randSeed, index))
+    prog_.addAll(ExitPoint(ListBool))
 
     if (randListBoolPop(ListBool) && nestingLevel > 0)
         prog_.addAll(ForLoop(program, randList, task, randSeed, index + 1, printfNum, nestingLevel - 1, ListBool, size))
     prog_.add("${BRACKETS[3]}$CARRIAGE_RETURN")
+    return prog_
+}
+
+fun ExitPoint(ListBool: MutableList<Int>): MutableList<String> {
+    val prog_: MutableList<String> = mutableListOf()
+    if (randListBoolPop(ListBool))
+        if (randListBoolPop(ListBool))
+            prog_.add("$CONTINUE$END_OF_LINE")
+        else
+            if (randListBoolPop(ListBool))
+                prog_.add("$BREAK$END_OF_LINE")
+            else
+                prog_.addAll(Return(0))
     return prog_
 }
 
