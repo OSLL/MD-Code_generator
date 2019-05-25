@@ -12,9 +12,12 @@ import java.util.*
 const val MAX_VALUE: Int = 7
 const val MIN_VALUE: Int = -MAX_VALUE
 
-val TYPE: List<String> = listOf("void", "int", "bool", "float", "double", "size_t")
-val MODIFIER: List<String> = listOf("short", "long", "unsigned")
-val FUNCNAME: List<String> = listOf("main", "subtraction", "addition", "multiply", "div", "mod")
+val BOOL = "bool"
+val INT = "int"
+val FLOAT = "float"
+val SIZE_T = "size_t"
+val UNSIGNED = "unsigned"
+val MAIN = "main"
 val ARITHMETIC_OPERATIONS: List<String> = listOf("+", "-", "/", "%")
 val LOGICAL_OPERATIONS: List<String> = listOf("!", "&&", "||")
 val RELATIONAL_OPERATIONS: List<String> = listOf("<", ">", "<=", ">=", "==", "!=")
@@ -22,14 +25,14 @@ val SPECIAL_OPERATIONS: List<String> = listOf("++", "--")
 val BITWISE_OPERATIONS: List<String> = listOf("<<", ">>", "|", "&")
 val IDENTIFIER: List<String> = listOf("a", "b", "c", "d", "e", "f", "g")
 val CARRIAGE_RETURN = "\n"
-val CARRIAGE_RETURN_ = "\\n"
+val PRINT_CARRIAGE_RETURN = "\\n"
 val EQUALLY = "="
 val COMMA = ","
 val DOT = "."
 val SEMICOLON = ";"
 val COLON = ":"
 val QUOTES = "\""
-val END_OF_LINE = "${SEMICOLON}${CARRIAGE_RETURN}"
+val END_OF_LINE = "$SEMICOLON$CARRIAGE_RETURN"
 val LIBRARY: List<String> = listOf("stdio.h")
 val INCLUDE: List<String> = listOf("#include <", ">")
 val BRACKETS: List<String> = listOf("(", ")", "{", "}", "[", "]")
@@ -110,7 +113,7 @@ fun Operation(operation: MutableList<String>, randList: MutableList<Int>): Mutab
 //добавляет в контейнер заданную библиотеку
 fun Include(libr_numb: Int): MutableList<String> {
     val program_: MutableList<String> = mutableListOf()
-    program_.add("${INCLUDE[0]}${LIBRARY[libr_numb]}${INCLUDE[1]}$CARRIAGE_RETURN")
+    program_.add("${INCLUDE[0]}${LIBRARY[libr_numb]}${INCLUDE[1]}$CARRIAGE_RETURN$CARRIAGE_RETURN")
     return program_
 }
 
@@ -230,22 +233,22 @@ fun firstTask(task: Int, operation: MutableList<String>, randSeed: Int, varNum: 
     val size = 70
 
     val List1 = randList(Random(randSeed.toLong()), from, to, size)
-    val List2 = randList(Random(randSeed.toLong()), from, operation.size, size)
+    val List2 = randList(Random(randSeed.toLong()), from, operation.size, size) //индексы операторов
     val List3 = randList(Random(randSeed.toLong()), from + 1, MAX_VALUE, size)
-    val ListBool = randList(Random(randSeed.toLong()), 0, 2, size)
+    val listBool = randList(Random(randSeed.toLong()), 0, 2, size)
 
     val prog_: MutableList<String> = mutableListOf()
-    prog_.addAll(Init(1, randSeed, varNum, from, to))
+    prog_.addAll(Init(1, randSeed, varNum, from, to, listBool))
 
     val prog: MutableList<String> = mutableListOf()
     prog.addAll(prog_)
 
     if (printfNum != 0 && printfNum != 1) {
-        prog_.addAll(State(prog, task, operation, randSeed, List1, List2, List3, ListBool, stateNum, argNum, printfNum, redefinitonVar, id, 0, stateNum / printfNum))
+        prog_.addAll(State(prog, task, operation, randSeed, List1, List2, List3, listBool, stateNum, argNum, printfNum, redefinitonVar, id, 0, stateNum / printfNum))
         prog_.addAll(Printf(prog, List1, task, randSeed, id))
     }
     else {
-        prog_.addAll(State(prog, task, operation, randSeed, List1, List2, List3, ListBool, stateNum, argNum, printfNum, redefinitonVar, id,0, -1))
+        prog_.addAll(State(prog, task, operation, randSeed, List1, List2, List3, listBool, stateNum, argNum, printfNum, redefinitonVar, id,0, -1))
         if (printfNum == 1)
             prog_.addAll(Printf(prog, List1, task, randSeed, id))
     }
@@ -261,10 +264,8 @@ fun itemSelection(args: MutableList<String>) : MutableList<String> {
     val randSeed = parseInt(args[1])
     val variablesNum = parseInt(args[2])
 
-    val from = 0
-    val to = variablesNum
     val size = 70
-    val randList = randList(Random(randSeed.toLong()), from, to, size)
+    val randList = randList(Random(randSeed.toLong()), 0, variablesNum, size)
 
     when (task) {
         1 -> { //arithmetic operating block
@@ -274,7 +275,7 @@ fun itemSelection(args: MutableList<String>) : MutableList<String> {
             var redefinitonVar = false
             if (parseInt(args[6]) == 1)
                 redefinitonVar = true
-            val operationIndex = 7
+            val operationIndex = 7 //операции начинаются с args[7]
 
             val OPERATIONS_TYPE: MutableList<String> = mutableListOf()
             OPERATIONS_TYPE.addAll(OperationType(args, operationIndex))
@@ -286,14 +287,18 @@ fun itemSelection(args: MutableList<String>) : MutableList<String> {
             var nestingLevel = parseInt(args[4])
             if (printfNum == 1)
                 nestingLevel = 0
-            val ListBool = randList(Random(randSeed.toLong()), 0, 2, size)
+//            val listBool = randList(Random(randSeed.toLong()), 0, 2, (variablesNum + (nestingLevel + 4) * printfNum))
+//            val listBool = randList(Random(randSeed.toLong()), 0, 2, (variablesNum + 12 + (2 * nestingLevel + 1) * printfNum))
+            val listBool = randList(Random(randSeed.toLong()), 0, 2, size)
+            println(listBool)
+
             var index = 1
-            prog_.addAll(Init(2, randSeed, 0, 0, 0))
+            prog_.addAll(Init(2, randSeed, variablesNum, 0, 0, listBool))
 
             when (task) {
                 2 -> { //if block
                     for (i in 0..printfNum - 1) {
-                        prog_.addAll(If(program, randList, task, randSeed, index++, printfNum, nestingLevel, ListBool))
+                        prog_.addAll(If(program, randList, task, randSeed, index++, printfNum, nestingLevel, listBool))
                     }
                 }
                 3 -> {
@@ -301,20 +306,21 @@ fun itemSelection(args: MutableList<String>) : MutableList<String> {
                 }
                 4 -> { //while block
                     for (i in 0..printfNum - 1) {
-                        prog_.addAll(While(program, randList, task, randSeed, index++, printfNum, nestingLevel, ListBool))
+                        prog_.addAll(While(program, randList, task, randSeed, index++, printfNum, nestingLevel, listBool))
                     }
                 }
                 5 -> { //do while block
                     for (i in 0..printfNum - 1) {
-                        prog_.addAll(DoWhile(program, randList, task, randSeed, index++, printfNum, nestingLevel, ListBool))
+                        prog_.addAll(DoWhile(program, randList, task, randSeed, index++, printfNum, nestingLevel, listBool))
                     }
                 }
                 6 -> { //for block
                     for (i in 0..printfNum - 1) {
-                        prog_.addAll(ForLoop(program, randList, task, randSeed, index++, printfNum, nestingLevel, ListBool, 10))
+                        prog_.addAll(ForLoop(program, randList, task, randSeed, index++, printfNum, nestingLevel, listBool, 10))
                     }
                 }
             }
+            println(listBool)
         }
     }
     return prog_
@@ -322,15 +328,25 @@ fun itemSelection(args: MutableList<String>) : MutableList<String> {
 
 fun Main(args: MutableList<String>): MutableList<String> {
     val prog_: MutableList<String> = mutableListOf()
-    prog_.add("$CARRIAGE_RETURN${TYPE[1]} ${FUNCNAME[0]}${BRACKETS[0]}${BRACKETS[1]} ${BRACKETS[2]}$CARRIAGE_RETURN")
+    prog_.add("$INT $MAIN${BRACKETS[0]}${BRACKETS[1]} ${BRACKETS[2]}$CARRIAGE_RETURN")
     prog_.addAll(itemSelection(args))
     prog_.addAll(Return(0))
     prog_.add(BRACKETS[3])
     return prog_
 }
 
+fun InitAddition(operationList: MutableList<String> , operationIdList: MutableList<Int>, listFloat: MutableList<Float>,
+                 listInt: MutableList<Int>, listBool: MutableList<Int>): MutableList<String> {
+    val prog_: MutableList<String> = mutableListOf()
+    prog_.addAll(Operation(operationList, operationIdList))
+    prog_.add("${randListFloatPop(listFloat) + randListPop(listInt)}")
+    if (randListBoolPop(listBool))
+        prog_.addAll(InitAddition(operationList, operationIdList, listFloat, listInt, listBool))
+    return prog_
+}
+
 //инициализация переменных
-fun Init(index: Int, randSeed: Int, varNum: Int, from: Int, to: Int): MutableList<String> {
+fun Init(index: Int, randSeed: Int, varNum: Int, from: Int, to: Int, listBool: MutableList<Int>): MutableList<String> {
     val prog_: MutableList<String> = mutableListOf()
     when (index) {
         1 -> { //*
@@ -339,7 +355,7 @@ fun Init(index: Int, randSeed: Int, varNum: Int, from: Int, to: Int): MutableLis
 
             val randList4 = randList(Random(randSeed.toLong()), from, MAX_VALUE, initialized_args + 1)
             for (i in 0..initialized_args) {
-                prog_.add("${MODIFIER[2]} ${TYPE[1]} ")
+                prog_.add("$UNSIGNED $INT ")
                 prog_.add("${IDENTIFIER[i]} $EQUALLY")
                 prog_.add(" ${randListPop(randList4)}")
                 prog_.add(END_OF_LINE)
@@ -347,7 +363,7 @@ fun Init(index: Int, randSeed: Int, varNum: Int, from: Int, to: Int): MutableLis
 
             if (uninitialized_args > -1) {
                 var i = initialized_args + 1
-                prog_.add("${MODIFIER[2]} ${TYPE[1]}")
+                prog_.add("$UNSIGNED $INT")
                 for (j: Int in i..uninitialized_args) {
                     prog_.add(" ${IDENTIFIER[j]}$COMMA")
                     i++
@@ -356,12 +372,32 @@ fun Init(index: Int, randSeed: Int, varNum: Int, from: Int, to: Int): MutableLis
             }
         }
         2 -> {
-            val randList = randListFloat(Random(randSeed.toLong()), 0, 4)
-            val randList_ = randList(Random(randSeed.toLong()), from + 1, MAX_VALUE, 10)
+            val listFloat = randListFloat(Random(randSeed.toLong()), 0, varNum * 5)
+            val listInt = randList(Random(randSeed.toLong()), from + 1, MAX_VALUE, varNum * 5)
+
+            val operationList: MutableList<String> = mutableListOf()
+            operationList.addAll(ARITHMETIC_OPERATIONS)
+            operationList.addAll(BITWISE_OPERATIONS)
+
+            val operationIdList = randList(Random(randSeed.toLong()), 0, operationList.size, 70) //индексы операторов
+            println(operationIdList)
+
             //инициализация переменных
-            for (i in 0..1) {
-                prog_.add("${TYPE[1]} ${IDENTIFIER[i]} $EQUALLY ${randListFloatPop(randList) + randListPop(randList_)} " +
-                        "+ ${randListFloatPop(randList) + randListPop(randList_)}$END_OF_LINE")
+            for (i in 0..varNum - 1) {
+                /*if (randListBoolPop(listBool)) {
+                    prog_.add("$BOOL ")
+                    prog_.add("${IDENTIFIER[i]} $EQUALLY ${randListPop(listBool)}$END_OF_LINE")
+                }
+                else {*/
+                    if (randListBoolPop(listBool))
+                        prog_.add("$INT ")
+                    else
+                        prog_.add("$FLOAT ")
+                    prog_.add("${IDENTIFIER[i]} $EQUALLY ${randListFloatPop(listFloat) + randListPop(listInt)}")
+                    if (randListBoolPop(listBool))
+                        prog_.addAll(InitAddition(operationList, operationIdList, listFloat, listInt, listBool))
+                    prog_.add("$END_OF_LINE")
+                    //}
             }
         }
     }
@@ -388,14 +424,14 @@ fun Printf(program: MutableList<String>, randList: MutableList<Int>, index: Int,
                 randList.add(randList.first())
                 randListPop(randList)
             }
-            prog_.add("%i${BRACKETS[5]}${CARRIAGE_RETURN_}$QUOTES$COMMA ${IDENTIFIER[randListPop(randList)]}")
+            prog_.add("%i${BRACKETS[5]}${PRINT_CARRIAGE_RETURN}$QUOTES$COMMA ${IDENTIFIER[randListPop(randList)]}")
         }
-        2 -> prog_.add("${BRACKETS[5]}$CARRIAGE_RETURN_$QUOTES")
-        3 -> prog_.add("else - $count${BRACKETS[5]}$CARRIAGE_RETURN_$QUOTES")
+        2 -> prog_.add("${BRACKETS[5]}$PRINT_CARRIAGE_RETURN$QUOTES")
+        3 -> prog_.add("else - $count${BRACKETS[5]}$PRINT_CARRIAGE_RETURN$QUOTES")
         //3 -> prog_.add("")
-        4 -> prog_.add("check while loop - $count] %d$CARRIAGE_RETURN_$QUOTES$COMMA ++${IDENTIFIER[rand(0, 2, randSeed)]}")
-        5 -> prog_.add("check do while loop - $count] %d$CARRIAGE_RETURN_$QUOTES$COMMA ++${IDENTIFIER[rand(0, 2, randSeed)]}")
-        6 -> prog_.add("check for loop - $count] %li$CARRIAGE_RETURN_$QUOTES$COMMA i")
+        4 -> prog_.add("check while loop - $count] %d$PRINT_CARRIAGE_RETURN$QUOTES$COMMA ++${IDENTIFIER[rand(0, 2, randSeed)]}")
+        5 -> prog_.add("check do while loop - $count] %d$PRINT_CARRIAGE_RETURN$QUOTES$COMMA ++${IDENTIFIER[rand(0, 2, randSeed)]}")
+        6 -> prog_.add("check for loop - $count] %li$PRINT_CARRIAGE_RETURN$QUOTES$COMMA i")
     }
     prog_.add("${BRACKETS[1]}$END_OF_LINE")
     return prog_
@@ -432,7 +468,8 @@ fun While(program: MutableList<String>, randList: MutableList<Int>, task: Int, r
     val prog_: MutableList<String> = mutableListOf()
     prog_.add("$WHILE ${BRACKETS[0]}${IDENTIFIER[rand(0, 2, randSeed)]} % 4${BRACKETS[1]} ${BRACKETS[2]}$CARRIAGE_RETURN")
     prog_.addAll(Printf(program, randList, task, randSeed, index))
-    prog_.addAll(ExitPoint(ListBool))
+    if (randListBoolPop(ListBool))
+        prog_.addAll(ExitPoint(ListBool))
 
     if (randListBoolPop(ListBool) && nestingLevel > 0)
         prog_.addAll(While(program, randList, task, randSeed, index + 1, printfNum, nestingLevel - 1, ListBool))
@@ -446,7 +483,8 @@ fun DoWhile(program: MutableList<String>, randList: MutableList<Int>, task: Int,
     val prog_: MutableList<String> = mutableListOf()
     prog_.add("$DO ${BRACKETS[2]}$CARRIAGE_RETURN")
     prog_.addAll(Printf(program, randList, task, randSeed, index))
-    prog_.addAll(ExitPoint(ListBool))
+    if (randListBoolPop(ListBool))
+        prog_.addAll(ExitPoint(ListBool))
 
     if (randListBoolPop(ListBool) && nestingLevel > 0)
         prog_.addAll(DoWhile(program, randList, task, randSeed, index + 1, printfNum, nestingLevel - 1, ListBool))
@@ -458,9 +496,10 @@ fun DoWhile(program: MutableList<String>, randList: MutableList<Int>, task: Int,
 fun ForLoop(program: MutableList<String>, randList: MutableList<Int>, task: Int, randSeed: Int, index: Int,
             printfNum: Int, nestingLevel: Int, ListBool: MutableList<Int>, size: Int): MutableList<String> {
     val prog_: MutableList<String> = mutableListOf()
-    prog_.add("$FOR ${BRACKETS[0]}${TYPE[5]} i $EQUALLY 0$SEMICOLON i < $size$SEMICOLON i++${BRACKETS[1]} ${BRACKETS[2]}$CARRIAGE_RETURN")
+    prog_.add("$FOR ${BRACKETS[0]}$SIZE_T i $EQUALLY 0$SEMICOLON i < $size$SEMICOLON i++${BRACKETS[1]} ${BRACKETS[2]}$CARRIAGE_RETURN")
     prog_.addAll(Printf(program, randList, task, randSeed, index))
-    prog_.addAll(ExitPoint(ListBool))
+    if (randListBoolPop(ListBool))
+        prog_.addAll(ExitPoint(ListBool))
 
     if (randListBoolPop(ListBool) && nestingLevel > 0)
         prog_.addAll(ForLoop(program, randList, task, randSeed, index + 1, printfNum, nestingLevel - 1, ListBool, size))
@@ -470,14 +509,18 @@ fun ForLoop(program: MutableList<String>, randList: MutableList<Int>, task: Int,
 
 fun ExitPoint(ListBool: MutableList<Int>): MutableList<String> {
     val prog_: MutableList<String> = mutableListOf()
-    if (randListBoolPop(ListBool))
-        if (randListBoolPop(ListBool))
-            prog_.add("$CONTINUE$END_OF_LINE")
-        else
-            if (randListBoolPop(ListBool))
-                prog_.add("$BREAK$END_OF_LINE")
-            else
-                prog_.addAll(Return(0))
+    if (randListBoolPop(ListBool)) {
+        prog_.add("$CONTINUE$END_OF_LINE")
+        return prog_
+    }
+    if (randListBoolPop(ListBool)) {
+        prog_.add("$BREAK$END_OF_LINE")
+        return prog_
+    }
+    if (randListBoolPop(ListBool)) {
+        prog_.addAll(Return(0))
+        return prog_
+    }
     return prog_
 }
 
