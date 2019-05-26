@@ -23,7 +23,7 @@ val LOGICAL_OPERATIONS: List<String> = listOf("!", "&&", "||")
 val RELATIONAL_OPERATIONS: List<String> = listOf("<", ">", "<=", ">=", "==", "!=")
 val SPECIAL_OPERATIONS: List<String> = listOf("++", "--")
 val BITWISE_OPERATIONS: List<String> = listOf("<<", ">>", "|", "&")
-val OPERATIONS: MutableList<String> = mutableListOf("+", "-", "/", "%", "<<", ">>", "|", "&")
+val OPERATIONS: MutableList<String> = mutableListOf("+", "-", "/", "%")
 val IDENTIFIER: List<String> = listOf("a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z")
 val CARRIAGE_RETURN = "\n"
 val PRINT_CARRIAGE_RETURN = "\\n"
@@ -34,7 +34,7 @@ val SEMICOLON = ";"
 val COLON = ":"
 val QUOTES = "\""
 val END_OF_LINE = "$SEMICOLON$CARRIAGE_RETURN"
-val LIBRARY: List<String> = listOf("stdio.h")
+val LIBRARY: List<String> = listOf("stdio.h", "stdbool.h")
 val INCLUDE: List<String> = listOf("#include <", ">")
 val BRACKETS: List<String> = listOf("(", ")", "{", "}", "[", "]")
 val TAB = "\t"
@@ -81,7 +81,7 @@ fun checkOperator(program: MutableList<String>): Boolean {
 //добавляет ранее инициализированную переменную в контейнер
 fun Identifier(program: MutableList<String>, randList: MutableList<Int>): MutableList<String> {
     val program_: MutableList<String> = mutableListOf()
-    val index = randListPop(randList)
+    val index = randListIntPop(randList)
     val value = "${IDENTIFIER[index]} $EQUALLY"
     for (i: Int in 0..(program.size - 1))
         if (program[i] == value)
@@ -107,14 +107,14 @@ fun OperationType(args: MutableList<String>, operationIndex: Int): MutableList<S
 //выбирает случайный мат опретаор из контейнера мат операторов
 fun Operation(operation: MutableList<String>, randList: MutableList<Int>): MutableList<String> {
     val program_: MutableList<String> = mutableListOf()
-    program_.add(" ${operation[randListPop(randList)]} ")
+    program_.add(" ${operation[randListIntPop(randList)]} ")
     return program_
 }
 
 //добавляет в контейнер заданную библиотеку
 fun Include(libr_numb: Int): MutableList<String> {
     val program_: MutableList<String> = mutableListOf()
-    program_.add("${INCLUDE[0]}${LIBRARY[libr_numb]}${INCLUDE[1]}$CARRIAGE_RETURN$CARRIAGE_RETURN")
+    program_.add("${INCLUDE[0]}${LIBRARY[libr_numb]}${INCLUDE[1]}$CARRIAGE_RETURN")
     return program_
 }
 
@@ -155,7 +155,7 @@ fun Atom(program: MutableList<String>, operation: MutableList<String>, randList1
             if (randListBoolPop(randListBool))
                 program_.addAll(Identifier(program, randList1))
             else
-                program_.add("${randListPop(randList3)}")
+                program_.add("${randListIntPop(randList3)}")
     return program_
 }
 
@@ -168,7 +168,7 @@ fun ExpressionAddition(program: MutableList<String>, operation: MutableList<Stri
         program_.addAll(Operation(operation, randList2))
         program.addAll(program_)
         if (checkOperator(program)) { //проверяет наличие операторов сдвига (<<, >>) в контейнере
-            program_.add("${randListPop(randList3)}")
+            program_.add("${randListIntPop(randList3)}")
             return program_
         }
         program_.addAll(Atom(program, operation, randList1, randList2, randList3, randListBool, argNum, count))
@@ -185,12 +185,12 @@ fun Expression(program: MutableList<String>, operation: MutableList<String>, ran
     val program_: MutableList<String> = mutableListOf()
     if (count == 0 || count < argNum) {
         if (checkOperator(program)) //проверяет наличие операторов сдвига (<<, >>) в контейнере
-            program_.add("${randListPop(randList3)}")
+            program_.add("${randListIntPop(randList3)}")
         else {
             if (randListBoolPop(randListBool))
                 program_.addAll(Identifier(program, randList1))
             else
-                program_.add("${randListPop(randList3)}")
+                program_.add("${randListIntPop(randList3)}")
             program.addAll(program_)
             program_.addAll(ExpressionAddition(program, operation, randList1, randList2, randList3, randListBool, argNum, count + 1))
         }
@@ -204,7 +204,7 @@ fun State(prog: MutableList<String>, task: Int, operation: MutableList<String>, 
           stateNum: Int, argNum: Int, printfNum: Int, redefinitonVar: Boolean, id: Int, count: Int, count_: Int): MutableList<String> {
     val prog_: MutableList<String> = mutableListOf()
     if (count < stateNum) {
-        val index = randListPop(List1)
+        val index = randListIntPop(List1)
         prog_.add("${IDENTIFIER[index]} $EQUALLY ")
         prog.addAll(prog_)
         if (checkIdentifier(prog, index) && !redefinitonVar) { //выключено переопределение = 0
@@ -330,7 +330,6 @@ fun itemSelection(args: MutableList<String>) : MutableList<String> {
                     } while (printfNum - printfList.size > 0)
                 }
             }
- //           println(listBool)
         }
     }
     return prog_
@@ -349,7 +348,7 @@ fun InitAddition(operationList: MutableList<String> , operationIdList: MutableLi
                  listInt: MutableList<Int>, listBool: MutableList<Int>): MutableList<String> {
     val prog_: MutableList<String> = mutableListOf()
     prog_.addAll(Operation(operationList, operationIdList))
-    prog_.add("${randListFloatPop(listFloat) + randListPop(listInt)}")
+    prog_.add("${randListFloatPop(listFloat) + randListIntPop(listInt)}")
     if (randListBoolPop(listBool))
         prog_.addAll(InitAddition(operationList, operationIdList, listFloat, listInt, listBool))
     return prog_
@@ -369,7 +368,7 @@ fun Init(index: Int, randSeed: Int, varNum: Int, printfNum: Int, from: Int, to: 
             for (i in 0..initialized_args) {
                 prog_.add("$UNSIGNED $INT ")
                 prog_.add("${IDENTIFIER[i]} $EQUALLY")
-                prog_.add(" ${randListPop(randList4)}")
+                prog_.add(" ${randListIntPop(randList4)}")
                 prog_.add(END_OF_LINE)
             }
 
@@ -391,33 +390,22 @@ fun Init(index: Int, randSeed: Int, varNum: Int, printfNum: Int, from: Int, to: 
             if (printfNum - printfList.size == 1)
                 j = varNum
             for (i in variableList.size..j - 1) {
-                if (randListBoolPop(listBool))
-                    prog_.add("$INT ")
-                else
-                    prog_.add("$FLOAT ")
-                prog_.add("${IDENTIFIER[i]} $EQUALLY ${randListFloatPop(listFloat) + randListPop(listInt)}")
-                variableList.add("${IDENTIFIER[i]}")
-                if (randListBoolPop(listBool))
-                    prog_.addAll(InitAddition(OPERATIONS, operationIdList, listFloat, listInt, listBool))
-                prog_.add("$END_OF_LINE")
-            }
-
-            /*for (i in 0..varNum - 1) {
-                /*if (randListBoolPop(listBool)) {
+                if (randListBoolPop(listBool)) {
                     prog_.add("$BOOL ")
-                    prog_.add("${IDENTIFIER[i]} $EQUALLY ${randListPop(listBool)}$END_OF_LINE")
+                    prog_.add("${IDENTIFIER[i]} $EQUALLY ${randListBoolPop(listBool)}")
                 }
-                else {*/
+                else {
                     if (randListBoolPop(listBool))
                         prog_.add("$INT ")
                     else
                         prog_.add("$FLOAT ")
-                    prog_.add("${IDENTIFIER[i]} $EQUALLY ${randListFloatPop(listFloat) + randListPop(listInt)}")
+                    prog_.add("${IDENTIFIER[i]} $EQUALLY ${randListFloatPop(listFloat) + randListIntPop(listInt)}")
                     if (randListBoolPop(listBool))
-                        prog_.addAll(InitAddition(operationList, operationIdList, listFloat, listInt, listBool))
-                    prog_.add("$END_OF_LINE")
-                    //}
-            }*/
+                        prog_.addAll(InitAddition(OPERATIONS, operationIdList, listFloat, listInt, listBool))
+                }
+                prog_.add("$END_OF_LINE")
+                variableList.add("${IDENTIFIER[i]}")
+            }
         }
     }
     return prog_
@@ -428,9 +416,9 @@ fun Init(index: Int, randSeed: Int, varNum: Int, printfNum: Int, from: Int, to: 
     val program_: MutableList<String> = mutableListOf()
     while (!checkIdentifier(program, randList.first())) {
         randList.add(randList.first())
-        randListPop(randList)
+        randListIntPop(randList)
     }
-    program_.add("$TAB$PRINTF${BRACKETS[0]}$QUOTES%i${CARRIAGE_RETURN_}$QUOTES$COMMA ${IDENTIFIER[randListPop(randList)]}${BRACKETS[1]}$END_OF_LINE")
+    program_.add("$TAB$PRINTF${BRACKETS[0]}$QUOTES%i${CARRIAGE_RETURN_}$QUOTES$COMMA ${IDENTIFIER[randListIntPop(randList)]}${BRACKETS[1]}$END_OF_LINE")
     return program_
 }*/
 
@@ -441,9 +429,9 @@ fun Printf(program: MutableList<String>, randList: MutableList<Int>, index: Int,
         1 -> {
             while (!checkIdentifier(program, randList.first())) {
                 randList.add(randList.first())
-                randListPop(randList)
+                randListIntPop(randList)
             }
-            prog_.add("%i${BRACKETS[5]}${PRINT_CARRIAGE_RETURN}$QUOTES$COMMA ${IDENTIFIER[randListPop(randList)]}")
+            prog_.add("%i${BRACKETS[5]}${PRINT_CARRIAGE_RETURN}$QUOTES$COMMA ${IDENTIFIER[randListIntPop(randList)]}")
         }
         2 -> prog_.add("if - $count${BRACKETS[5]}$PRINT_CARRIAGE_RETURN$QUOTES")
         0 -> prog_.add("else - $count${BRACKETS[5]}$PRINT_CARRIAGE_RETURN$QUOTES")
@@ -581,7 +569,7 @@ fun randListFloat(random: Random, from: Int, size: Int): MutableList<Float> = Mu
 }
 
 //возвращает первое число из списка int и удаляет его Int
-fun randListPop(randList: MutableList<Int>) : Int {
+fun randListIntPop(randList: MutableList<Int>) : Int {
     if (!randList.isEmpty()) {
         val index = randList.first()
         randList.remove(index)
@@ -615,6 +603,9 @@ fun randListBoolPop(randListBool: MutableList<Int>) : Boolean {
 fun programGenerate(args: MutableList<String>) : MutableList<String> {
     val prog_: MutableList<String> = mutableListOf()
     prog_.addAll(Include(0))
+    if (parseInt(args[0]) != 1)
+        prog_.addAll(Include(1))
+    prog_.add("$CARRIAGE_RETURN")
     prog_.addAll(Main(args))
     return prog_
 }
