@@ -1,10 +1,12 @@
-import io.ktor.application.call
+package com.example
+/*import io.ktor.application.call
 import io.ktor.response.respondText
 import io.ktor.routing.get
 import io.ktor.routing.routing
 import io.ktor.server.engine.embeddedServer
-import io.ktor.server.netty.Netty
+import io.ktor.server.netty.Netty*/
 
+import kotlinx.html.RunAt
 import java.io.File
 import java.lang.Integer.parseInt
 import java.util.*
@@ -610,6 +612,7 @@ fun programGenerate(args: MutableList<String>) : MutableList<String> {
     return prog_
 }
 
+
 fun printFun(args: MutableList<String>): MutableList<String> {
     val program: MutableList<String> = mutableListOf()
     program.addAll(programGenerate(args))
@@ -622,19 +625,6 @@ fun printFun(args: MutableList<String>): MutableList<String> {
 }
 
 fun main() {
-    val args_: MutableList<String> = mutableListOf()
-    val server = embeddedServer(Netty, port = 8080) {
-        routing {
-            get("/") {
-                val args: String? = call.request.queryParameters["args"] // To access a single parameter (first one if repeated)
-                args_.addAll(args.toString().split(','))
-                if (args_[0] != "null")
-                    call.respondText("${printFun(args_).joinToString("")}")
-                else
-                    call.respondText("Введите в адресную строку входные данные для задания\nНапример: args=1,19,1,4,3,2,1,<<,>>,|,*,+,&")
-                args_.clear()
-            }
-        }
-    }
-    server.start(wait = true)
+    val server: Server = Server()
+    server.main()
 }
