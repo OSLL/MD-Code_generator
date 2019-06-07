@@ -31,6 +31,12 @@ val QUOTES = "\""
 val END_OF_LINE = "$SEMICOLON$CARRIAGE_RETURN"
 val LIBRARY: List<String> = listOf("stdio.h", "stdbool.h")
 val INCLUDE: List<String> = listOf("#include <", ">")
+val ROUND_BRACKET = "("
+val ROUND_BRACKET_ = ")"
+val BRACE = "{"
+val BRACE_ = "}"
+val SQUARE_BRACKET = "["
+val SQUARE_BRACKET_ = "]"
 val BRACKETS: List<String> = listOf("(", ")", "{", "}", "[", "]")
 val TAB = "\t"
 val BREAK = "break"
@@ -255,6 +261,8 @@ fun firstTask(task: Int, operation: MutableList<String>, randSeed: Int, varNum: 
     return prog_
 }
 
+/*________________________________________________________*/
+
 fun itemSelection(args: MutableList<String>) : MutableList<String> {
     val prog_: MutableList<String> = mutableListOf()
     val program: MutableList<String> = mutableListOf()
@@ -379,12 +387,15 @@ fun Init(index: Int, randSeed: Int, varNum: Int, printfNum: Int, from: Int, to: 
         }
         2 -> {
             //инициализация переменных
-            if (varNum - variableList.size <= 0)
+            if (varNum - variableList.size < 1)
                 return prog_
-            var j = rand(0, varNum - variableList.size, randSeed)
-            if (printfNum - printfList.size == 1)
-                j = varNum
-            for (i in variableList.size..j - 1) {
+
+            var j = varNum / (printfNum + 1)
+            if (varNum % (printfNum + 1) != 0 && varNum - variableList.size != j && randListBoolPop(listBool))
+                j += 1
+            if (printfNum - printfList.size == 0)
+                j = varNum - variableList.size
+            for (i in variableList.size..variableList.size + j - 1) {
                 if (randListBoolPop(listBool)) {
                     prog_.add("$BOOL ")
                     prog_.add("${IDENTIFIER[i]} $EQUALLY ${randListBoolPop(listBool)}")
@@ -605,15 +616,20 @@ fun programGenerate(args: MutableList<String>) : MutableList<String> {
     return prog_
 }
 
+fun checkMask(args: MutableList<String>) : Boolean {
+    return true
+}
 
 fun printFun(args: MutableList<String>): MutableList<String> {
     val program: MutableList<String> = mutableListOf()
-    program.addAll(programGenerate(args))
+    if (checkMask(args)) {
+        program.addAll(programGenerate(args))
 //    val time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss"))
 //    var file = File("func_$time.c")
 
-    var file = File("func.c")
-    file.writeText(program.joinToString(""))
+        var file = File("func.c")
+        file.writeText(program.joinToString(""))
+    }
     return program
 }
 
