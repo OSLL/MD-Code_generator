@@ -410,14 +410,14 @@ fun Init(parameters: ProgramParameters, from: Int, to: Int, listBool: MutableLis
         else -> {
             //инициализация переменных
             var j = parameters.getVariablesNum() / parameters.getPrintfNum()
+            if (j == 0)
+                j = 1
             if (parameters.getVariablesNum() % parameters.getPrintfNum() != 0 && parameters.getVariablesNum() - program.getCounterVariables() != j && randListBoolPop(listBool))
                 j += 1
 
             if (parameters.getPrintfNum() - program.getCounterPrintf() == 0)
                 j = parameters.getVariablesNum() - program.getCounterVariables()
 
-//            println("j = $j")
-//            println("${program.getCounterVariables()}..${(program.getCounterVariables() + j - 1)}")
             for (i in program.getCounterVariables()..(program.getCounterVariables() + j - 1)) {
                 var index = randListIntPop(listCondition)
                 when(index) {
@@ -458,17 +458,7 @@ fun Init(parameters: ProgramParameters, from: Int, to: Int, listBool: MutableLis
             }
         }
     }
-/*
-    println("init variable.size:" + parameters.getVariablesNum())
-    for (i: Int in 0..program.getVariableBool().size - 1)
-        print(program.getVariableBoolIndex(i) + ", ")
-    for (i: Int in 0..program.getVariableFloat().size - 1)
-        print(program.getVariableFloatIndex(i) + ", ")
-    for (i: Int in 0..program.getVariableInt().size - 1)
-        print(program.getVariableIntIndex(i) + ", ")
-    println("")
     return program_
-*/
 }
 
 //печатает инструкцию вывода
@@ -581,7 +571,6 @@ fun arithmeticCondition(prog: Program, listInt: MutableList<Int>, ListBool: Muta
 
 fun findClosingBracket(program_: MutableList<String>, i: Int) : Int {
     var j = i + 1
-//    for (j: Int in i + 1..program_.size - 1) {
     while (j < program_.size - 1) {
         if (program_[j] == BRACE)
             j = findClosingBracket(program_, j)
@@ -608,64 +597,32 @@ fun checkIdentifier(program: MutableList<String>, index: Int): Boolean {
 fun findVisibleVar(program_: MutableList<String>): Program {
     val program = Program()
     var i = 0
-//    println("______\n" + program_ + "\n______\n")
     while (i < program_.size - 1) {
-        if (program_[i] == BRACE /*&& count_brace != 0*/) {
+        if (program_[i] == BRACE) {
             val k = findClosingBracket(program_, i)
-//            println(program_[i - 2] + " ~ " + k)
             if (k != 0)
                 i = k
         }
-//        if (program_[i] == BRACE && count_brace == 0)
-//            count_brace++
-
-//        println("'${program_[i]}'")
         if (program_[i] == INT) {
-//            println(program_[i])
             program.getVariableInt().add("${program_[i + 1]}")
             program.incrementCounterVariables()
         }
         if (program_[i] == BOOL) {
-//            println(program_[i])
             program.getVariableBool().add("${program_[i + 1]}")
             program.incrementCounterVariables()
         }
         if (program_[i] == FLOAT) {
-//            println(program_[i])
             program.getVariableFloat().add("${program_[i + 1]}")
             program.incrementCounterVariables()
         }
         i++
     }
-//    println(count_brace)
-    print("find visible variable: ")
-    for (i: Int in 0..program.getVariableBool().size - 1)
-        print(program.getVariableBoolIndex(i) + ", ")
-    for (i: Int in 0..program.getVariableFloat().size - 1)
-        print(program.getVariableFloatIndex(i) + ", ")
-    for (i: Int in 0..program.getVariableInt().size - 1)
-        print(program.getVariableIntIndex(i) + ", ")
-    println("")
-
-
     return program
 }
 
-fun Condition(program_: MutableList<String>, /*prog: Program,*/ ListBool: MutableList<Int>, listInt: MutableList<Int>, listCondition: MutableList<Int>): MutableList<String> {
+fun Condition(program_: MutableList<String>, ListBool: MutableList<Int>, listInt: MutableList<Int>, listCondition: MutableList<Int>): MutableList<String> {
     val prog_: MutableList<String> = mutableListOf()
     val prog = findVisibleVar(program_)
-
-/*
-    print("condition: ")
-    for (i: Int in 0..prog.getVariableBool().size - 1)
-        print(prog.getVariableBoolIndex(i) + ", ")
-    for (i: Int in 0..prog.getVariableFloat().size - 1)
-        print(prog.getVariableFloatIndex(i) + ", ")
-    for (i: Int in 0..prog.getVariableInt().size - 1)
-        print(prog.getVariableIntIndex(i) + ", ")
-    println("")
-*/
-
     if (prog.getVariableBool().size == 0 && prog.getVariableFloat().size == 0 && prog.getVariableInt().size == 1) {
         prog_.add("${prog.getVariableIntIndex(0)}")
         return prog_
