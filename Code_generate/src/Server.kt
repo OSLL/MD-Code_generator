@@ -1,5 +1,6 @@
 package com.example
 
+import io.ktor.application.ApplicationCall
 import io.ktor.application.call
 import io.ktor.response.respondText
 import io.ktor.routing.get
@@ -11,12 +12,13 @@ import java.lang.Integer.parseInt
 val TEXT = "Введите в адресную строку входные данные для задания\n" +
         "Используйте URL код для символов: + - %2b и & - %26\n" +
         "Например: \n" +
-        "task=1&rand_seed=19&variables_num=1&statements_num=4&arguments_num=3&printf_num=2&redefinition_var=1&operations=<<,>>,|,%26,*,%2b\n" +
-        "task=2&rand_seed=1&variables_num=4&arguments_num=4&printf_num=6&nesting_level=4\n" +
-        "task=4&rand_seed=13&variables_num=6&arguments_num=4&printf_num=7&nesting_level=3\n" +
-        "task=5&rand_seed=12&variables_num=4&arguments_num=3&printf_num=4&nesting_level=3\n" +
-        "task=6&rand_seed=18&variables_num=6&arguments_num=3&printf_num=5&nesting_level=3&size=2\n"
+        "/get_source?task=1&rand_seed=19&variables_num=1&statements_num=4&arguments_num=3&printf_num=2&redefinition_var=1&operations=<<,>>,|,%26,*,%2b\n" +
+        "/get_source?task=2&rand_seed=1&variables_num=4&arguments_num=4&printf_num=6&nesting_level=4\n" +
+        "/get_source?task=4&rand_seed=13&variables_num=6&arguments_num=4&printf_num=7&nesting_level=3\n" +
+        "/get_source?task=5&rand_seed=12&variables_num=4&arguments_num=3&printf_num=4&nesting_level=3\n" +
+        "/get_source?task=6&rand_seed=18&variables_num=6&arguments_num=3&printf_num=5&nesting_level=3&size=2\n"
 val TEXT_ = "Ошибка ввода. Попробуйте снова.\n\n"
+val TEXT__ = "Задача пока находится в разработке, попробуйте другой тип задач.\n\n"
 
 class Server {
     fun main() {
@@ -45,7 +47,7 @@ class Server {
                                 else {
                                     //val parameters = ProgramParameters(task.toString(), rand_seed.toString(), variables_num.toString(), statements_num.toString(), arguments_num.toString(), printf_num.toString(), redefinition_var.toString(), operations.toString())
                                     //call.respondText("${printFun(parameters).joinToString("")}")
-                                    call.respondText("Задача пока находится в разработке, попробуйте другой тип задач.\n\n$TEXT")
+                                    call.respondText("$TEXT__$TEXT")
                                 }
                             }
                             6 -> {
@@ -53,6 +55,8 @@ class Server {
                                     call.respondText("$TEXT_$TEXT")
                                 else {
                                     val parameters = ProgramParameters(task.toString(), rand_seed.toString(), variables_num.toString(), arguments_num.toString(), printf_num.toString(), nesting_level.toString(), size.toString())
+                                    printFun(parameters)
+//                                    call.respondText("${Runtime.getRuntime().exec("run.sh")}")
                                     call.respondText("${printFun(parameters).joinToString("")}")
                                 }
                             }
@@ -61,6 +65,9 @@ class Server {
                                     call.respondText("$TEXT_$TEXT")
                                 else {
                                     val parameters = ProgramParameters(task.toString(), rand_seed.toString(), variables_num.toString(), arguments_num.toString(), printf_num.toString(), nesting_level.toString())
+                                    printFun(parameters)
+//                                    Runtime.getRuntime().exec("run.sh")
+//                                    call.respondText("${Runtime.getRuntime().exec("run.sh")}")
                                     call.respondText("${printFun(parameters).joinToString("")}")
                                 }
                             }
