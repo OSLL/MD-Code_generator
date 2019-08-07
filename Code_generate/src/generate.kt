@@ -675,6 +675,7 @@ fun findVisibleVar(program_: MutableList<String>): Program {
         }
     i++
     }
+/*
     print("find visible variable: ")
     for (i: Int in 0..program.getVariableBool().size - 1)
         print(program.getVariableBoolIndex(i) + ", ")
@@ -683,7 +684,7 @@ fun findVisibleVar(program_: MutableList<String>): Program {
     for (i: Int in 0..program.getVariableInt().size - 1)
         print(program.getVariableIntIndex(i) + ", ")
     println(".")
-
+*/
     return program
 }
 
