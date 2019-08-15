@@ -66,8 +66,8 @@ class Server {
                                 else {
                                     val parameters = ProgramParameters(task.toString(), rand_seed.toString(), variables_num.toString(), arguments_num.toString(), printf_num.toString(), nesting_level.toString())
                                     printFun(parameters)
-//                                    Runtime.getRuntime().exec("run.sh")
-//                                    call.respondText("${Runtime.getRuntime().exec("run.sh")}")
+//                                    Runtime.getRuntime().exec("chmod +X ./run.sh")
+//                                    call.respondText("${Runtime.getRuntime().exec("./run.sh")}")
                                     call.respondText("${printFun(parameters).joinToString("")}")
                                 }
                             }

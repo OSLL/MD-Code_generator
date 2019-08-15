@@ -330,25 +330,29 @@ fun itemSelection(parameters: ProgramParameters) : MutableList<String> {
 }
 
 fun InitModOperation(argNum: Int, operationList: MutableList<String> , operationIdList: MutableList<Int>, listFloat: MutableList<Float>,
-                     listBool: MutableList<Int>, numList: MutableList<Int>): MutableList<String> {
+                     listBool: MutableList<Int>, numList: MutableList<Int>, visibleVar: Program): MutableList<String> {
     val prog_: MutableList<String> = mutableListOf()
 
     if (argNum > 2) {
-        val a = randListIntPop(numList)
+        var a : String
+        if (randListBoolPop(listBool) && visibleVar.getVariableInt().size != 0)
+            a = visibleVar.getVariableIntIndex(rand(0, visibleVar.getVariableInt().size, visibleVar.getParameters_().getRandSeed()))
+        else
+            a = "${randListIntPop(numList)}"
         var b = randListIntPop(numList)
         while (b == 0)
             b = randListIntPop(numList)
         prog_.add("$a$MOD$b")
 
         if (argNum - 2 > 1 && randListBoolPop(listBool))
-            prog_.addAll(InitAddition(argNum - 2, operationList, operationIdList, listFloat, listBool, numList))
+            prog_.addAll(InitAddition(argNum - 2, operationList, operationIdList, listFloat, listBool, numList, visibleVar))
         else {
             if (argNum - 2 > 2 && randListBoolPop(listBool)) {
                 var i = randListIntPop(operationIdList)
                 while (ARITHMETIC_OPERATIONS[i] == MOD || ARITHMETIC_OPERATIONS[i] == DIV || ARITHMETIC_OPERATIONS[i] == MULTIPLICATION)
                     i = randListIntPop(operationIdList)
                 prog_.add("${ARITHMETIC_OPERATIONS[i]}")
-                prog_.addAll(InitModOperation(argNum - 2, operationList, operationIdList, listFloat, listBool, numList))
+                prog_.addAll(InitModOperation(argNum - 2, operationList, operationIdList, listFloat, listBool, numList, visibleVar))
             }
         }
     }
@@ -356,27 +360,36 @@ fun InitModOperation(argNum: Int, operationList: MutableList<String> , operation
 }
 
 fun InitAddition(argNum: Int, operationList: MutableList<String> , operationIdList: MutableList<Int>, listFloat: MutableList<Float>,
-                 listBool: MutableList<Int>, numList: MutableList<Int>): MutableList<String> {
+                 listBool: MutableList<Int>, numList: MutableList<Int>, visibleVar: Program): MutableList<String> {
     val prog_: MutableList<String> = mutableListOf()
 
     if (argNum > 1) {
         var i = randListIntPop(operationIdList)
         while (ARITHMETIC_OPERATIONS[i] == MOD)
             i = randListIntPop(operationIdList)
-        if (randListBoolPop(listBool))
-            prog_.add("${ARITHMETIC_OPERATIONS[i]}${randListFloatPop(listFloat)}")
-        else
-            prog_.add("${ARITHMETIC_OPERATIONS[i]}${randListIntPop(numList)}")
+        prog_.add("${ARITHMETIC_OPERATIONS[i]}")
+        if (randListBoolPop(listBool)) {
+            if (randListBoolPop(listBool) && visibleVar.getVariableFloat().size != 0)
+                prog_.add("${visibleVar.getVariableFloatIndex(rand(0, visibleVar.getVariableFloat().size, visibleVar.getParameters_().getRandSeed()))}")
+            else
+                prog_.add("${randListFloatPop(listFloat)}")
+        }
+        else {
+            if (randListBoolPop(listBool) && visibleVar.getVariableInt().size != 0)
+                prog_.add("${visibleVar.getVariableIntIndex(rand(0, visibleVar.getVariableInt().size, visibleVar.getParameters_().getRandSeed()))}")
+            else
+                prog_.add("${randListIntPop(numList)}")
+        }
 
         if (argNum - 1 > 1 && randListBoolPop(listBool))
-            prog_.addAll(InitAddition(argNum - 1, operationList, operationIdList, listFloat, listBool, numList))
+            prog_.addAll(InitAddition(argNum - 1, operationList, operationIdList, listFloat, listBool, numList, visibleVar))
         else {
             if (argNum - 1 > 2 && randListBoolPop(listBool)) {
                 i = randListIntPop(operationIdList)
                 while (ARITHMETIC_OPERATIONS[i] == MOD || ARITHMETIC_OPERATIONS[i] == DIV || ARITHMETIC_OPERATIONS[i] == MULTIPLICATION)
                     i = randListIntPop(operationIdList)
                 prog_.add("${ARITHMETIC_OPERATIONS[i]}")
-                prog_.addAll(InitModOperation(argNum - 1, operationList, operationIdList, listFloat, listBool, numList))
+                prog_.addAll(InitModOperation(argNum - 1, operationList, operationIdList, listFloat, listBool, numList, visibleVar))
             }
         }
     }
@@ -425,12 +438,20 @@ fun Init(parameters: ProgramParameters, from: Int, to: Int, listBool: MutableLis
 
             for (i in program.getCounterVariables()..(program.getCounterVariables() + j - 1)) {
                 var index = randListIntPop(listCondition)
+                val visibleVar = findVisibleVar(program_)
                 when(index) {
                     0 -> {
                         program_.add("$BOOL")
                         program_.add(" ")
                         program_.add("${IDENTIFIER[i]}")
-                        program_.add("$EQUALLY${randListBoolPop(listBool)}")
+                        program_.add("$EQUALLY")
+                        if (randListBoolPop(listBool) && visibleVar.getVariableBool().size != 0) {
+                            if (randListBoolPop(listBool))
+                                program_.add("$LOGICAL_NEGATION")
+                            program_.add("${visibleVar.getVariableBoolIndex(rand(0, visibleVar.getVariableBool().size, parameters.getRandSeed()))}")
+                        }
+                        else
+                            program_.add("${randListBoolPop(listBool)}")
                         program.getVariableBool().add("${IDENTIFIER[i]}")
                     }
                     else -> {
@@ -449,14 +470,22 @@ fun Init(parameters: ProgramParameters, from: Int, to: Int, listBool: MutableLis
                         program_.add("$EQUALLY")
 
                         if (parameters.getArgumentsNum() > 2 && randListBoolPop(listBool))
-                            program_.addAll(InitModOperation(parameters.getArgumentsNum(), OPERATIONS, operationIdList, listFloat, listBool, numList))
+                            program_.addAll(InitModOperation(parameters.getArgumentsNum(), OPERATIONS, operationIdList, listFloat, listBool, numList, visibleVar))
                         else {
-                            if (randListBoolPop(listBool))
-                                program_.add("${randListFloatPop(listFloat)}")
-                            else
-                                program_.add("${randListIntPop(numList)}")
+                            if (randListBoolPop(listBool)) {
+                                if (randListBoolPop(listBool) && visibleVar.getVariableFloat().size != 0)
+                                    program_.add("${visibleVar.getVariableFloatIndex(rand(0, visibleVar.getVariableFloat().size, visibleVar.getParameters_().getRandSeed()))}")
+                                else
+                                    program_.add("${randListFloatPop(listFloat)}")
+                            }
+                            else {
+                                if (randListBoolPop(listBool) && visibleVar.getVariableInt().size != 0)
+                                    program_.add("${visibleVar.getVariableIntIndex(rand(0, visibleVar.getVariableInt().size, visibleVar.getParameters_().getRandSeed()))}")
+                                else
+                                    program_.add("${randListIntPop(numList)}")
+                            }
                             if (parameters.getArgumentsNum() > 1 && randListBoolPop(listBool))
-                                program_.addAll(InitAddition(parameters.getArgumentsNum(), OPERATIONS, operationIdList, listFloat, listBool, numList))
+                                program_.addAll(InitAddition(parameters.getArgumentsNum(), OPERATIONS, operationIdList, listFloat, listBool, numList, visibleVar))
                         }
                     }
                 }
@@ -467,6 +496,7 @@ fun Init(parameters: ProgramParameters, from: Int, to: Int, listBool: MutableLis
     }
     return program_
 }
+
 
 //печатает инструкцию вывода
 /*fun printfStamp(program: MutableList<String>, randList: MutableList<Int>): MutableList<String> {
