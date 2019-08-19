@@ -21,7 +21,7 @@ val TEXT_ = "Ошибка ввода. Попробуйте снова.\n\n"
 val TEXT__ = "Задача пока находится в разработке, попробуйте другой тип задач.\n\n"
 
 class Server {
-    fun main() {
+    constructor() {
         val server = embeddedServer(Netty, port = 8080) {
             routing {
                 get("/") {
@@ -45,9 +45,10 @@ class Server {
                                 if (rand_seed.toString() == "null" || variables_num.toString() == "null" || statements_num.toString() == "null" || arguments_num.toString() == "null" || printf_num.toString() == "null" || redefinition_var.toString() == "null" || operations.toString() == "null")
                                     call.respondText("$TEXT_$TEXT")
                                 else {
-                                    //val parameters = ProgramParameters(task.toString(), rand_seed.toString(), variables_num.toString(), statements_num.toString(), arguments_num.toString(), printf_num.toString(), redefinition_var.toString(), operations.toString())
-                                    //call.respondText("${printFun(parameters).joinToString("")}")
-                                    call.respondText("$TEXT__$TEXT")
+                                    val parameters = ProgramParameters(task.toString(), rand_seed.toString(), variables_num.toString(), statements_num.toString(), arguments_num.toString(), printf_num.toString(), redefinition_var.toString(), operations.toString())
+                                    val generator = Generator(parameters)
+                                    call.respondText("${generator.programGenerate().joinToString("")}")
+//                                    call.respondText("$TEXT__$TEXT")
                                 }
                             }
                             6 -> {
@@ -55,9 +56,8 @@ class Server {
                                     call.respondText("$TEXT_$TEXT")
                                 else {
                                     val parameters = ProgramParameters(task.toString(), rand_seed.toString(), variables_num.toString(), arguments_num.toString(), printf_num.toString(), nesting_level.toString(), size.toString())
-                                    printFun(parameters)
-//                                    call.respondText("${Runtime.getRuntime().exec("run.sh")}")
-                                    call.respondText("${printFun(parameters).joinToString("")}")
+                                    val generator = Generator(parameters)
+                                    call.respondText("${generator.programGenerate().joinToString("")}")
                                 }
                             }
                             else -> {
@@ -65,10 +65,8 @@ class Server {
                                     call.respondText("$TEXT_$TEXT")
                                 else {
                                     val parameters = ProgramParameters(task.toString(), rand_seed.toString(), variables_num.toString(), arguments_num.toString(), printf_num.toString(), nesting_level.toString())
-                                    printFun(parameters)
-//                                    Runtime.getRuntime().exec("chmod +X ./run.sh")
-//                                    call.respondText("${Runtime.getRuntime().exec("./run.sh")}")
-                                    call.respondText("${printFun(parameters).joinToString("")}")
+                                    val generator = Generator(parameters)
+                                    call.respondText("${generator.programGenerate().joinToString("")}")
                                 }
                             }
                         }

@@ -22,7 +22,7 @@ class ProgramParameters {
         variables_num = parseInt(args[2])
 
         when (task) {
-            1 -> {
+            1 -> {/*
                 statements_num = Integer.parseInt(args[3])
                 arguments_num = Integer.parseInt(args[4])
                 printf_num = Integer.parseInt(args[5])
@@ -32,13 +32,14 @@ class ProgramParameters {
 //                operation_index = 7 //операции начинаются с args[7]
 
                 OPERATIONS_TYPE.addAll(OperationType(args, 7))
+                */
             }
             else -> {
-                arguments_num = Integer.parseInt(args[3])
+                arguments_num = parseInt(args[3])
                 if ( arguments_num < 1)
                     arguments_num = 1
-                printf_num = Integer.parseInt(args[4])
-                nesting_level = Integer.parseInt(args[5])
+                printf_num = parseInt(args[4])
+                nesting_level = parseInt(args[5])
                 if (printf_num == 1)
                     nesting_level = 0
 
