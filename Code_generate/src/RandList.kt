@@ -3,8 +3,7 @@ package com.example
 import java.util.*
 
 class RandList {
-    var randList: MutableList<Int> = mutableListOf()
-    var numList: MutableList<Int> = mutableListOf()
+    var variableIdList: MutableList<Int> = mutableListOf()
     var listBool: MutableList<Int> = mutableListOf()
     var listInt: MutableList<Int> = mutableListOf()
     var listFloat: MutableList<Float> = mutableListOf()
@@ -13,18 +12,20 @@ class RandList {
 
     constructor() { }
 
-    constructor(randSeed: Int, size_: Int, variablesNum: Int) {
+    constructor(randSeed: Int, size_: Int, variablesNum: Int, operationNum: Int) {
         val size = size_
-        randList = randListInt(Random(randSeed.toLong()), 0, variablesNum, size)
+        variableIdList = randListInt(Random(randSeed.toLong()), 0, variablesNum, size)
+        listBool = randListInt(Random(randSeed.toLong()), 0, 2, size)
+        listInt = randListInt(Random(randSeed.toLong()), 1, MAX_VALUE, size)
+        operationIdList = randListInt(Random(randSeed.toLong()), 0, operationNum, size) //индексы операторов
     }
 
-    constructor(randSeed: Int, size_: Int, variablesNum: Int, argumentsNum: Int) {
+    constructor(randSeed: Int, size_: Int, variablesNum: Int) {
         val size = size_
-        randList = randListInt(Random(randSeed.toLong()), 0, variablesNum, size)
-        numList = randListInt(Random(randSeed.toLong()), 1, MAX_VALUE, variablesNum * argumentsNum)
+        variableIdList = randListInt(Random(randSeed.toLong()), 0, variablesNum, size)
         listBool = randListInt(Random(randSeed.toLong()), 0, 2, size)
-        listInt = randListInt(Random(randSeed.toLong()), 0, variablesNum, variablesNum * 10)
-        listFloat = randListFloat(Random(randSeed.toLong()), 0, 9, variablesNum * 5)
+        listInt = randListInt(Random(randSeed.toLong()), 0, MAX_VALUE, size)
+        listFloat = randListFloat(Random(randSeed.toLong()), 1, MAX_VALUE, variablesNum * 5)
         operationIdList = randListInt(Random(randSeed.toLong()), 0, OPERATIONS.size, 70) //индексы операторов
         listCondition = randListInt(Random(randSeed.toLong()), 0, 3, size/*parameters.getPrintfNum() + parameters.getVariablesNum()*/)
     }

@@ -22,17 +22,17 @@ class ProgramParameters {
         variables_num = parseInt(args[2])
 
         when (task) {
-            1 -> {/*
-                statements_num = Integer.parseInt(args[3])
-                arguments_num = Integer.parseInt(args[4])
-                printf_num = Integer.parseInt(args[5])
+            1 -> {
+                statements_num = parseInt(args[3])
+                arguments_num = parseInt(args[4])
+                printf_num = parseInt(args[5])
+                if (printf_num == 0)
+                    printf_num = 1
                 redefiniton_var = false
                 if (parseInt(args[6]) == 1)
                     redefiniton_var = true
-//                operation_index = 7 //операции начинаются с args[7]
-
-                OPERATIONS_TYPE.addAll(OperationType(args, 7))
-                */
+                for (i: Int in 7..args.size - 1)
+                    OPERATIONS_TYPE.add(args[i])
             }
             else -> {
                 arguments_num = parseInt(args[3])

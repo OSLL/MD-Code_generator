@@ -8,6 +8,7 @@ class Program {
     internal val variable_bool: MutableSet<String> = mutableSetOf()
 
     var counter_variables = 0
+    var counter_terms = 0
     var counter_if = 0
     var counter_else = 0
     var counter_while = 0
@@ -22,6 +23,7 @@ class Program {
 
     internal constructor(prog: Program) {
         counter_variables = prog.counter_variables
+        counter_terms = prog.counter_terms
         counter_if = prog.counter_if
         counter_else = prog.counter_else
         counter_while = prog.counter_while
@@ -43,6 +45,10 @@ class Program {
 
     internal fun setVariableUnsInt(variable: MutableList<String>) {
         variable_uns_int.addAll(variable)
+    }
+
+    internal fun getVariableUnsIntIndex(index: Int): String {
+        return variable_uns_int.elementAt(index)
     }
 
     internal fun getVariableSize_t(): MutableSet<String> {
@@ -100,6 +106,14 @@ class Program {
 
     internal fun incrementCounterVariables() {
         counter_variables++
+    }
+
+    internal fun getCounterTerm(): Int {
+        return counter_terms
+    }
+
+    internal fun incrementCounterTerm() {
+        counter_terms++
     }
 
     internal fun getCounterIf(): Int {
