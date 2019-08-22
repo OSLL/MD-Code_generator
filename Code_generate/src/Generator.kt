@@ -60,7 +60,6 @@ class Generator {
         var file = File("func.c")
         file.writeText(program.getProgram().joinToString(""))
         Runtime.getRuntime().exec("clang-format -i func.c")
-        println(randList_.listInt.size)
         return program.getProgram()
     }
 
@@ -207,19 +206,25 @@ class Generator {
         return program_
     }
 
+    fun AdditionOrSubtractionOperation(): MutableList<String> {
+        val program_: MutableList<String> = mutableListOf()
+        if (randList_.randListBoolPop(randList_.listBool))
+            program_.add(ADDITION)
+        else
+            program_.add(SUBTRACTION)
+        return program_
+    }
+
     fun InitModOperation(argNum: Int, visibleVar: Program): MutableList<String> {
             val program_: MutableList<String> = mutableListOf()
 
             if (argNum > 2) {
                 var a : String
                 if (visibleVar.getVariableInt().size != 0 && randList_.randListBoolPop(randList_.listBool)) {
-//                    a = visibleVar.getVariableIntIndex(randList_.rand(0, visibleVar.getVariableInt().size, parameters.getRandSeed()))
-
                     var index = randList_.randListIntPop(randList_.variableIdList)
                     while (index > visibleVar.getVariableInt().size - 1)
                         index = randList_.randListIntPop(randList_.variableIdList)
                     a = visibleVar.getVariableIntIndex(index)
-
                 }
                 else
                     a = "${randList_.randListIntPop(randList_.listInt)}"
@@ -232,10 +237,7 @@ class Generator {
                     program_.addAll(InitAddition(argNum - 2, visibleVar))
                 else {
                     if (argNum - 2 > 2 && randList_.randListBoolPop(randList_.listBool)) {
-                        var i = randList_.randListIntPop(randList_.operationIdList)
-                        while (ARITHMETIC_OPERATIONS[i] == MOD || ARITHMETIC_OPERATIONS[i] == DIV || ARITHMETIC_OPERATIONS[i] == MULTIPLICATION)
-                            i = randList_.randListIntPop(randList_.operationIdList)
-                        program_.add("${ARITHMETIC_OPERATIONS[i]}")
+                        program_.addAll(AdditionOrSubtractionOperation())
                         program_.addAll(InitModOperation(argNum - 2, visibleVar))
                     }
                 }
@@ -252,7 +254,7 @@ class Generator {
                 var index = randList_.randListIntPop(randList_.variableIdList)
                 while (index > visibleVar.getVariableFloat().size - 1)
                     index = randList_.randListIntPop(randList_.variableIdList)
-                program_.add("${visibleVar.getVariableFloatIndex(index)}")
+                program_.add(visibleVar.getVariableFloatIndex(index))
             }
             else
                 program_.add("${randList_.randListFloatPop(randList_.listFloat)}")
@@ -263,7 +265,7 @@ class Generator {
                 var index = randList_.randListIntPop(randList_.variableIdList)
                 while (index > visibleVar.getVariableInt().size - 1)
                     index = randList_.randListIntPop(randList_.variableIdList)
-                program_.add("${visibleVar.getVariableIntIndex(index)}")
+                program_.add(visibleVar.getVariableIntIndex(index))
             }
             else
                 program_.add("${randList_.randListIntPop(randList_.listInt)}")
@@ -275,20 +277,14 @@ class Generator {
         val program_: MutableList<String> = mutableListOf()
 
         if (argNum > 1) {
-            var i = randList_.randListIntPop(randList_.operationIdList)
-            while (ARITHMETIC_OPERATIONS[i] == MOD)
-                i = randList_.randListIntPop(randList_.operationIdList)
-            program_.add("${ARITHMETIC_OPERATIONS[i]}")
+            program_.add("${ARITHMETIC_OPERATIONS[randList_.randListIntPop(randList_.operationIdList)]}")
             program_.addAll(AddFloatOrInt(visibleVar))
 
             if (argNum - 1 > 1 && randList_.randListBoolPop(randList_.listBool))
                 program_.addAll(InitAddition(argNum - 1, visibleVar))
             else {
                 if (argNum - 1 > 2 && randList_.randListBoolPop(randList_.listBool)) {
-                    i = randList_.randListIntPop(randList_.operationIdList)
-                    while (ARITHMETIC_OPERATIONS[i] == MOD || ARITHMETIC_OPERATIONS[i] == DIV || ARITHMETIC_OPERATIONS[i] == MULTIPLICATION)
-                        i = randList_.randListIntPop(randList_.operationIdList)
-                    program_.add("${ARITHMETIC_OPERATIONS[i]}")
+                    program_.addAll(AdditionOrSubtractionOperation())
                     program_.addAll(InitModOperation(argNum - 1, visibleVar))
                 }
             }
@@ -342,7 +338,7 @@ class Generator {
                     j = parameters.getVariablesNum() - program.getCounterVariables()
 
                 for (i in program.getCounterVariables()..(program.getCounterVariables() + j - 1)) {
-                    var index_ = randList_.randListIntPop(randList_.listCondition)
+                    val index_ = randList_.randListIntPop(randList_.listCondition)
                     val visibleVar = findVisibleVar(program_)
                     when(index_) {
                         0 -> {
@@ -381,11 +377,11 @@ class Generator {
                             program_.add("$EQUALLY")
 
                             if (parameters.getArgumentsNum() > 2 && randList_.randListBoolPop(randList_.listBool))
-                                program_.addAll(InitModOperation(parameters.getArgumentsNum(), /*OPERATIONS,*/ visibleVar))
+                                program_.addAll(InitModOperation(parameters.getArgumentsNum(), visibleVar))
                             else {
                                 program_.addAll(AddFloatOrInt(visibleVar))
                                 if (parameters.getArgumentsNum() > 1 && randList_.randListBoolPop(randList_.listBool))
-                                    program_.addAll(InitAddition(parameters.getArgumentsNum(), /*OPERATIONS*/ visibleVar))
+                                    program_.addAll(InitAddition(parameters.getArgumentsNum(), visibleVar))
                             }
                         }
                     }
@@ -433,110 +429,37 @@ class Generator {
 
     fun returnIntVariable(visibleVar: Program): MutableList<String> {
         val variable: MutableList<String> = mutableListOf()
-        var index = randList_.randListIntPop(randList_.listInt)
-        while (!(index > -1 && index < visibleVar.getVariableInt().size))
-            index = randList_.randListIntPop(randList_.listInt)
-        variable.add("${visibleVar.getVariableIntIndex(index)}")
-        return variable
-    }
-
-    fun returnIdentif(visibleVar: Program): MutableList<String> {
-        val variable: MutableList<String> = mutableListOf()
-
-        if (visibleVar.getVariableInt().size > 0 && visibleVar.getVariableFloat().size > 0) {
-            if (randList_.randListBoolPop(randList_.listBool)) { // int variable
-                if (visibleVar.getVariableInt().size == 1)
-                    variable.add("${visibleVar.getVariableIntIndex(0)}")
-                else {
-                    var index = randList_.randListIntPop(randList_.listInt)
-                    while (!(index > -1 && index < visibleVar.getVariableInt().size))
-                        index = randList_.randListIntPop(randList_.listInt)
-
-                    variable.add("${visibleVar.getVariableIntIndex(index)}")
-                }
-
-                return variable
-            }
-            else { // float variable
-                if (visibleVar.getVariableFloat().size == 1)
-                    variable.add("${visibleVar.getVariableFloatIndex(0)}")
-                else {
-                    var index = randList_.randListIntPop(randList_.listInt)
-                    while (!(index > -1 && index < visibleVar.getVariableFloat().size))
-                        index = randList_.randListIntPop(randList_.listInt)
-
-                    variable.add("${visibleVar.getVariableFloatIndex(index)}")
-                }
-                return variable
-            }
-        }
+        if (visibleVar.getVariableInt().size == 1)
+            variable.add(visibleVar.getVariableIntIndex(0))
         else {
-            if (visibleVar.getVariableInt().size == 0) {
-                var index = randList_.randListIntPop(randList_.listInt)
-                while (!(index > -1 && index < visibleVar.getVariableFloat().size))
-                    index = randList_.randListIntPop(randList_.listInt)
-                variable.add("${visibleVar.getVariableFloatIndex(index)}")
-                return variable
-            }
-            if (visibleVar.getVariableFloat().size == 0) {
-                var index = randList_.randListIntPop(randList_.listInt)
-                while (!(index > -1 && index < visibleVar.getVariableInt().size))
-                    index = randList_.randListIntPop(randList_.listInt)
-                variable.add("${visibleVar.getVariableIntIndex(index)}")
-                return variable
-            }
+            var index = randList_.randListIntPop(randList_.variableIdList)
+            while (index > visibleVar.getVariableInt().size - 1)
+                index = randList_.randListIntPop(randList_.variableIdList)
+            variable.add(visibleVar.getVariableIntIndex(index))
         }
-
-        if (variable.isEmpty())
-            returnIdentif(visibleVar)
-
         return variable
     }
 
-    fun arithmeticCondition(visibleVar: Program): MutableList<String> {
-        val condition: MutableList<String> = mutableListOf()
-        var i = randList_.randListIntPop(randList_.listInt)
-        while (!(i > -1 && i < ARITHMETIC_OPERATIONS.size))
-            i = randList_.randListIntPop(randList_.listInt)
-
-        if (ARITHMETIC_OPERATIONS[i] == MOD) {
-            if (visibleVar.getVariableInt().size > 1) {
-                var a = returnIntVariable(visibleVar).joinToString("")
-                val b = returnIntVariable(visibleVar).joinToString("")
-                while (a == b)
-                    a = returnIntVariable(visibleVar).joinToString("")
-                condition.add("$a")
-                condition.add("${ARITHMETIC_OPERATIONS[i]}")
-                condition.add("$b")
-            } else condition.addAll(arithmeticCondition(visibleVar))
+    fun returnFloatVariable(visibleVar: Program): MutableList<String> {
+        val variable: MutableList<String> = mutableListOf()
+        if (visibleVar.getVariableFloat().size == 1)
+            variable.add(visibleVar.getVariableFloatIndex(0))
+        else {
+            var index = randList_.randListIntPop(randList_.variableIdList)
+            while (index > visibleVar.getVariableFloat().size - 1)
+                index = randList_.randListIntPop(randList_.variableIdList)
+            variable.add(visibleVar.getVariableFloatIndex(index))
         }
-        if (ARITHMETIC_OPERATIONS[i] != MOD) {
-            if (visibleVar.getVariableInt().size == 0 && visibleVar.getVariableFloat().size == 2) {
-                var a = visibleVar.getVariableFloatIndex(0)
-                var b = visibleVar.getVariableFloatIndex(1)
-                condition.add("$a")
-                condition.add("${ARITHMETIC_OPERATIONS[i]}")
-                condition.add("$b")
-                return condition
-            }
-            if (visibleVar.getVariableInt().size == 2 && visibleVar.getVariableFloat().size == 0) {
-                var a = visibleVar.getVariableIntIndex(0)
-                var b = visibleVar.getVariableIntIndex(1)
-                condition.add("$a")
-                condition.add("${ARITHMETIC_OPERATIONS[i]}")
-                condition.add("$b")
-                return condition
-            }
-            var a = returnIdentif(visibleVar).joinToString("")
-            val b = returnIdentif(visibleVar).joinToString("")
-            while (a == b)
-                a = returnIdentif(visibleVar).joinToString("")
+        return variable
+    }
 
-            condition.add("$a")
-            condition.add("${ARITHMETIC_OPERATIONS[i]}")
-            condition.add("$b")
-        }
-        return condition
+    fun returnVariable(visibleVar: Program): MutableList<String> {
+        val variable: MutableList<String> = mutableListOf()
+        if (randList_.randListBoolPop(randList_.listBool))
+            variable.addAll(returnIntVariable(visibleVar))
+        else
+            variable.addAll(returnFloatVariable(visibleVar))
+        return variable
     }
 
     fun findClosingBracket(program_: MutableList<String>, i: Int) : Int {
@@ -575,11 +498,11 @@ class Generator {
             if (program_[i] == FLOAT) {
                 program.getVariableFloat().add("${program_[i + 2]}")
                 program.incrementCounterVariables()
-            }/*
+            }
             if (program_[i] == EQUALLY && program_[i - 3] != UNSIGNED_INT) {
                 program.getVariableUnsInt().add("${program_[i - 1]}")
                 program.incrementCounterVariables()
-            }*/
+            }
 
             i++
         }
@@ -614,101 +537,61 @@ class Generator {
 */
 
         if (visibleVar.getVariableBool().size == 0 && visibleVar.getVariableFloat().size == 0 && visibleVar.getVariableInt().size == 1) {
-            program_.add("${visibleVar.getVariableIntIndex(0)}")
+            program_.add(visibleVar.getVariableIntIndex(0))
             return program_
         }
         if (visibleVar.getVariableBool().size == 0 && visibleVar.getVariableFloat().size == 1 && visibleVar.getVariableInt().size == 0) {
-            program_.add("${visibleVar.getVariableFloatIndex(0)}")
+            program_.add(visibleVar.getVariableFloatIndex(0))
             return program_
         }
-        var index = randList_.randListIntPop(randList_.listCondition)
-        if ((index == 1 || index == 2))
-            if ((visibleVar.getVariableFloat().size == 0 && visibleVar.getVariableInt().size == 0)
-                || (visibleVar.getVariableFloat().size == 0 && visibleVar.getVariableInt().size == 1)
-                || (visibleVar.getVariableFloat().size == 1 && visibleVar.getVariableInt().size == 0)) {
-                index = 0
-            }
-        while (visibleVar.getVariableBool().size == 0 && index == 0) {
-            println("while - visibleVar.getVariableBool().size == 0 && index == 0")
-            index = randList_.randListIntPop(randList_.listCondition)
+        if (visibleVar.getVariableBool().size == 1 && visibleVar.getVariableFloat().size == 0 && visibleVar.getVariableInt().size == 0) {
+            if (!randList_.randListBoolPop(randList_.listBool))
+                program_.add("$LOGICAL_NEGATION")
+            program_.add(visibleVar.getVariableBoolIndex(0))
+            return program_
+        }
+
+        var index = 0
+        if ((visibleVar.getVariableFloat().size == 0 && visibleVar.getVariableInt().size == 0)
+            || (visibleVar.getVariableFloat().size == 0 && visibleVar.getVariableInt().size == 1)
+            || (visibleVar.getVariableFloat().size == 1 && visibleVar.getVariableInt().size == 0)) index = 0
+        else index = randList_.randListIntPop(randList_.listCondition)
+        if (visibleVar.getVariableBool().size == 0 && index == 0) {
+            if (randList_.randListBoolPop(randList_.listBool)) index = 1
+            else index = 2
         }
 
         when (index) {
             0 -> { //bool variable
-                if (visibleVar.getVariableBool().size > 0) {
-                    if (visibleVar.getVariableBool().size == 1) {
-                        if (!randList_.randListBoolPop(randList_.listBool))
-                            program_.add("$LOGICAL_NEGATION")
-                        program_.add("${visibleVar.getVariableBoolIndex(0)}")
-                        return program_
-                    }
-                    if (visibleVar.getVariableBool().size > 1) {
-                        var i = randList_.randListIntPop(randList_.listInt)
-                        var i_ = randList_.randListIntPop(randList_.listInt)
-                        if (visibleVar.getVariableBool().size == 2) {
-                            i = 0
-                            i_ = 1
-                        }
-                        else {
-                            while (!(i > -1 && i < visibleVar.getVariableBool().size)) {
-                                println("!(i > -1 && i < visibleVar.getVariableBool().size)")
-                                i = randList_.randListIntPop(randList_.listInt)
-                            }
+                if (visibleVar.getVariableBool().size == 1) {
+                    if (!randList_.randListBoolPop(randList_.listBool))
+                        program_.add("$LOGICAL_NEGATION")
+                    program_.add(visibleVar.getVariableBoolIndex(0))
+                    return program_
+                }
+                else {
+                    var i = 0
+                    var i_ = 1
+                    if (visibleVar.getVariableBool().size > 2) {
+                        i = randList_.randListIntPop(randList_.variableIdList)
+                        while (i > visibleVar.getVariableBool().size - 1)
+                            i = randList_.randListIntPop(randList_.variableIdList)
 
-                            while (!(i_ > -1 && i_ < visibleVar.getVariableBool().size)) {
-                                println("!(i_ > -1 && i_ < visibleVar.getVariableBool().size)")
-                                i_ = randList_.randListIntPop(randList_.listInt)
-                            }
-                        }
-
-                        index = randList_.randListIntPop(randList_.listCondition)
-                        when (index) {
-                            0 -> {
-                                program_.addAll(logicalExpr(visibleVar.getVariableBoolIndex(i), visibleVar.getVariableBoolIndex(i_)))
-                                /*
-                                prog_.add("${prog.getVariableBoolIndex(i)}")
-                                if (randListBoolPop(ListBool))
-                                    prog_.add("$LOGICAL_AND")
-                                else
-                                    prog_.add("$LOGICAL_OR")
-                                prog_.add("${prog.getVariableBoolIndex(i_)}")
-                                */
-                            }
-                            1 -> {
-                                program_.addAll(logicalExpr("$LOGICAL_NEGATION${visibleVar.getVariableBoolIndex(i)}", visibleVar.getVariableBoolIndex(i_)))
-                                /*
-                                prog_.add("$LOGICAL_NEGATION")
-                                prog_.add("${prog.getVariableBoolIndex(i)}")
-                                if (randListBoolPop(ListBool))
-                                    prog_.add("$LOGICAL_AND")
-                                else
-                                    prog_.add("$LOGICAL_OR")
-                                prog_.add("${prog.getVariableBoolIndex(i_)}")
-                                */
-                            }
-                            2 -> {
-                                program_.addAll(logicalExpr(visibleVar.getVariableBoolIndex(i), "$LOGICAL_NEGATION${visibleVar.getVariableBoolIndex(i_)}"))
-                                /*
-                                prog_.add("${prog.getVariableBoolIndex(i)}")
-                                if (randListBoolPop(ListBool))
-                                    prog_.add("$LOGICAL_AND")
-                                else
-                                    prog_.add("$LOGICAL_OR")
-                                prog_.add("$LOGICAL_NEGATION")
-                                prog_.add("${prog.getVariableBoolIndex(i_)}")
-                                */
-                            }
-                        }
-                        return program_
+                        i_ = randList_.randListIntPop(randList_.variableIdList)
+                        while (i_ > visibleVar.getVariableBool().size - 1)
+                            i_ = randList_.randListIntPop(randList_.variableIdList)
                     }
+
+                    when (randList_.randListIntPop(randList_.listCondition)) {
+                        0 -> program_.addAll(logicalExpr(visibleVar.getVariableBoolIndex(i), visibleVar.getVariableBoolIndex(i_)))
+                        1 -> program_.addAll(logicalExpr("$LOGICAL_NEGATION${visibleVar.getVariableBoolIndex(i)}", visibleVar.getVariableBoolIndex(i_)))
+                        2 -> program_.addAll(logicalExpr(visibleVar.getVariableBoolIndex(i), "$LOGICAL_NEGATION${visibleVar.getVariableBoolIndex(i_)}"))
+                    }
+                    return program_
                 }
             }
             1 -> { //int or float variable - comparison
-                var i = randList_.randListIntPop(randList_.listInt)
-                while (!(i > -1 && i < RELATIONAL_OPERATIONS.size)) {
-                   println("!(i > -1 && i < RELATIONAL_OPERATIONS.size)")
-                    i = randList_.randListIntPop(randList_.listInt)
-                }
+                var i = randList_.randListIntPop(randList_.relationalOperationIdList)
 
                 var a = ""
                 var b = ""
@@ -722,20 +605,54 @@ class Generator {
                 }
                 if (!(visibleVar.getVariableInt().size == 0 && visibleVar.getVariableFloat().size == 2)
                     && !(visibleVar.getVariableInt().size == 2 && visibleVar.getVariableFloat().size == 0)) {
-                    a = returnIdentif(visibleVar).joinToString("")
-                    b = returnIdentif(visibleVar).joinToString("")
+                    a = returnVariable(visibleVar).joinToString("")
+                    b = returnVariable(visibleVar).joinToString("")
 
                     while (a == b)
-                        a = returnIdentif(visibleVar).joinToString("")
+                        a = returnVariable(visibleVar).joinToString("")
                 }
 
-                program_.add("$a")
-                program_.add("${RELATIONAL_OPERATIONS[i]}")
-                program_.add("$b")
+                program_.add(a)
+                program_.add(RELATIONAL_OPERATIONS[i])
+                program_.add(b)
                 return program_
             }
             2 -> { //int or float variable - arithmetic operation
-                program_.addAll(arithmeticCondition(visibleVar))
+                var a = ""
+                var b = ""
+                var operation = ""
+                if (visibleVar.getVariableInt().size == 0 && visibleVar.getVariableFloat().size == 2) {
+                    a = visibleVar.getVariableFloatIndex(0)
+                    b = visibleVar.getVariableFloatIndex(1)
+                    operation = ARITHMETIC_OPERATIONS[randList_.randListIntPop(randList_.operationIdList)]
+                }
+                if (visibleVar.getVariableInt().size == 2 && visibleVar.getVariableFloat().size == 0) {
+                    a = visibleVar.getVariableIntIndex(0)
+                    b = visibleVar.getVariableIntIndex(1)
+                    if (randList_.randListBoolPop(randList_.listBool)) operation = MOD
+                    else operation = ARITHMETIC_OPERATIONS[randList_.randListIntPop(randList_.operationIdList)]
+                }
+                if (!(visibleVar.getVariableInt().size == 0 && visibleVar.getVariableFloat().size == 2)
+                    && !(visibleVar.getVariableInt().size == 2 && visibleVar.getVariableFloat().size == 0)) {
+                    if (visibleVar.getVariableInt().size > 1 && randList_.randListBoolPop(randList_.listBool)) {//MOD operation
+                        a = returnIntVariable(visibleVar).joinToString("")
+                        b = returnIntVariable(visibleVar).joinToString("")
+                        while (a == b)
+                            a = returnIntVariable(visibleVar).joinToString("")
+                        operation = MOD
+                    }
+                    else {
+                        a = returnVariable(visibleVar).joinToString("")
+                        b = returnVariable(visibleVar).joinToString("")
+                        while (a == b)
+                            a = returnVariable(visibleVar).joinToString("")
+                        operation = ARITHMETIC_OPERATIONS[randList_.randListIntPop(randList_.operationIdList)]
+                    }
+                }
+
+                program_.add(a)
+                program_.add(operation)
+                program_.add(b)
                 return program_
             }
         }
@@ -765,7 +682,7 @@ class Generator {
         program.incrementCounterIf()
         program_.addAll(Printf(parameters.getTask_()))
 
-        if (randList_.randListBoolPop(randList_.listBool) && nestingLevel > 1 && parameters.getPrintfNum() > program.getCounterIf())
+        if (nestingLevel > 1 && parameters.getPrintfNum() > program.getCounterIf() && randList_.randListBoolPop(randList_.listBool))
             program_.addAll(If(nestingLevel - 1, p))
 
         program_.add("$BRACE_")
@@ -790,7 +707,7 @@ class Generator {
         program.incrementCounterElse()
         program_.addAll(Printf(parameters.getTask_() - 2))
 
-        if (randList_.randListBoolPop(randList_.listBool) && nestingLevel > 1 && parameters.getPrintfNum() > program.getCounterIf())
+        if (nestingLevel > 1 && parameters.getPrintfNum() > program.getCounterIf() && randList_.randListBoolPop(randList_.listBool))
             program_.addAll(If(nestingLevel - 1, p))
 
         program_.add("$BRACE_")
@@ -831,7 +748,7 @@ class Generator {
         if (randList_.randListBoolPop(randList_.listBool))
             program_.addAll(ExitPoint())
 
-        if (randList_.randListBoolPop(randList_.listBool) && nestingLevel > 1 && parameters.getPrintfNum() > program.getCounterFor())
+        if (nestingLevel > 1 && parameters.getPrintfNum() > program.getCounterFor() && randList_.randListBoolPop(randList_.listBool))
             program_.addAll(ForLoop(nestingLevel - 1, p))
 
         program_.add("$BRACE_")
@@ -844,17 +761,11 @@ class Generator {
         for (i: Int in 0..condition.size - 1) {
             for (j: Int in 0..program.getVariableBool().size - 1) { //bool variable
                 if (condition[i] == program.getVariableBoolIndex(j)) {
-                    //if (randListBoolPop(listBool)) {
                     program_.add("${condition[i]}")
                     program_.add("$EQUALLY")
                     program_.add("$LOGICAL_NEGATION")
                     program_.add("${condition[i]}")
                     program_.add("$END_OF_LINE")
-                    /*}
-                    else {
-
-                    }*/
-
                     return program_
                 }
             }
@@ -910,7 +821,7 @@ class Generator {
         if (randList_.randListBoolPop(randList_.listBool))
             program_.addAll(ExitPoint())
 
-        if (randList_.randListBoolPop(randList_.listBool) && nestingLevel > 1 && parameters.getPrintfNum() > program.getCounterWhile())
+        if (nestingLevel > 1 && parameters.getPrintfNum() > program.getCounterWhile() && randList_.randListBoolPop(randList_.listBool))
             program_.addAll(While(nestingLevel - 1, p))
 
         program_.add("$BRACE_")
@@ -920,9 +831,9 @@ class Generator {
 
     fun DoWhile(nestingLevel: Int, prog: MutableList<String>) : MutableList<String> {
         val program_: MutableList<String> = mutableListOf()
-        if (parameters.getVariablesNum() - program.getCounterVariables() > 0 ) {
+        if (parameters.getVariablesNum() - program.getCounterVariables() > 0 )
             program_.addAll(Init())
-        }
+
         val p: MutableList<String> = mutableListOf()
         p.addAll(prog)
         p.addAll(program_)
@@ -939,7 +850,7 @@ class Generator {
         if (randList_.randListBoolPop(randList_.listBool))
             program_.addAll(ExitPoint())
 
-        if (randList_.randListBoolPop(randList_.listBool) && nestingLevel > 1 && parameters.getPrintfNum() > program.getCounterDoWhile())
+        if (nestingLevel > 1 && parameters.getPrintfNum() > program.getCounterDoWhile() && randList_.randListBoolPop(randList_.listBool))
             program_.addAll(DoWhile(nestingLevel - 1, p))
 
         program_.add("$BRACE_")
@@ -965,7 +876,7 @@ class Generator {
             return program_
         }
         if (randList_.randListBoolPop(randList_.listBool)) {
-        program_.addAll(Return(0))
+            program_.addAll(Return(0))
             return program_
         }
         return program_

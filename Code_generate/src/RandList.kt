@@ -7,8 +7,9 @@ class RandList {
     var listBool: MutableList<Int> = mutableListOf()
     var listInt: MutableList<Int> = mutableListOf()
     var listFloat: MutableList<Float> = mutableListOf()
-    var operationIdList: MutableList<Int> = mutableListOf() //индексы операторов
+    var operationIdList: MutableList<Int> = mutableListOf() //индексы мат операторов
     var listCondition: MutableList<Int> = mutableListOf()
+    var relationalOperationIdList: MutableList<Int> = mutableListOf() //индексы операторов сравнения
 
     constructor() { }
 
@@ -17,17 +18,18 @@ class RandList {
         variableIdList = randListInt(Random(randSeed.toLong()), 0, variablesNum, size)
         listBool = randListInt(Random(randSeed.toLong()), 0, 2, size)
         listInt = randListInt(Random(randSeed.toLong()), 1, MAX_VALUE, size)
-        operationIdList = randListInt(Random(randSeed.toLong()), 0, operationNum, size) //индексы операторов
+        operationIdList = randListInt(Random(randSeed.toLong()), 0, operationNum, size) //индексы мат операторов
     }
 
     constructor(randSeed: Int, size_: Int, variablesNum: Int) {
         val size = size_
-        variableIdList = randListInt(Random(randSeed.toLong()), 0, variablesNum, size)
-        listBool = randListInt(Random(randSeed.toLong()), 0, 2, size)
-        listInt = randListInt(Random(randSeed.toLong()), 0, MAX_VALUE, size)
+        variableIdList = randListInt(Random(randSeed.toLong()), 0, variablesNum, size * 5) // * 3
+        listBool = randListInt(Random(randSeed.toLong()), 0, 2, size * 3)
+        listInt = randListInt(Random(randSeed.toLong()), 1, MAX_VALUE, size)
         listFloat = randListFloat(Random(randSeed.toLong()), 1, MAX_VALUE, variablesNum * 5)
-        operationIdList = randListInt(Random(randSeed.toLong()), 0, OPERATIONS.size, 70) //индексы операторов
+        operationIdList = randListInt(Random(randSeed.toLong()), 0, ARITHMETIC_OPERATIONS.size, 70) //индексы мат операторов
         listCondition = randListInt(Random(randSeed.toLong()), 0, 3, size/*parameters.getPrintfNum() + parameters.getVariablesNum()*/)
+        relationalOperationIdList = randListInt(Random(randSeed.toLong()), 0, RELATIONAL_OPERATIONS.size, 70)
     }
 
     //генерирует число в диапазоне [from; to] с зерном randSeed
