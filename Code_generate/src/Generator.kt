@@ -417,6 +417,14 @@ class Generator {
 
     fun returnVariable(visibleVar: Program): MutableList<String> {
         val variable: MutableList<String> = mutableListOf()
+        if (visibleVar.getVariableFloat().size == 0) {
+            variable.addAll(returnIntVariable(visibleVar))
+            return variable
+        }
+        if (visibleVar.getVariableInt().size == 0) {
+            variable.addAll(returnFloatVariable(visibleVar))
+            return variable
+        }
         if (randList_.randListBoolPop(randList_.listBool))
             variable.addAll(returnIntVariable(visibleVar))
         else
@@ -568,10 +576,9 @@ class Generator {
                 if (!(visibleVar.getVariableInt().size == 0 && visibleVar.getVariableFloat().size == 2)
                     && !(visibleVar.getVariableInt().size == 2 && visibleVar.getVariableFloat().size == 0)) {
                     a = returnVariable(visibleVar).joinToString("")
+                    visibleVar.getVariableInt().remove(a)
+                    visibleVar.getVariableFloat().remove(a)
                     b = returnVariable(visibleVar).joinToString("")
-
-                    while (a == b)
-                        a = returnVariable(visibleVar).joinToString("")
                 }
 
                 program_.add(a)
@@ -598,16 +605,15 @@ class Generator {
                     && !(visibleVar.getVariableInt().size == 2 && visibleVar.getVariableFloat().size == 0)) {
                     if (visibleVar.getVariableInt().size > 1 && randList_.randListBoolPop(randList_.listBool)) {//MOD operation
                         a = returnIntVariable(visibleVar).joinToString("")
+                        visibleVar.getVariableInt().remove(a)
                         b = returnIntVariable(visibleVar).joinToString("")
-                        while (a == b)
-                            a = returnIntVariable(visibleVar).joinToString("")
                         operation = MOD
                     }
                     else {
                         a = returnVariable(visibleVar).joinToString("")
+                        visibleVar.getVariableInt().remove(a)
+                        visibleVar.getVariableFloat().remove(a)
                         b = returnVariable(visibleVar).joinToString("")
-                        while (a == b)
-                            a = returnVariable(visibleVar).joinToString("")
                         operation = ARITHMETIC_OPERATIONS[randList_.randListIntPop(randList_.operationIdList)]
                     }
                 }
