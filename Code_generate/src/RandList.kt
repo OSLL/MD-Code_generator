@@ -23,8 +23,8 @@ class RandList {
 
     constructor(randSeed: Int, size_: Int, variablesNum: Int) {
         val size = size_
-        variableIdList = randListInt(Random(randSeed.toLong()), 0, variablesNum, size * 5) // * 3
-        listBool = randListInt(Random(randSeed.toLong()), 0, 2, size * 3)
+        variableIdList = randListInt(Random(randSeed.toLong()), 0, variablesNum, size * 10) // * 3
+        listBool = randListInt(Random(randSeed.toLong()), 0, 2, size * 6)
         listInt = randListInt(Random(randSeed.toLong()), 1, MAX_VALUE, size)
         listFloat = randListFloat(Random(randSeed.toLong()), 1, MAX_VALUE, variablesNum * 5)
         operationIdList = randListInt(Random(randSeed.toLong()), 0, ARITHMETIC_OPERATIONS.size, 70) //индексы мат операторов

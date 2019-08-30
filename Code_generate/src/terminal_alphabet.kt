@@ -19,7 +19,8 @@ val LOGICAL_AND = "&&"
 val LOGICAL_OR = "||"
 val LOGICAL_OPERATIONS: List<String> = listOf("!", "&&", "||")
 val RELATIONAL_OPERATIONS: List<String> = listOf("<", ">", "<=", ">=", "==", "!=")
-val SPECIAL_OPERATIONS: List<String> = listOf("++", "--")
+val INCREMENT = "++"
+val DECREMENT = "--"
 val BITWISE_OPERATIONS: List<String> = listOf("<<", ">>", "|", "&")
 val IDENTIFIER: List<String> = listOf("a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z")
 val CARRIAGE_RETURN = "\n"

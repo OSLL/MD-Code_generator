@@ -14,13 +14,15 @@ class Program {
     var counter_while = 0
     var counter_do_while = 0
     var counter_for = 0
+    var counter_switch = 0
+    var counter_case = 0
     var counter_printf = 0
 
     internal val program_: MutableList<String> = mutableListOf()
 
 
     internal constructor() {}
-
+/*
     internal constructor(prog: Program) {
         counter_variables = prog.counter_variables
         counter_terms = prog.counter_terms
@@ -38,7 +40,7 @@ class Program {
         variable_bool.addAll(prog.variable_bool)
         program_.addAll(prog.program_)
     }
-
+*/
     internal fun getVariableUnsInt(): MutableSet<String> {
         return variable_uns_int
     }
@@ -170,6 +172,22 @@ class Program {
 
     internal fun incrementCounterPrintf() {
         counter_printf++
+    }
+
+    internal fun getCounterCase(): Int {
+        return counter_case
+    }
+
+    internal fun incrementCounterCase() {
+        counter_case++
+    }
+
+    internal fun getCounterSwitch(): Int {
+        return counter_switch
+    }
+
+    internal fun incrementCounterSwitch() {
+        counter_switch++
     }
 
     internal fun getProgram(): MutableList<String> {
