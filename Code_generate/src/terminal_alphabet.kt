@@ -19,6 +19,8 @@ val LOGICAL_AND = "&&"
 val LOGICAL_OR = "||"
 val LOGICAL_OPERATIONS: List<String> = listOf("!", "&&", "||")
 val RELATIONAL_OPERATIONS: List<String> = listOf("<", ">", "<=", ">=", "==", "!=")
+val LESS_THAN = "<"
+val MORE_THAN = ">"
 val INCREMENT = "++"
 val DECREMENT = "--"
 val BITWISE_OPERATIONS: List<String> = listOf("<<", ">>", "|", "&")
@@ -29,6 +31,7 @@ val EQUALLY = "="
 val COMMA = ","
 val DOT = "."
 val DASH = "-"
+val UNDERSCORE = "_"
 val SEMICOLON = ";"
 val COLON = ":"
 val QUOTES = "\""
