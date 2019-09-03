@@ -1,6 +1,8 @@
 package com.example
 
+import java.io.BufferedReader
 import java.io.File
+import java.io.InputStreamReader
 
 class Generator {
     var program: Program = Program()
@@ -60,8 +62,23 @@ class Generator {
 
         var file = File("func.c")
         file.writeText(program.getProgram().joinToString(""))
-        Runtime.getRuntime().exec("clang-format -i func.c")
+
         return program.getProgram()
+    }
+
+    fun runtime(): MutableList<String> {
+//        Runtime.getRuntime().exec("clang-format -i func.c")
+//        Runtime.getRuntime().exec("gcc func.c -o func")
+        val process: Process = Runtime.getRuntime().exec("./run.sh")
+        val is_: BufferedReader = BufferedReader(InputStreamReader(process.getInputStream()))
+        var line = is_.readLine()
+        val line_ = mutableListOf<String>()
+
+        while (line != null) {
+            line_.add(line)
+            line = is_.readLine()
+        }
+        return line_
     }
 
     fun unsignedIntVariableIndex(visibleVar: Program): Int {

@@ -1,6 +1,5 @@
 package com.example
 
-import io.ktor.application.ApplicationCall
 import io.ktor.application.call
 import io.ktor.response.respondText
 import io.ktor.routing.get
@@ -47,62 +46,50 @@ class Server {
                     val nesting_level: String? = call.request.queryParameters["nesting_level"]
 
                     if (task.toString() != "null") {
+                        var parameters: ProgramParameters = ProgramParameters()
                         when (parseInt(task)) {
                             1 -> {
                                 if (rand_seed.toString() == "null" || variables_num.toString() == "null" || statements_num.toString() == "null" || arguments_num.toString() == "null" || printf_num.toString() == "null" || redefinition_var.toString() == "null" || operations.toString() == "null")
                                     call.respondText("$TEXT_$TEXT")
-                                else {
-                                    val parameters = ProgramParameters(task.toString(), rand_seed.toString(), variables_num.toString(), statements_num.toString(), arguments_num.toString(), printf_num.toString(), redefinition_var.toString(), operations.toString())
-                                    val generator = Generator(parameters)
-                                    call.respondText("${generator.programGenerate().joinToString("")}")
-//                                    call.respondText("$TEXT__$TEXT")
-                                }
+                                else
+                                    parameters = ProgramParameters(task.toString(), rand_seed.toString(), variables_num.toString(), statements_num.toString(), arguments_num.toString(), printf_num.toString(), redefinition_var.toString(), operations.toString())
                             }
                             2 -> {
                                 if (rand_seed.toString() == "null" || variables_num.toString() == "null" || arguments_num.toString() == "null" || if_num.toString() == "null" || nesting_level.toString() == "null")
                                     call.respondText("$TEXT_$TEXT")
-                                else {
-                                    val parameters = ProgramParameters(task.toString(), rand_seed.toString(), variables_num.toString(), arguments_num.toString(), if_num.toString(), nesting_level.toString())
-                                    val generator = Generator(parameters)
-                                    call.respondText("${generator.programGenerate().joinToString("")}")
-                                }
+                                else
+                                    parameters = ProgramParameters(task.toString(), rand_seed.toString(), variables_num.toString(), arguments_num.toString(), if_num.toString(), nesting_level.toString())
                             }
                             3 -> {
                                 if (rand_seed.toString() == "null" || variables_num.toString() == "null" || arguments_num.toString() == "null" || switch_num.toString() == "null" || case_num.toString() == "null" || nesting_level.toString() == "null")
                                     call.respondText("$TEXT_$TEXT")
-                                else {
-                                    val parameters = ProgramParameters(task.toString(), rand_seed.toString(), variables_num.toString(), arguments_num.toString(), switch_num.toString(), case_num.toString(), nesting_level.toString())
-                                    val generator = Generator(parameters)
-                                    call.respondText("${generator.programGenerate().joinToString("")}")
-                                }
+                                else
+                                    parameters = ProgramParameters(task.toString(), rand_seed.toString(), variables_num.toString(), arguments_num.toString(), switch_num.toString(), case_num.toString(), nesting_level.toString())
                             }
                             4 -> {
                                 if (rand_seed.toString() == "null" || variables_num.toString() == "null" || arguments_num.toString() == "null" || while_num.toString() == "null" || nesting_level.toString() == "null")
                                     call.respondText("$TEXT_$TEXT")
-                                else {
-                                    val parameters = ProgramParameters(task.toString(), rand_seed.toString(), variables_num.toString(), arguments_num.toString(), while_num.toString(), nesting_level.toString())
-                                    val generator = Generator(parameters)
-                                    call.respondText("${generator.programGenerate().joinToString("")}")
-                                }
+                                else
+                                    parameters = ProgramParameters(task.toString(), rand_seed.toString(), variables_num.toString(), arguments_num.toString(), while_num.toString(), nesting_level.toString())
                             }
                             5 -> {
                                 if (rand_seed.toString() == "null" || variables_num.toString() == "null" || arguments_num.toString() == "null" || do_while_num.toString() == "null" || nesting_level.toString() == "null")
                                     call.respondText("$TEXT_$TEXT")
-                                else {
-                                    val parameters = ProgramParameters(task.toString(), rand_seed.toString(), variables_num.toString(), arguments_num.toString(), do_while_num.toString(), nesting_level.toString())
-                                    val generator = Generator(parameters)
-                                    call.respondText("${generator.programGenerate().joinToString("")}")
-                                }
+                                else
+                                    parameters = ProgramParameters(task.toString(), rand_seed.toString(), variables_num.toString(), arguments_num.toString(), do_while_num.toString(), nesting_level.toString())
                             }
                             6 -> {
                                 if (rand_seed.toString() == "null" || variables_num.toString() == "null" || arguments_num.toString() == "null" || for_num.toString() == "null" || size.toString() == "null" || nesting_level.toString() == "null")
                                     call.respondText("$TEXT_$TEXT")
-                                else {
-                                    val parameters = ProgramParameters(task.toString(), rand_seed.toString(), variables_num.toString(), arguments_num.toString(), for_num.toString(), size.toString(), nesting_level.toString())
-                                    val generator = Generator(parameters)
-                                    call.respondText("${generator.programGenerate().joinToString("")}")
-                                }
+                                else
+                                    parameters = ProgramParameters(task.toString(), rand_seed.toString(), variables_num.toString(), arguments_num.toString(), for_num.toString(), size.toString(), nesting_level.toString())
                             }
+                        }
+                        if (parameters.getTask_() != 0) {
+                            val generator = Generator(parameters)
+                            generator.programGenerate()
+//                            call.respondText("${generator.programGenerate().joinToString("")}")
+                            call.respondText("${generator.runtime().joinToString("")}")
                         }
                     }
                     else {

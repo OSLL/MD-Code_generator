@@ -127,6 +127,8 @@ class ProgramParameters {
         if (printf_num == 1) nesting_level = 0
     }
 
+//    val parameters = ProgramParameters(task.toString(), rand_seed.toString(), variables_num.toString(), arguments_num.toString(), for_num.toString(), size.toString(), nesting_level.toString())
+
     constructor(task_: String, rand_seed_: String, variables_num_: String, arguments_num_: String, printf_num_: String, size: String, nesting_level_: String) {
         task = parseInt(task_)
         rand_seed = parseInt(rand_seed_)
