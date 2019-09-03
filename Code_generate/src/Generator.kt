@@ -59,7 +59,7 @@ class Generator {
             program.getProgram().addAll(Include(1))
         program.getProgram().add(CARRIAGE_RETURN)
         program.getProgram().addAll(Main())
-
+        
         var file = File("func.c")
         file.writeText(program.getProgram().joinToString(""))
 
@@ -69,6 +69,7 @@ class Generator {
     fun runtime(): MutableList<String> {
 //        Runtime.getRuntime().exec("clang-format -i func.c")
 //        Runtime.getRuntime().exec("gcc func.c -o func")
+//        val process: Process = Runtime.getRuntime().exec("./func.c")
         val process: Process = Runtime.getRuntime().exec("./run.sh")
         val is_: BufferedReader = BufferedReader(InputStreamReader(process.getInputStream()))
         var line = is_.readLine()
@@ -163,7 +164,6 @@ class Generator {
 
     fun itemSelection() : MutableList<String> {
         val program_: MutableList<String> = mutableListOf()
-
         when (parameters.getTask_()) {
             1 -> { //arithmetic operating block
                 program_.addAll(Init(program.getProgram()))
@@ -905,7 +905,6 @@ class Generator {
             program_.add(EQUALLY)
             program_.add("$step")
         }
-
         return program_
     }
 
@@ -919,7 +918,9 @@ class Generator {
         p.addAll(program_)
         val visibleVar = findVisibleVar(p)
         val variable: String
-        val flag = randList_.randListBoolPop(randList_.listBool)
+        var flag: Boolean
+        if (!visibleVar.getVariableInt().isEmpty()) flag = false
+        else flag = randList_.randListBoolPop(randList_.listBool)
         if (flag) variable = returnIntVariable(visibleVar)
         else variable = "${IDENTIFIER[randList_.randListIntPop(randList_.indexVariableList)]}$UNDERSCORE"
 

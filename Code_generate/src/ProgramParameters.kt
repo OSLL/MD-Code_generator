@@ -81,16 +81,12 @@ class ProgramParameters {
             }
             6 -> {
                 arguments_num = parseInt(args[3])
-                if ( arguments_num < 1)
-                    arguments_num = 1
+                if ( arguments_num < 1) arguments_num = 1
                 for_num = parseInt(args[4])
                 printf_num = for_num
                 nesting_level = parseInt(args[5])
-                if (for_num == 1)
-                    nesting_level = 0
-
-                if (task == 6)
-                    size_ = parseInt(args[6])
+                if (for_num == 1) nesting_level = 0
+                size_ = parseInt(args[6])
             }
             else -> {
             }
@@ -143,9 +139,9 @@ class ProgramParameters {
                 printf_num = case_num
             }
             6 -> {
-                printf_num = parseInt(printf_num_)
-                for_num = printf_num
+                for_num = parseInt(printf_num_)
                 size_ = parseInt(size)
+                printf_num = for_num
             }
         }
         nesting_level = parseInt(nesting_level_)

@@ -11,11 +11,11 @@ import java.lang.Integer.parseInt
 val TEXT = "Введите в адресную строку входные данные для задания\n" +
         "Используйте URL код для символов: + - %2b и & - %26\n" +
         "Например: \n" +
-        "/get_source?task=1&rand_seed=19&variables_num=1&statements_num=4&arguments_num=3&printf_num=2&redefinition_var=1&operations=<<,>>,|,%26,*,%2b\n" +
+        "/get_source?task=1&rand_seed=2&variables_num=6&statements_num=7&arguments_num=13&printf_num=3&redefinition_var=1&operations=|,%26,*,%2b\n" +
         "/get_source?task=2&rand_seed=1&variables_num=4&arguments_num=4&if_num=6&nesting_level=4\n" +
         "/get_source?task=3&rand_seed=7&variables_num=8&arguments_num=7&switch_num=7&case_num=6&nesting_level=3\n" +
         "/get_source?task=4&rand_seed=13&variables_num=6&arguments_num=4&while_num=7&nesting_level=3\n" +
-        "/get_source?task=5&rand_seed=12&variables_num=4&arguments_num=3&do_while_num=4&nesting_level=3\n" +
+        "/get_source?task=5&rand_seed=1&variables_num=4&arguments_num=3&do_while_num=4&nesting_level=3\n" +
         "/get_source?task=6&rand_seed=18&variables_num=6&arguments_num=3&for_num=5&size=2&nesting_level=3\n"
 val TEXT_ = "Ошибка ввода. Попробуйте снова.\n\n"
 val TEXT__ = "Задача пока находится в разработке, попробуйте другой тип задач.\n\n"
@@ -89,7 +89,9 @@ class Server {
                             val generator = Generator(parameters)
                             generator.programGenerate()
 //                            call.respondText("${generator.programGenerate().joinToString("")}")
-                            call.respondText("${generator.runtime().joinToString("")}")
+                            val respondText = generator.runtime()
+                            if (!respondText.isEmpty())
+                                call.respondText("${respondText.joinToString("\n")}")
                         }
                     }
                     else {
