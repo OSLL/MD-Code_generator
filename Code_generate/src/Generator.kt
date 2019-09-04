@@ -59,7 +59,7 @@ class Generator {
             program.getProgram().addAll(Include(1))
         program.getProgram().add(CARRIAGE_RETURN)
         program.getProgram().addAll(Main())
-        
+
         var file = File("func.c")
         file.writeText(program.getProgram().joinToString(""))
 
@@ -67,9 +67,6 @@ class Generator {
     }
 
     fun runtime(): MutableList<String> {
-//        Runtime.getRuntime().exec("clang-format -i func.c")
-//        Runtime.getRuntime().exec("gcc func.c -o func")
-//        val process: Process = Runtime.getRuntime().exec("./func.c")
         val process: Process = Runtime.getRuntime().exec("./run.sh")
         val is_: BufferedReader = BufferedReader(InputStreamReader(process.getInputStream()))
         var line = is_.readLine()
@@ -126,13 +123,14 @@ class Generator {
     fun Term(visibleVar: Program): MutableList<String> {
         val program_: MutableList<String> = mutableListOf()
 
+        var variable: String
         if (!parameters.getRedefinitionVar()) {
-            var variable = IDENTIFIER[randList_.randListIntPop(randList_.variableIdList)]
+            variable = IDENTIFIER[randList_.randListIntPop(randList_.variableIdList)]
             while (visibleVar.getVariableUnsInt().contains(variable))
                 variable = IDENTIFIER[randList_.randListIntPop(randList_.variableIdList)]
-            program_.add(variable)
         }
-        else program_.add(IDENTIFIER[randList_.randListIntPop(randList_.variableIdList)])
+        else variable = IDENTIFIER[randList_.randListIntPop(randList_.variableIdList)]
+        program_.add(variable)
         program_.add(EQUALLY)
 
         val flag = randList_.randListBoolPop(randList_.listBool)
@@ -152,12 +150,19 @@ class Generator {
 
         if (flag) program_.add(ROUND_BRACKET_)
         program_.add(END_OF_LINE)
+        program.getVariableUnsInt().add(variable)
         program.incrementCounterTerm()
 
-        if (parameters.getPrintfNum() == 2 && program.getCounterTerm() % (parameters.getStatementsNum() / (parameters.getPrintfNum())) == 0
-            || parameters.getStatementsNum() - program.getCounterTerm() == 0
-            || program.getCounterTerm() % (parameters.getStatementsNum() / (parameters.getPrintfNum() - 1)) == 0)
-            program_.addAll(Printf(visibleVar))
+        val prog = mutableListOf<String>()
+        prog.addAll(program.getProgram())
+        prog.addAll(program_)
+        val visibleVar_ = findVisibleVar(prog)
+        if (parameters.getStatementsNum() / parameters.getPrintfNum() == 0) program_.addAll(Printf(visibleVar_))
+        else
+            if (parameters.getPrintfNum() == 2 && program.getCounterTerm() % (parameters.getStatementsNum() / parameters.getPrintfNum()) == 0
+                    || parameters.getStatementsNum() - program.getCounterTerm() == 0
+                    || program.getCounterTerm() % (parameters.getStatementsNum() / (parameters.getPrintfNum() - 1)) == 0)
+                    program_.addAll(Printf(visibleVar_))
 
         return program_
     }
@@ -329,8 +334,9 @@ class Generator {
         when (parameters.getTask_()) {
             1 -> {
                 //номера инициализированных переменных
-                val initialized_args = randList_.rand(0, parameters.getVariablesNum() - 1, parameters.getRandSeed())
+                var initialized_args = randList_.rand(0, parameters.getVariablesNum() - 1, parameters.getRandSeed())
 
+                if (parameters.getVariablesNum() == 1) initialized_args = -1
                 for (i in 0..initialized_args) {
                     program_.add(UNSIGNED_INT)
                     program_.add(" ")
