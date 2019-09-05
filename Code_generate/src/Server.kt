@@ -6,6 +6,7 @@ import io.ktor.routing.get
 import io.ktor.routing.routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
+import java.io.File
 import java.lang.Integer.parseInt
 
 val TEXT = "Введите в адресную строку входные данные для задания\n" +
@@ -87,22 +88,86 @@ class Server {
                         }
                         if (0 < parameters.getTask_() && parameters.getTask_() < 7) {
                             val generator = Generator(parameters)
-                            generator.programGenerate()
+//                            generator.programGenerate()
+                            val func = generator.programGenerate().joinToString("")
 //                            call.respondText("${generator.programGenerate().joinToString("")}")
 //                            Runtime.getRuntime().exec("./run.sh")
                             generator.runtime()
 
-                            val func = generator.readFile("func.c")
-                            val result = generator.readFile("1.txt")
-                            call.respondText("$result")
+//                            val func = readFile("func.c")
+//                            val result = readFile("1.txt")
+                            call.respondText("$func")
                         }
                     }
-                    else {
-                        call.respondText("$TEXT_$TEXT")
+                    else call.respondText("$TEXT_$TEXT")
+                }
+                get("/check_answer") {
+                    val task: String? = call.request.queryParameters["task"]
+                    val rand_seed: String? = call.request.queryParameters["rand_seed"]
+                    val variables_num: String? = call.request.queryParameters["variables_num"]
+                    val statements_num: String? = call.request.queryParameters["statements_num"]
+                    val arguments_num: String? = call.request.queryParameters["arguments_num"]
+                    val printf_num: String? = call.request.queryParameters["printf_num"]
+                    val redefinition_var: String? = call.request.queryParameters["redefinition_var"]
+                    val operations: String? = call.request.queryParameters["operations"]
+                    val if_num: String? = call.request.queryParameters["if_num"]
+                    val switch_num: String? = call.request.queryParameters["switch_num"]
+                    val case_num: String? = call.request.queryParameters["case_num"]
+                    val while_num: String? = call.request.queryParameters["while_num"]
+                    val do_while_num: String? = call.request.queryParameters["do_while_num"]
+                    val for_num: String? = call.request.queryParameters["for_num"]
+                    val size: String? = call.request.queryParameters["size"]
+                    val nesting_level: String? = call.request.queryParameters["nesting_level"]
+                    val answer: String? = call.request.queryParameters["answer"]
+
+                    if (task.toString() != "null" && answer.toString() != "null") {
+                        when (parseInt(task)) {
+                            1 -> {
+                                if (rand_seed.toString() == "null" || variables_num.toString() == "null" || statements_num.toString() == "null" || arguments_num.toString() == "null" || printf_num.toString() == "null" || redefinition_var.toString() == "null" || operations.toString() == "null")
+                                    call.respondText("$TEXT_$TEXT")
+                            }
+                            2 -> {
+                                if (rand_seed.toString() == "null" || variables_num.toString() == "null" || arguments_num.toString() == "null" || if_num.toString() == "null" || nesting_level.toString() == "null")
+                                    call.respondText("$TEXT_$TEXT")
+                            }
+                            3 -> {
+                                if (rand_seed.toString() == "null" || variables_num.toString() == "null" || arguments_num.toString() == "null" || switch_num.toString() == "null" || case_num.toString() == "null" || nesting_level.toString() == "null")
+                                    call.respondText("$TEXT_$TEXT")
+                            }
+                            4 -> {
+                                if (rand_seed.toString() == "null" || variables_num.toString() == "null" || arguments_num.toString() == "null" || while_num.toString() == "null" || nesting_level.toString() == "null")
+                                    call.respondText("$TEXT_$TEXT")
+                            }
+                            5 -> {
+                                if (rand_seed.toString() == "null" || variables_num.toString() == "null" || arguments_num.toString() == "null" || do_while_num.toString() == "null" || nesting_level.toString() == "null")
+                                    call.respondText("$TEXT_$TEXT")
+                            }
+                            6 -> {
+                                if (rand_seed.toString() == "null" || variables_num.toString() == "null" || arguments_num.toString() == "null" || for_num.toString() == "null" || size.toString() == "null" || nesting_level.toString() == "null")
+                                    call.respondText("$TEXT_$TEXT")
+                            }
+                        }
+                        if (0 < parseInt(task) && parseInt(task) < 7) {
+
+//                            val func = readFile("func.c")
+                            var result = readFile("1.txt")
+//                            call.respondText("result:\n$result")
+//                            call.respondText("answer:\n$answer")
+                            result = result.replace(CARRIAGE_RETURN, "")
+                            var flag = 300
+                            if (result == answer)
+                                flag = 200
+                            call.respondText("$flag\n\nresult:\n$result\n\nanswer:\n$answer")
+                        }
                     }
+                    else call.respondText("$TEXT_$TEXT")
+
                 }
             }
         }
         server.start(wait = true)
     }
+
+    fun readFile(fileName: String) = File(fileName).inputStream().readBytes().toString(Charsets.UTF_8)
+
 }

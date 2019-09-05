@@ -65,7 +65,6 @@ class Generator {
 
         return program.getProgram()
     }
-    fun readFile(fileName: String) = File(fileName).inputStream().readBytes().toString(Charsets.UTF_8)
 
     fun runtime()/*: MutableList<String>*/ {
 //        Runtime.getRuntime().exec("clang-format -i func.c")
