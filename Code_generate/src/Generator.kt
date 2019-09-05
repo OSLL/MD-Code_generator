@@ -65,18 +65,26 @@ class Generator {
 
         return program.getProgram()
     }
+    fun readFile(fileName: String) = File(fileName).inputStream().readBytes().toString(Charsets.UTF_8)
 
-    fun runtime(): MutableList<String> {
+    fun runtime()/*: MutableList<String>*/ {
+//        Runtime.getRuntime().exec("clang-format -i func.c")
+//        Runtime.getRuntime().exec("gcc func.c -o func")
+//        val process: Process = Runtime.getRuntime().exec("./func > 1.txt")
         val process: Process = Runtime.getRuntime().exec("./run.sh")
+//        if (process.exitValue() == 0)
+//            return true
+//        return false
         val is_: BufferedReader = BufferedReader(InputStreamReader(process.getInputStream()))
         var line = is_.readLine()
-        val line_ = mutableListOf<String>()
+//        val line_ = mutableListOf<String>()
+//
+//        while (line != null) {
+//            line_.add(line)
+//            line = is_.readLine()
+//        }
+//        return line_
 
-        while (line != null) {
-            line_.add(line)
-            line = is_.readLine()
-        }
-        return line_
     }
 
     fun unsignedIntVariableIndex(visibleVar: Program): Int {

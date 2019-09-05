@@ -85,13 +85,16 @@ class Server {
                                     parameters = ProgramParameters(task.toString(), rand_seed.toString(), variables_num.toString(), arguments_num.toString(), for_num.toString(), size.toString(), nesting_level.toString())
                             }
                         }
-                        if (parameters.getTask_() != 0) {
+                        if (0 < parameters.getTask_() && parameters.getTask_() < 7) {
                             val generator = Generator(parameters)
                             generator.programGenerate()
 //                            call.respondText("${generator.programGenerate().joinToString("")}")
-                            val respondText = generator.runtime()
-                            if (!respondText.isEmpty())
-                                call.respondText("${respondText.joinToString("\n")}")
+//                            Runtime.getRuntime().exec("./run.sh")
+                            generator.runtime()
+
+                            val func = generator.readFile("func.c")
+                            val result = generator.readFile("1.txt")
+                            call.respondText("$result")
                         }
                     }
                     else {
