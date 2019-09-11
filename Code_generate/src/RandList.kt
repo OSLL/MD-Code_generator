@@ -71,7 +71,7 @@ class RandList {
             randList.remove(index)
             return index
         }
-        return 0
+        return 1
     }
 
     //возвращает первое число из списка float и удаляет его
@@ -81,7 +81,7 @@ class RandList {
             randList.remove(value)
             return value
         }
-        return 0F
+        return 1F
     }
 
     //возвращает первое число из списка и удаляет его Boolean

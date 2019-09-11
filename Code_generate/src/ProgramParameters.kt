@@ -18,7 +18,6 @@ class ProgramParameters {
     var redefiniton_var = false
     val OPERATIONS_TYPE: MutableList<String> = mutableListOf()
     var nesting_level = 0
-    var size_ = 0
 
     constructor() { }
 
@@ -86,9 +85,20 @@ class ProgramParameters {
                 printf_num = for_num
                 nesting_level = parseInt(args[5])
                 if (for_num == 1) nesting_level = 0
-                size_ = parseInt(args[6])
             }
-            else -> {
+            7 -> {
+                arguments_num = parseInt(args[3])
+                if ( arguments_num < 1) arguments_num = 1
+                if_num = parseInt(args[4])
+                switch_num = parseInt(args[5])
+                case_num = parseInt(args[6])
+                if (case_num < 2) case_num = 2
+                while_num = parseInt(args[7])
+                do_while_num = parseInt(args[8])
+                for_num = parseInt(args[9])
+                printf_num = if_num + case_num + while_num + do_while_num + for_num
+                nesting_level = parseInt(args[10])
+                if (printf_num == 1) nesting_level = 0
             }
         }
     }
@@ -118,32 +128,22 @@ class ProgramParameters {
             2 -> if_num = printf_num
             4 -> while_num = printf_num
             5 -> do_while_num = printf_num
+            6 -> for_num = printf_num
         }
         nesting_level = parseInt(nesting_level_)
         if (printf_num == 1) nesting_level = 0
     }
 
-//    val parameters = ProgramParameters(task.toString(), rand_seed.toString(), variables_num.toString(), arguments_num.toString(), for_num.toString(), size.toString(), nesting_level.toString())
-
-    constructor(task_: String, rand_seed_: String, variables_num_: String, arguments_num_: String, printf_num_: String, size: String, nesting_level_: String) {
+    constructor(task_: String, rand_seed_: String, variables_num_: String, arguments_num_: String, printf_num_: String, case_num: String, nesting_level_: String) {
         task = parseInt(task_)
         rand_seed = parseInt(rand_seed_)
         variables_num = parseInt(variables_num_)
 
         arguments_num = parseInt(arguments_num_)
         if ( arguments_num < 1) arguments_num = 1
-        when (task) {
-            3 -> {
-                switch_num = parseInt(printf_num_)
-                case_num = parseInt(size)
-                printf_num = case_num
-            }
-            6 -> {
-                for_num = parseInt(printf_num_)
-                size_ = parseInt(size)
-                printf_num = for_num
-            }
-        }
+        switch_num = parseInt(printf_num_)
+        this.case_num = parseInt(case_num)
+        printf_num = this.case_num
         nesting_level = parseInt(nesting_level_)
         if (printf_num == 1) nesting_level = 0
     }
@@ -208,7 +208,4 @@ class ProgramParameters {
         return nesting_level
     }
 
-    fun getSize(): Int {
-        return size_
-    }
 }

@@ -17,7 +17,7 @@ val TEXT = "Введите в адресную строку входные да�
         "/get_source?task=3&rand_seed=7&variables_num=8&arguments_num=7&switch_num=7&case_num=6&nesting_level=3\n" +
         "/get_source?task=4&rand_seed=13&variables_num=6&arguments_num=4&while_num=7&nesting_level=3\n" +
         "/get_source?task=5&rand_seed=1&variables_num=4&arguments_num=3&do_while_num=4&nesting_level=3\n" +
-        "/get_source?task=6&rand_seed=18&variables_num=6&arguments_num=3&for_num=5&size=2&nesting_level=3\n"
+        "/get_source?task=6&rand_seed=18&variables_num=6&arguments_num=3&for_num=5&nesting_level=3\n"
 val TEXT_ = "Ошибка ввода. Попробуйте снова.\n\n"
 val TEXT__ = "Задача пока находится в разработке, попробуйте другой тип задач.\n\n"
 
@@ -43,7 +43,6 @@ class Server {
                     val while_num: String? = call.request.queryParameters["while_num"]
                     val do_while_num: String? = call.request.queryParameters["do_while_num"]
                     val for_num: String? = call.request.queryParameters["for_num"]
-                    val size: String? = call.request.queryParameters["size"]
                     val nesting_level: String? = call.request.queryParameters["nesting_level"]
 
                     if (task.toString() != "null") {
@@ -80,21 +79,20 @@ class Server {
                                     parameters = ProgramParameters(task.toString(), rand_seed.toString(), variables_num.toString(), arguments_num.toString(), do_while_num.toString(), nesting_level.toString())
                             }
                             6 -> {
-                                if (rand_seed.toString() == "null" || variables_num.toString() == "null" || arguments_num.toString() == "null" || for_num.toString() == "null" || size.toString() == "null" || nesting_level.toString() == "null")
+                                if (rand_seed.toString() == "null" || variables_num.toString() == "null" || arguments_num.toString() == "null" || for_num.toString() == "null" || nesting_level.toString() == "null")
                                     call.respondText("$TEXT_$TEXT")
                                 else
-                                    parameters = ProgramParameters(task.toString(), rand_seed.toString(), variables_num.toString(), arguments_num.toString(), for_num.toString(), size.toString(), nesting_level.toString())
+                                    parameters = ProgramParameters(task.toString(), rand_seed.toString(), variables_num.toString(), arguments_num.toString(), for_num.toString(), nesting_level.toString())
                             }
                         }
                         if (0 < parameters.getTask_() && parameters.getTask_() < 7) {
                             val generator = Generator(parameters)
-//                            generator.programGenerate()
-                            val func = generator.programGenerate().joinToString("")
+                            generator.programGenerate()
 //                            call.respondText("${generator.programGenerate().joinToString("")}")
 //                            Runtime.getRuntime().exec("./run.sh")
                             generator.runtime()
 
-//                            val func = readFile("func.c")
+                            val func = readFile("func.c")
 //                            val result = readFile("1.txt")
                             call.respondText("$func")
                         }
@@ -116,7 +114,6 @@ class Server {
                     val while_num: String? = call.request.queryParameters["while_num"]
                     val do_while_num: String? = call.request.queryParameters["do_while_num"]
                     val for_num: String? = call.request.queryParameters["for_num"]
-                    val size: String? = call.request.queryParameters["size"]
                     val nesting_level: String? = call.request.queryParameters["nesting_level"]
                     val answer: String? = call.request.queryParameters["answer"]
 
@@ -143,7 +140,7 @@ class Server {
                                     call.respondText("$TEXT_$TEXT")
                             }
                             6 -> {
-                                if (rand_seed.toString() == "null" || variables_num.toString() == "null" || arguments_num.toString() == "null" || for_num.toString() == "null" || size.toString() == "null" || nesting_level.toString() == "null")
+                                if (rand_seed.toString() == "null" || variables_num.toString() == "null" || arguments_num.toString() == "null" || for_num.toString() == "null" || nesting_level.toString() == "null")
                                     call.respondText("$TEXT_$TEXT")
                             }
                         }
@@ -153,10 +150,13 @@ class Server {
                             var result = readFile("1.txt")
 //                            call.respondText("result:\n$result")
 //                            call.respondText("answer:\n$answer")
-                            result = result.replace(CARRIAGE_RETURN, "")
                             var flag = 300
+                            result = result.replace(CARRIAGE_RETURN, "")
+
                             if (result == answer)
                                 flag = 200
+//                                call.response.status(200)
+//                            call.response.status(300)
                             call.respondText("$flag\n\nresult:\n$result\n\nanswer:\n$answer")
                         }
                     }
