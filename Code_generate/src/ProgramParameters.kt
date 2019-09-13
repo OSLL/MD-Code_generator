@@ -53,7 +53,7 @@ class ProgramParameters {
                 switch_num = parseInt(args[4])
                 case_num = parseInt(args[5])
                 if (case_num < 2) case_num = 2
-                printf_num = case_num
+                printf_num = switch_num * case_num
                 nesting_level = parseInt(args[6])
                 if (switch_num == 1)
                     nesting_level = 0
@@ -96,7 +96,7 @@ class ProgramParameters {
                 while_num = parseInt(args[7])
                 do_while_num = parseInt(args[8])
                 for_num = parseInt(args[9])
-                printf_num = if_num + case_num + while_num + do_while_num + for_num
+                printf_num = if_num + switch_num * case_num + while_num + do_while_num + for_num
                 nesting_level = parseInt(args[10])
                 if (printf_num == 1) nesting_level = 0
             }
