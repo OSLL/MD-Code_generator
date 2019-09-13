@@ -67,7 +67,7 @@ class Generator {
 //        var file = File("func_$time.c")
 //        Runtime.getRuntime().exec("clang-format -i func_$time.c")
 
-        var file = File("func.c")
+        var file = File("program.c")
         file.writeText(program.getProgram().joinToString(""))
 
         return program.getProgram()
@@ -95,6 +95,8 @@ class Generator {
     }
 
     fun unsignedIntVariableIndex(visibleVar: Program): Int {
+        if (visibleVar.getVariableUnsInt().size == 1)
+            return 0
         var index = randList_.randListIntPop(randList_.variableIdList)
         while (index > visibleVar.getVariableUnsInt().size - 1)
             index = randList_.randListIntPop(randList_.variableIdList)
@@ -116,7 +118,7 @@ class Generator {
 
         if (argNum > 1) {
             val operation = parameters.OPERATIONS_TYPE[randList_.randListIntPop(randList_.operationIdList)]
-            if (operation != BITWISE_OPERATIONS[0] && operation != BITWISE_OPERATIONS[1]) {
+            if (operation != BITWISE_OPERATIONS[0] && operation != BITWISE_OPERATIONS[1] && operation != DIV && operation != MOD) {
                 program_.add(operation)
                 val flag = randList_.randListBoolPop(randList_.listBool)
                 if (flag) program_.add(ROUND_BRACKET)
@@ -130,7 +132,6 @@ class Generator {
                 program_.add("${randList_.randListIntPop(randList_.listInt)}")
             }
         }
-
         return program_
     }
 
@@ -152,7 +153,7 @@ class Generator {
         if (flag) program_.add(ROUND_BRACKET)
         program_.addAll(unsignedIntVariableOrNumber(visibleVar))
         val operation = parameters.OPERATIONS_TYPE[randList_.randListIntPop(randList_.operationIdList)]
-        if (operation != BITWISE_OPERATIONS[0] && operation != BITWISE_OPERATIONS[1]) {
+        if (operation != BITWISE_OPERATIONS[0] && operation != BITWISE_OPERATIONS[1] && operation != DIV && operation != MOD) {
             program_.add(operation)
             program_.addAll(unsignedIntVariableOrNumber(visibleVar))
             if (parameters.getArgumentsNum() > 2 && randList_.randListBoolPop(randList_.listBool))
@@ -178,7 +179,6 @@ class Generator {
                     || parameters.getStatementsNum() - program.getCounterTerm() == 0
                     || program.getCounterTerm() % (parameters.getStatementsNum() / (parameters.getPrintfNum() - 1)) == 0)
                     program_.addAll(Printf(visibleVar_))
-
         return program_
     }
 
@@ -354,8 +354,13 @@ class Generator {
         val program_: MutableList<String> = mutableListOf()
 
         if (argNum > 1) {
-            program_.add(ARITHMETIC_OPERATIONS[randList_.randListIntPop(randList_.operationIdList)])
-            program_.addAll(addFloatOrInt(visibleVar))
+            val operation = ARITHMETIC_OPERATIONS[randList_.randListIntPop(randList_.operationIdList)]
+            program_.add(operation)
+            if (operation == MOD || operation == DIV) {
+                if (randList_.randListBoolPop(randList_.listBool)) program_.add("${randList_.randListFloatPop(randList_.listFloat)}")
+                else program_.add("${randList_.randListIntPop(randList_.listInt)}")
+            }
+            else program_.addAll(addFloatOrInt(visibleVar))
 
             if (argNum - 1 > 1 && randList_.randListBoolPop(randList_.listBool))
                 program_.addAll(InitAddition(argNum - 1, visibleVar))
@@ -562,7 +567,7 @@ class Generator {
         val flag_ = randList_.randListBoolPop(randList_.listBool)
         val operation = ARITHMETIC_OPERATIONS[randList_.randListIntPop(randList_.operationIdList)]
         val b: String
-        if (!visibleVar.getVariableFloat().isEmpty() && !visibleVar.getVariableInt().isEmpty())
+        if (!visibleVar.getVariableFloat().isEmpty() && !visibleVar.getVariableInt().isEmpty() && flag_ && (operation != MOD && operation != DIV))
             b = returnVariable(visibleVar)
         else b = "${randList_.randListIntPop(randList_.listInt)}"
         var format_code = "%i"
@@ -705,16 +710,6 @@ class Generator {
 
     fun Condition(visibleVar: Program): MutableList<String> {
         val program_: MutableList<String> = mutableListOf()
-/*
-    print("condition: ")
-    for (i: Int in 0..prog.getVariableBool().size - 1)
-        print(prog.getVariableBoolIndex(i) + ", ")
-    for (i: Int in 0..prog.getVariableFloat().size - 1)
-        print(prog.getVariableFloatIndex(i) + ", ")
-    for (i: Int in 0..prog.getVariableInt().size - 1)
-        print(prog.getVariableIntIndex(i) + ", ")
-    println("")
-*/
 
         if (visibleVar.getVariableBool().size == 0 && visibleVar.getVariableFloat().size == 0 && visibleVar.getVariableInt().size == 1) {
             program_.add(visibleVar.getVariableIntIndex(0))
@@ -849,6 +844,8 @@ class Generator {
                         operation = ARITHMETIC_OPERATIONS[randList_.randListIntPop(randList_.operationIdList)]
                     }
                 }
+
+                if (operation == DIV || operation == MOD) b = "${randList_.randListIntPop(randList_.listInt)}"
 
                 program_.add(a)
                 program_.add(operation)
@@ -1046,7 +1043,9 @@ class Generator {
             if (program.getVariableInt().contains(condition[i])) { //int variable
                 if (randList_.randListBoolPop(randList_.listBool)) {
                     program_.add(condition[i])
-                    program_.add(ARITHMETIC_OPERATIONS[randList_.randListIntPop(randList_.operationIdList)])
+                    var operation = ARITHMETIC_OPERATIONS[randList_.randListIntPop(randList_.operationIdList)]
+                    if (operation == MOD || operation == DIV) operation = ARITHMETIC_OPERATIONS[0]
+                    program_.add(operation)
                     program_.add(EQUALLY)
                     if (parameters.getArgumentsNum() > 2 && randList_.randListBoolPop(randList_.listBool))
                         program_.addAll(InitModOperation(parameters.getArgumentsNum(), visibleVar))
@@ -1065,7 +1064,9 @@ class Generator {
             if (program.getVariableFloat().contains(condition[i])) { //float variable
                 if (randList_.randListBoolPop(randList_.listBool)) {
                     program_.add(condition[i])
-                    program_.add(ARITHMETIC_OPERATIONS[randList_.randListIntPop(randList_.operationIdList)])
+                    var operation = ARITHMETIC_OPERATIONS[randList_.randListIntPop(randList_.operationIdList)]
+                    if (operation == MOD || operation == DIV) operation = ARITHMETIC_OPERATIONS[0]
+                    program_.add(operation)
                     program_.add(EQUALLY)
                     if (parameters.getArgumentsNum() > 2 && randList_.randListBoolPop(randList_.listBool))
                         program_.addAll(InitModOperation(parameters.getArgumentsNum(), visibleVar))
