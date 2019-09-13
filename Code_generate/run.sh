@@ -1,4 +1,4 @@
 #!/bin/bash
-clang-format -i func.c
-gcc func.c -o func
-./func > 1.txt
+clang-format -i program.c
+gcc program.c -o program
+./program > program_result.txt
