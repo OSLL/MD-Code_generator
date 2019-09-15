@@ -17,7 +17,9 @@ val TEXT = "Введите в адресную строку входные да�
         "/get_source?task=3&rand_seed=7&variables_num=8&arguments_num=7&switch_num=7&case_num=6&nesting_level=3\n" +
         "/get_source?task=4&rand_seed=13&variables_num=6&arguments_num=4&while_num=7&nesting_level=3\n" +
         "/get_source?task=5&rand_seed=1&variables_num=4&arguments_num=3&do_while_num=4&nesting_level=3\n" +
-        "/get_source?task=6&rand_seed=18&variables_num=6&arguments_num=3&for_num=5&nesting_level=3\n"
+        "/get_source?task=6&rand_seed=18&variables_num=6&arguments_num=3&for_num=5&nesting_level=3\n" +
+        "/get_source?task=7&rand_seed=10&variables_num=10&arguments_num=5&if_num=2&switch_num=3&case_num=3&while_num=2&do_while=1&for_num=2&nesting_level=3"
+
 val TEXT_ = "Ошибка ввода. Попробуйте снова.\n\n"
 val TEXT__ = "Задача пока находится в разработке, попробуйте другой тип задач.\n\n"
 
@@ -84,15 +86,21 @@ class Server {
                                 else
                                     parameters = ProgramParameters(task.toString(), rand_seed.toString(), variables_num.toString(), arguments_num.toString(), for_num.toString(), nesting_level.toString())
                             }
+                            7 -> {
+                                if (rand_seed.toString() != "null" && variables_num.toString() != "null" && arguments_num.toString() != "null" && nesting_level.toString() != "null"
+                                    && (if_num.toString() != "null" || (switch_num.toString() != "null" && case_num.toString() != "null") || while_num.toString() != "null" || do_while_num.toString() != "null" || for_num != "null"))
+                                    parameters = ProgramParameters(task.toString(), rand_seed.toString(), variables_num.toString(), arguments_num.toString(), if_num.toString(), switch_num.toString(), case_num.toString(), while_num.toString(), do_while_num.toString(), for_num.toString(), nesting_level.toString())
+                                else call.respondText("$TEXT_$TEXT")
+                            }
                         }
-                        if (0 < parameters.getTask_() && parameters.getTask_() < 7) {
+                        if (0 < parameters.getTask_() && parameters.getTask_() < 8) {
                             val generator = Generator(parameters)
                             generator.programGenerate()
 //                            call.respondText("${generator.programGenerate().joinToString("")}")
 //                            Runtime.getRuntime().exec("./run.sh")
                             generator.runtime()
 
-                            val func = readFile("func.c")
+                            val func = readFile("program.c")
 //                            val result = readFile("1.txt")
                             call.respondText("$func")
                         }
@@ -143,11 +151,16 @@ class Server {
                                 if (rand_seed.toString() == "null" || variables_num.toString() == "null" || arguments_num.toString() == "null" || for_num.toString() == "null" || nesting_level.toString() == "null")
                                     call.respondText("$TEXT_$TEXT")
                             }
+                            7 -> {
+                                if (!(rand_seed.toString() != "null" && variables_num.toString() != "null" && arguments_num.toString() != "null" && nesting_level.toString() != "null"
+                                            && (if_num.toString() != "null" || (switch_num.toString() != "null" && case_num.toString() != "null") || while_num.toString() != "null" || do_while_num.toString() != "null" || for_num != "null")))
+                                    call.respondText("$TEXT_$TEXT")
+                            }
                         }
-                        if (0 < parseInt(task) && parseInt(task) < 7) {
+                        if (0 < parseInt(task) && parseInt(task) < 8) {
 
 //                            val func = readFile("func.c")
-                            var result = readFile("1.txt")
+                            var result = readFile("program_result.txt")
 //                            call.respondText("result:\n$result")
 //                            call.respondText("answer:\n$answer")
                             var flag = 300

@@ -134,7 +134,7 @@ class ProgramParameters {
         if (printf_num == 1) nesting_level = 0
     }
 
-    constructor(task_: String, rand_seed_: String, variables_num_: String, arguments_num_: String, printf_num_: String, case_num: String, nesting_level_: String) {
+    constructor(task_: String, rand_seed_: String, variables_num_: String, arguments_num_: String, printf_num_: String, case_num_: String, nesting_level_: String) {
         task = parseInt(task_)
         rand_seed = parseInt(rand_seed_)
         variables_num = parseInt(variables_num_)
@@ -142,8 +142,30 @@ class ProgramParameters {
         arguments_num = parseInt(arguments_num_)
         if ( arguments_num < 1) arguments_num = 1
         switch_num = parseInt(printf_num_)
-        this.case_num = parseInt(case_num)
-        printf_num = this.case_num
+        case_num = parseInt(case_num_)
+        if (case_num < 2) case_num = 2
+        printf_num = case_num
+        nesting_level = parseInt(nesting_level_)
+        if (printf_num == 1) nesting_level = 0
+    }
+
+    constructor(task_: String, rand_seed_: String, variables_num_: String, arguments_num_: String, if_num_: String, switch_num_: String, case_num_: String, while_num_: String, do_while_num_: String, for_num_: String, nesting_level_: String) {
+        task = parseInt(task_)
+        rand_seed = parseInt(rand_seed_)
+        variables_num = parseInt(variables_num_)
+
+        arguments_num = parseInt(arguments_num_)
+        if ( arguments_num < 1) arguments_num = 1
+        if (if_num_ != "null") if_num = parseInt(if_num_)
+        if (switch_num_ != "null" && case_num_ != "null") {
+            switch_num = parseInt(switch_num_)
+            case_num = parseInt(case_num_)
+            if (case_num < 2) case_num = 2
+        }
+        if (while_num_ != "null") while_num = parseInt(while_num_)
+        if (do_while_num_ != "null") do_while_num = parseInt(do_while_num_)
+        if (for_num_ != "null") for_num = parseInt(for_num_)
+        printf_num = if_num + switch_num * case_num + while_num + do_while_num + for_num
         nesting_level = parseInt(nesting_level_)
         if (printf_num == 1) nesting_level = 0
     }
