@@ -1,6 +1,7 @@
 package com.example
 
 import io.ktor.application.call
+import io.ktor.http.HttpStatusCode
 import io.ktor.response.respondText
 import io.ktor.routing.get
 import io.ktor.routing.routing
@@ -161,16 +162,13 @@ class Server {
 
 //                            val func = readFile("func.c")
                             var result = readFile("program_result.txt")
-//                            call.respondText("result:\n$result")
-//                            call.respondText("answer:\n$answer")
-                            var flag = 300
                             result = result.replace(CARRIAGE_RETURN, "")
+                            var code : HttpStatusCode
 
-                            if (result == answer)
-                                flag = 200
-//                                call.response.status(200)
-//                            call.response.status(300)
-                            call.respondText("$flag\n\nresult:\n$result\n\nanswer:\n$answer")
+                            if (result == answer) code = HttpStatusCode.OK
+                            else code = HttpStatusCode.MultipleChoices
+                            call.response.status(code)
+                            call.respondText("${code.value}\n\nresult:\n$result\n\nanswer:\n$answer")
                         }
                     }
                     else call.respondText("$TEXT_$TEXT")
