@@ -4,6 +4,7 @@ const val MAX_VALUE: Int = 7
 
 val BOOL = "bool"
 val INT = "int"
+val INT_POINTER = "$INT*"
 val FLOAT = "float"
 val SIZE_T = "size_t"
 val UNSIGNED_INT = "unsigned int"
@@ -20,7 +21,9 @@ val LOGICAL_OR = "||"
 val LOGICAL_OPERATIONS: List<String> = listOf("!", "&&", "||")
 val RELATIONAL_OPERATIONS: List<String> = listOf("<", ">", "<=", ">=", "==", "!=")
 val LESS_THAN = "<"
+val LESS_EQUAL_THAN = "<="
 val MORE_THAN = ">"
+val MORE_EQUAL_THAN = ">="
 val INCREMENT = "++"
 val DECREMENT = "--"
 val BITWISE_OPERATIONS: List<String> = listOf("<<", ">>", "|", "&")

@@ -1011,20 +1011,16 @@ class Generator {
         return program_
     }
 
-    fun incrementOrDecrement(variable: String): MutableList<String> {
+    fun incrementOrDecrement(variable: String, flag: Boolean): MutableList<String> {
         val program_: MutableList<String> = mutableListOf()
         if (randList_.randListBoolPop(randList_.listBool)) {
             program_.add(variable)
-            if (randList_.randListBoolPop(randList_.listBool))
-                program_.add(INCREMENT)
-            else
-                program_.add(DECREMENT)
+            if (flag) program_.add(INCREMENT)
+            else program_.add(DECREMENT)
         }
         else {
-            if (randList_.randListBoolPop(randList_.listBool))
-                program_.add(INCREMENT)
-            else
-                program_.add(DECREMENT)
+            if (flag) program_.add(INCREMENT)
+            else program_.add(DECREMENT)
             program_.add(variable)
         }
         return program_
@@ -1032,19 +1028,35 @@ class Generator {
 
     fun varChange(condition: MutableList<String>, visibleVar: Program): MutableList<String> {
         val program_: MutableList<String> = mutableListOf()
+        var flag = randList_.randListBoolPop(randList_.listBool)
+        if (condition.size != 3) flag = false
+        else {
+            if (condition[1] == MORE_THAN || condition[1] == MORE_EQUAL_THAN || condition[1] == SUBTRACTION
+                || condition[1] == ADDITION || condition[1] == MULTIPLICATION || condition[1] == DIV || condition[1] == MOD)
+                flag = false
+            if (condition[1] == LESS_THAN || condition[1] == LESS_EQUAL_THAN)
+                flag = true
+        }
+
         for (i: Int in 0..condition.size - 1) {
+            var operation = ""
+            if (flag) {
+                if (randList_.randListBoolPop(randList_.listBool)) operation = ADDITION
+                else operation = MULTIPLICATION
+            }
+            if (!flag) operation = SUBTRACTION
+
             if (program.getVariableBool().contains(condition[i])) { //bool variable
                 program_.add(condition[i])
                 program_.add(EQUALLY)
                 program_.add(LOGICAL_NEGATION)
                 program_.add(condition[i])
-                break
+                program_.add(END_OF_LINE)
+                return program_
             }
             if (program.getVariableInt().contains(condition[i])) { //int variable
                 if (randList_.randListBoolPop(randList_.listBool)) {
                     program_.add(condition[i])
-                    var operation = ARITHMETIC_OPERATIONS[randList_.randListIntPop(randList_.operationIdList)]
-                    if (operation == MOD || operation == DIV) operation = ARITHMETIC_OPERATIONS[0]
                     program_.add(operation)
                     program_.add(EQUALLY)
                     if (parameters.getArgumentsNum() > 2 && randList_.randListBoolPop(randList_.listBool))
@@ -1056,16 +1068,15 @@ class Generator {
                     }
                 }
                 else {
-                    program_.add(INT)
-                    program_.addAll(incrementOrDecrement(condition[i]))
+                    program_.add(INT) //метка для printf
+                    program_.addAll(incrementOrDecrement(condition[i], flag))
                 }
-                break
+                program_.add(END_OF_LINE)
+                return program_
             }
             if (program.getVariableFloat().contains(condition[i])) { //float variable
                 if (randList_.randListBoolPop(randList_.listBool)) {
                     program_.add(condition[i])
-                    var operation = ARITHMETIC_OPERATIONS[randList_.randListIntPop(randList_.operationIdList)]
-                    if (operation == MOD || operation == DIV) operation = ARITHMETIC_OPERATIONS[0]
                     program_.add(operation)
                     program_.add(EQUALLY)
                     if (parameters.getArgumentsNum() > 2 && randList_.randListBoolPop(randList_.listBool))
@@ -1077,10 +1088,11 @@ class Generator {
                     }
                 }
                 else {
-                    program_.add(FLOAT)
-                    program_.addAll(incrementOrDecrement(condition[i]))
+                    program_.add(FLOAT) //метка для printf
+                    program_.addAll(incrementOrDecrement(condition[i], flag))
                 }
-                break
+                program_.add(END_OF_LINE)
+                return program_
             }
         }
         program_.add(END_OF_LINE)
