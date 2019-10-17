@@ -1,15 +1,12 @@
 
 import com.example.BRACE_
 import com.example.CARRIAGE_RETURN
-import com.example.END_OF_LINE
-import com.example.SEMICOLON
 import java.awt.Graphics2D
 import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO
 import java.awt.BasicStroke
 import java.awt.Color
-import javax.swing.Spring.height
 
 class Image {
     constructor(text: String) {
