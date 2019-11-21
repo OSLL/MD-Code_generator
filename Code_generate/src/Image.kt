@@ -1,12 +1,9 @@
+package com.example
 
-import com.example.BRACE_
-import com.example.CARRIAGE_RETURN
-import java.awt.Graphics2D
+import java.awt.Color
 import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO
-import java.awt.BasicStroke
-import java.awt.Color
 
 class Image {
     constructor(text: String) {
@@ -14,11 +11,15 @@ class Image {
         for (i in 0..(text.length - 1))
             if (text[i].toString() == CARRIAGE_RETURN) count++
         count++
-        var image = BufferedImage(400, count * 17, BufferedImage.TYPE_BYTE_GRAY)
-        val g = image.getGraphics() as Graphics2D
-        g.stroke = BasicStroke(3f)
-        g.color = Color.WHITE
-//        g.background = Color.WHITE
+
+        var width = 400
+        var height = count * 17
+
+        var image = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
+        val g = image.createGraphics()
+        g.background = Color.WHITE
+        g.clearRect(0, 0, width, height)
+        g.color = Color.BLACK
         var h = 10
         var w = 7
 
