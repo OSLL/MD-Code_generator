@@ -15,15 +15,17 @@ class ProgramParameters {
     var while_num = 0
     var do_while_num = 0
     var for_num = 0
-    var redefiniton_var = false
+    var redefiniton_var = true
     val OPERATIONS_TYPE: MutableList<String> = mutableListOf()
     var nesting_level = 0
+    var array_num = 0
+    var array_size = 0
 
     constructor() { }
 
     constructor(args: MutableList<String>) {
         task = parseInt(args[0])
-        rand_seed = parseInt(args[1])
+        rand_seed = args[1].hashCode()
         variables_num = parseInt(args[2])
 
         when (task) {
@@ -31,7 +33,6 @@ class ProgramParameters {
                 statements_num = parseInt(args[3])
                 arguments_num = parseInt(args[4])
                 printf_num = parseInt(args[5])
-                if (printf_num == 0) printf_num = 1
                 redefiniton_var = false
                 if (parseInt(args[6]) == 1) redefiniton_var = true
                 for (i: Int in 7..args.size - 1)
@@ -39,48 +40,36 @@ class ProgramParameters {
             }
             2 -> {
                 arguments_num = parseInt(args[3])
-                if ( arguments_num < 1)
-                    arguments_num = 1
                 if_num = parseInt(args[4])
                 printf_num = if_num
                 nesting_level = parseInt(args[5])
-                if (if_num == 1)
-                    nesting_level = 0
+                if (if_num == 1) nesting_level = 0
             }
             3 -> {
                 arguments_num = parseInt(args[3])
-                if ( arguments_num < 1) arguments_num = 1
                 switch_num = parseInt(args[4])
                 case_num = parseInt(args[5])
                 if (case_num < 2) case_num = 2
                 printf_num = switch_num * case_num
                 nesting_level = parseInt(args[6])
-                if (switch_num == 1)
-                    nesting_level = 0
+                if (switch_num == 1) nesting_level = 0
             }
             4 -> {
                 arguments_num = parseInt(args[3])
-                if ( arguments_num < 1)
-                    arguments_num = 1
                 while_num = parseInt(args[4])
                 printf_num = while_num
                 nesting_level = parseInt(args[5])
-                if (while_num == 1)
-                    nesting_level = 0
+                if (while_num == 1) nesting_level = 0
             }
             5 -> {
                 arguments_num = parseInt(args[3])
-                if ( arguments_num < 1)
-                    arguments_num = 1
                 do_while_num = parseInt(args[4])
                 printf_num = do_while_num
                 nesting_level = parseInt(args[5])
-                if (do_while_num == 1)
-                    nesting_level = 0
+                if (do_while_num == 1) nesting_level = 0
             }
             6 -> {
                 arguments_num = parseInt(args[3])
-                if ( arguments_num < 1) arguments_num = 1
                 for_num = parseInt(args[4])
                 printf_num = for_num
                 nesting_level = parseInt(args[5])
@@ -88,7 +77,6 @@ class ProgramParameters {
             }
             7 -> {
                 arguments_num = parseInt(args[3])
-                if ( arguments_num < 1) arguments_num = 1
                 if_num = parseInt(args[4])
                 switch_num = parseInt(args[5])
                 case_num = parseInt(args[6])
@@ -100,74 +88,27 @@ class ProgramParameters {
                 nesting_level = parseInt(args[10])
                 if (printf_num == 1) nesting_level = 0
             }
+            8 -> {
+                statements_num = parseInt(args[3])
+                arguments_num = parseInt(args[4])
+                printf_num = parseInt(args[5])
+                if (variables_num < 2) variables_num = 2
+            }
+            9 -> {
+                array_num = parseInt(args[2])
+                if (array_num < 1) array_num = 1
+                array_size = parseInt(args[3])
+                if (array_size < 3) array_size = 3
+                statements_num = parseInt(args[4])
+                if (statements_num < 1) statements_num = 1
+                printf_num = parseInt(args[5])
+            }
         }
-    }
 
-    constructor(task_: String, rand_seed_: String, variables_num_: String, statements_num_: String, arguments_num_: String, printf_num_: String, redefinition_var_: String, operations_: String) {
-        task = parseInt(task_)
-        rand_seed = parseInt(rand_seed_)
-        variables_num = parseInt(variables_num_)
-
-        statements_num = parseInt(statements_num_)
-        arguments_num = parseInt(arguments_num_)
-        printf_num = parseInt(printf_num_)
-        redefiniton_var = false
-        if (parseInt(redefinition_var_) == 1) redefiniton_var = true
-        OPERATIONS_TYPE.addAll(operations_.toString().split(','))
-    }
-
-    constructor(task_: String, rand_seed_: String, variables_num_: String, arguments_num_: String, printf_num_: String, nesting_level_: String) {
-        task = parseInt(task_)
-        rand_seed = parseInt(rand_seed_)
-        variables_num = parseInt(variables_num_)
-
-        arguments_num = parseInt(arguments_num_)
-        if ( arguments_num < 1) arguments_num = 1
-        printf_num = parseInt(printf_num_)
-        when (task) {
-            2 -> if_num = printf_num
-            4 -> while_num = printf_num
-            5 -> do_while_num = printf_num
-            6 -> for_num = printf_num
-        }
-        nesting_level = parseInt(nesting_level_)
-        if (printf_num == 1) nesting_level = 0
-    }
-
-    constructor(task_: String, rand_seed_: String, variables_num_: String, arguments_num_: String, printf_num_: String, case_num_: String, nesting_level_: String) {
-        task = parseInt(task_)
-        rand_seed = parseInt(rand_seed_)
-        variables_num = parseInt(variables_num_)
-
-        arguments_num = parseInt(arguments_num_)
-        if ( arguments_num < 1) arguments_num = 1
-        switch_num = parseInt(printf_num_)
-        case_num = parseInt(case_num_)
-        if (case_num < 2) case_num = 2
-        printf_num = case_num
-        nesting_level = parseInt(nesting_level_)
-        if (printf_num == 1) nesting_level = 0
-    }
-
-    constructor(task_: String, rand_seed_: String, variables_num_: String, arguments_num_: String, if_num_: String, switch_num_: String, case_num_: String, while_num_: String, do_while_num_: String, for_num_: String, nesting_level_: String) {
-        task = parseInt(task_)
-        rand_seed = parseInt(rand_seed_)
-        variables_num = parseInt(variables_num_)
-
-        arguments_num = parseInt(arguments_num_)
-        if ( arguments_num < 1) arguments_num = 1
-        if (if_num_ != "null") if_num = parseInt(if_num_)
-        if (switch_num_ != "null" && case_num_ != "null") {
-            switch_num = parseInt(switch_num_)
-            case_num = parseInt(case_num_)
-            if (case_num < 2) case_num = 2
-        }
-        if (while_num_ != "null") while_num = parseInt(while_num_)
-        if (do_while_num_ != "null") do_while_num = parseInt(do_while_num_)
-        if (for_num_ != "null") for_num = parseInt(for_num_)
-        printf_num = if_num + switch_num * case_num + while_num + do_while_num + for_num
-        nesting_level = parseInt(nesting_level_)
-        if (printf_num == 1) nesting_level = 0
+        if (arguments_num < 1) arguments_num = 1
+        if (printf_num == 0) printf_num = 1
+        if (task == 8)
+            if (printf_num < 2) printf_num = 2
     }
 
     fun getTask_(): Int {
@@ -228,6 +169,18 @@ class ProgramParameters {
 
     fun getNestingLevel(): Int {
         return nesting_level
+    }
+
+    fun println_() {
+        println("[$task $rand_seed $variables_num $arguments_num $printf_num $if_num $switch_num $case_num $while_num $do_while_num $for_num $nesting_level]")
+    }
+
+    fun getArrayNum(): Int {
+        return array_num
+    }
+
+    fun getArraySize(): Int {
+        return array_size
     }
 
 }

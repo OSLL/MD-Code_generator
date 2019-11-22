@@ -81,40 +81,40 @@ class Server {
                         else {
                             args_.addAll(returnArgs_(task, rand_seed, variables_num, statements_num, arguments_num, printf_num, redefinition_var, operations, if_num, switch_num, case_num, while_num, do_while_num, for_num, nesting_level))
                             parameters = ProgramParameters(args_)
-                        }
 
-                        var v_number = ""
-                        var number = 0
-                        var count = 15
+                            var v_number = ""
+                            var number = 0
+                            var count = 15
 
-                        var generator = Generator(parameters)
-                        generator.programGenerate()
+                            var generator = Generator(parameters)
+                            generator.programGenerate()
 
-                        if (!generator.runtime()) {
-                            for (i in (TEMPLATE.length)..(rand_seed.toString().length - 1))
-                                v_number = "$v_number${rand_seed.toString()[i]}"
-                            number = parseInt(v_number)
-                        }
+                            if (!generator.runtime()) {
+                                for (i in (TEMPLATE.length)..(rand_seed.toString().length - 1))
+                                    v_number = "$v_number${rand_seed.toString()[i]}"
+                                number = parseInt(v_number)
+                            }
 
-                        while (!generator.runtime() && count != 0) {
-                            count--
-                            number++
-                            rand_seed = "$TEMPLATE${number}"
-                            args_[1] = rand_seed.toString()
+                            while (!generator.runtime() && count != 0) {
+                                count--
+                                number++
+                                rand_seed = "$TEMPLATE${number}"
+                                args_[1] = rand_seed.toString()
 //                            println(args_)
 
-                            parameters = ProgramParameters(args_)
-                            generator = Generator(parameters)
-                            generator.programGenerate()
-                            if (generator.runtime())
-                                return@get call.respondRedirect(newData("/get_source", task, rand_seed, variables_num, statements_num, arguments_num, printf_num, redefinition_var, operations, if_num, switch_num, case_num, while_num, do_while_num, for_num, nesting_level), permanent = false)
-                        }
+                                parameters = ProgramParameters(args_)
+                                generator = Generator(parameters)
+                                generator.programGenerate()
+                                if (generator.runtime())
+                                    return@get call.respondRedirect(newData("/get_source", task, rand_seed, variables_num, statements_num, arguments_num, printf_num, redefinition_var, operations, if_num, switch_num, case_num, while_num, do_while_num, for_num, nesting_level), permanent = false)
+                            }
 
-                        if (generator.runtime()) {
-                            val func = readFile("program.c")
-                            call.respondText("$func")
+                            if (generator.runtime()) {
+                                val func = readFile("program.c")
+                                call.respondText("$func")
+                            }
+                            else call.respondText("$TEXT___$TEXT")
                         }
-                        else call.respondText("$TEXT___$TEXT")
                     }
                     else call.respondText("$TEXT_$TEXT")
                 }
@@ -143,48 +143,46 @@ class Server {
                         else {
                             args_.addAll(returnArgs_(task, rand_seed, variables_num, statements_num, arguments_num, printf_num, redefinition_var, operations, if_num, switch_num, case_num, while_num, do_while_num, for_num, nesting_level))
                             parameters = ProgramParameters(args_)
-                        }
 
-                        var v_number = ""
-                        var number = 0
-                        var count = 15
+                            var v_number = ""
+                            var number = 0
+                            var count = 15
 
-                        var generator = Generator(parameters)
-                        generator.programGenerate()
+                            var generator = Generator(parameters)
+                            generator.programGenerate()
 
-                        if (!generator.runtime()) {
-                            for (i in (TEMPLATE.length)..(rand_seed.toString().length - 1))
-                                v_number = "$v_number${rand_seed.toString()[i]}"
-                            number = parseInt(v_number)
-                        }
+                            if (!generator.runtime()) {
+                                for (i in (TEMPLATE.length)..(rand_seed.toString().length - 1))
+                                    v_number = "$v_number${rand_seed.toString()[i]}"
+                                number = parseInt(v_number)
+                            }
 
-                        while (!generator.runtime() && count != 0) {
-                            count--
-                            number++
-                            rand_seed = "$TEMPLATE${number}"
-                            args_[1] = rand_seed.toString()
+                            while (!generator.runtime() && count != 0) {
+                                count--
+                                number++
+                                rand_seed = "$TEMPLATE${number}"
+                                args_[1] = rand_seed.toString()
 //                            println(args_)
 
-                            parameters = ProgramParameters(args_)
-                            generator = Generator(parameters)
-                            generator.programGenerate()
-                            if (generator.runtime())
-                                return@get call.respondRedirect(newData("/get_image", task, rand_seed, variables_num, statements_num, arguments_num, printf_num, redefinition_var, operations, if_num, switch_num, case_num, while_num, do_while_num, for_num, nesting_level), permanent = false)
-                        }
+                                parameters = ProgramParameters(args_)
+                                generator = Generator(parameters)
+                                generator.programGenerate()
+                                if (generator.runtime())
+                                    return@get call.respondRedirect(newData("/get_image", task, rand_seed, variables_num, statements_num, arguments_num, printf_num, redefinition_var, operations, if_num, switch_num, case_num, while_num, do_while_num, for_num, nesting_level), permanent = false)
+                            }
 
-                        if (generator.runtime()) {
-                            Image(readFile("program.c"))
-                            call.respondHtml {
-                                body {
-                                    p {
-                                        img(src = "../saved.png", alt = "qwe")
+                            if (generator.runtime()) {
+                                Image(readFile("program.c"))
+                                call.respondHtml {
+                                    body {
+                                        p {
+                                            img(src = "../saved.png", alt = "qwe")
+                                        }
                                     }
                                 }
                             }
-//                            val func = readFile("program.c")
-//                            call.respondText("")
+                            else call.respondText("$TEXT___$TEXT")
                         }
-                        else call.respondText("$TEXT___$TEXT")
                     }
                     else call.respondText("$TEXT_$TEXT")
                 }
@@ -248,74 +246,44 @@ class Server {
 
     fun returnArgs_(task: String?, rand_seed: String?, variables_num: String?, statements_num: String?, arguments_num: String?, printf_num: String?, redefinition_var: String?, operations: String?, if_num: String?, switch_num: String?, case_num: String?, while_num: String?, do_while_num: String?, for_num: String?, nesting_level: String?): MutableList<String> {
         val args_: MutableList<String> = mutableListOf()
+        args_.add(task.toString())
+        args_.add(rand_seed.toString())
+        args_.add(variables_num.toString())
         when (parseInt(task)) {
             1 -> {
-                args_.add(task.toString())
-                args_.add(rand_seed.toString())
-                args_.add(variables_num.toString())
                 args_.add(statements_num.toString())
                 args_.add(arguments_num.toString())
                 args_.add(printf_num.toString())
                 args_.add(redefinition_var.toString())
                 args_.addAll(operations.toString().split(','))
-
-//                parameters = ProgramParameters(task.toString(), rand_seed.toString(), variables_num.toString(), statements_num.toString(), arguments_num.toString(), printf_num.toString(), redefinition_var.toString(), operations.toString())
             }
             2 -> {
-                args_.add(task.toString())
-                args_.add(rand_seed.toString())
-                args_.add(variables_num.toString())
                 args_.add(arguments_num.toString())
                 args_.add(if_num.toString())
                 args_.add(nesting_level.toString())
-
-//                parameters = ProgramParameters(task.toString(), rand_seed.toString(), variables_num.toString(), arguments_num.toString(), if_num.toString(), nesting_level.toString())
             }
             3 -> {
-                args_.add(task.toString())
-                args_.add(rand_seed.toString())
-                args_.add(variables_num.toString())
                 args_.add(arguments_num.toString())
                 args_.add(switch_num.toString())
                 args_.add(case_num.toString())
                 args_.add(nesting_level.toString())
-
-//                parameters = ProgramParameters(task.toString(), rand_seed.toString(), variables_num.toString(), arguments_num.toString(), switch_num.toString(), case_num.toString(), nesting_level.toString())
             }
             4 -> {
-                args_.add(task.toString())
-                args_.add(rand_seed.toString())
-                args_.add(variables_num.toString())
                 args_.add(arguments_num.toString())
                 args_.add(while_num.toString())
                 args_.add(nesting_level.toString())
-
-//                parameters = ProgramParameters(task.toString(), rand_seed.toString(), variables_num.toString(), arguments_num.toString(), while_num.toString(), nesting_level.toString())
             }
             5 -> {
-                args_.add(task.toString())
-                args_.add(rand_seed.toString())
-                args_.add(variables_num.toString())
                 args_.add(arguments_num.toString())
                 args_.add(do_while_num.toString())
                 args_.add(nesting_level.toString())
-
-//                parameters = ProgramParameters(task.toString(), rand_seed.toString(), variables_num.toString(), arguments_num.toString(), do_while_num.toString(), nesting_level.toString())
             }
             6 -> {
-                args_.add(task.toString())
-                args_.add(rand_seed.toString())
-                args_.add(variables_num.toString())
                 args_.add(arguments_num.toString())
                 args_.add(for_num.toString())
                 args_.add(nesting_level.toString())
-
-//                parameters = ProgramParameters(task.toString(), rand_seed.toString(), variables_num.toString(), arguments_num.toString(), for_num.toString(), nesting_level.toString())
             }
             7 -> {
-                args_.add(task.toString())
-                args_.add(rand_seed.toString())
-                args_.add(variables_num.toString())
                 args_.add(arguments_num.toString())
                 args_.add(nesting_level.toString())
                 if (if_num.toString() != "null") args_.add(if_num.toString())
@@ -330,28 +298,16 @@ class Server {
                 else args_.add("0")
                 if (for_num.toString() != "null") args_.add(for_num.toString())
                 else args_.add("0")
-
-//                parameters = ProgramParameters(task.toString(), rand_seed.toString(), variables_num.toString(), arguments_num.toString(), if_num.toString(), switch_num.toString(), case_num.toString(), while_num.toString(), do_while_num.toString(), for_num.toString(), nesting_level.toString())
             }
             8 -> {
-                args_.add(task.toString())
-                args_.add(rand_seed.toString())
-                args_.add(variables_num.toString())
                 args_.add(statements_num.toString())
                 args_.add(arguments_num.toString())
                 args_.add(printf_num.toString())
-
-//                parameters = ProgramParameters(task.toString(), rand_seed.toString(), variables_num.toString(), statements_num.toString(), arguments_num.toString(), printf_num.toString(), true)
             }
             9 -> {
-                args_.add(task.toString())
-                args_.add(rand_seed.toString())
-                args_.add(variables_num.toString())
                 args_.add(statements_num.toString())
                 args_.add(arguments_num.toString())
                 args_.add(printf_num.toString())
-
-//                parameters = ProgramParameters(task.toString(), rand_seed.toString(), variables_num.toString(), statements_num.toString(), arguments_num.toString(), printf_num.toString(), true)
             }
         }
         return args_
