@@ -328,7 +328,7 @@ class Server {
                     val nesting_level: String? = call.request.queryParameters["nesting_level"]
                     val answer: String? = call.request.queryParameters["answer"]
 
-                    if (task.toString() != "null" && 0 < parseInt(task.toString()) && parseInt(task.toString()) < 8 && answer.toString() != "null"
+                    if (task.toString() != "null" && 0 < parseInt(task.toString()) && parseInt(task.toString()) < 10 && answer.toString() != "null"
                         && rand_seed.toString() != "null" && rand_seed.toString().length > 8 && rand_seed.toString().contains(TEMPLATE)) {
                         when (parseInt(task)) {
                             1 -> {
