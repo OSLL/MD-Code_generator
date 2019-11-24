@@ -13,14 +13,8 @@ class Generator {
 
     constructor(param: ProgramParameters) {
         parameters = param
-        when (parameters.getTask_()) {
-            1 -> randList_ = RandList(parameters.getRandSeed(), 50, parameters.getVariablesNum(), parameters.getOperationType().size)
-            6 -> randList_ = RandList(parameters.getRandSeed(), 60, parameters.getVariablesNum(), parameters.getForNum(), 0)
-            7 -> randList_ = RandList(parameters.getRandSeed(), 60, parameters.getVariablesNum(), parameters.getForNum(), 0)
-//            8 -> randList_ = RandList(parameters.getRandSeed(), 60, parameters.getVariablesNum(), parameters.getForNum(), 0)
-            9 -> randList_ = RandList(parameters.getRandSeed(), 100, parameters.getArrayNum() * 2, parameters.getArraySize(), true)
-            else -> randList_ = RandList(parameters.getRandSeed(), 60, parameters.getVariablesNum())
-        }
+        var size = 100
+        randList_ = RandList(parameters, size)
     }
 
     fun Include(index: Int): MutableList<String> {
@@ -62,20 +56,6 @@ class Generator {
             program.getProgram().addAll(Include(1))
         program.getProgram().add(CARRIAGE_RETURN)
         program.getProgram().addAll(Main())
-
-//        val time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss"))
-//        var file = File("func_$time.c")
-//        Runtime.getRuntime().exec("clang-format -i func_$time.c")
-
-//        println("___________________________")
-//        println(randList_.variableIdList.size)
-//        println(randList_.listBool.size)
-//        println(randList_.listInt.size)
-//        println(randList_.listFloat.size)
-//        println(randList_.operationIdList.size)
-//        println(randList_.listCondition.size)
-//        println(randList_.relationalOperationIdList.size)
-//        println(randList_.indexVariableList.size)
 
         var file = File("program.c")
         file.writeText(program.getProgram().joinToString(""))
