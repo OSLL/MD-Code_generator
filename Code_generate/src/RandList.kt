@@ -3,6 +3,7 @@ package com.example
 import java.util.*
 
 class RandList {
+    var rand_seed = 0
     var variableIdList: MutableList<Int> = mutableListOf()
     var listBool: MutableList<Int> = mutableListOf()
     var listInt: MutableList<Int> = mutableListOf()
@@ -11,10 +12,12 @@ class RandList {
     var listCondition: MutableList<Int> = mutableListOf()
     var relationalOperationIdList: MutableList<Int> = mutableListOf() //индексы операторов сравнения
     var indexVariableList: MutableList<Int> = mutableListOf()
+    var listArraySize: MutableList<Int> = mutableListOf()
 
     constructor() { }
 
     constructor(randSeed: Int, size_: Int, variablesNum: Int, operationNum: Int) {
+        rand_seed = randSeed
         val size = size_
         variableIdList = randListInt(Random(randSeed.toLong()), 0, variablesNum, size)
         listBool = randListInt(Random(randSeed.toLong()), 0, 2, size)
@@ -23,6 +26,7 @@ class RandList {
     }
 
     constructor(randSeed: Int, size_: Int, variablesNum: Int) {
+        rand_seed = randSeed
         val size = size_
         variableIdList = randListInt(Random(randSeed.toLong()), 0, variablesNum, size * 10) // * 3
         listBool = randListInt(Random(randSeed.toLong()), 0, 2, size * 6)
@@ -34,6 +38,7 @@ class RandList {
     }
 
     constructor(randSeed: Int, size_: Int, variablesNum: Int, for_number: Int, i_: Int) {
+        rand_seed = randSeed
         val size = size_
         variableIdList = randListInt(Random(randSeed.toLong()), 0, variablesNum, size * 10) // * 3
         listBool = randListInt(Random(randSeed.toLong()), 0, 2, size * 6)
@@ -45,6 +50,14 @@ class RandList {
         indexVariableList = randListInt(Random(randSeed.toLong()), 0, IDENTIFIER.size, for_number + 1) // * 3
     }
 
+    constructor(randSeed: Int, size_: Int, variablesNum: Int, arraySize: Int, i_: Boolean) {
+        rand_seed = randSeed
+        val size = size_
+        variableIdList = randListInt(Random(randSeed.toLong()), 0, variablesNum, size)
+        listBool = randListInt(Random(randSeed.toLong()), 0, 2, size)
+        listInt = randListInt(Random(randSeed.toLong()), 1, MAX_VALUE, size)
+        listArraySize = randListInt(Random(randSeed.toLong()), 3, arraySize, size)
+    }
 
     //генерирует число в диапазоне [from; to] с зерном randSeed
     fun rand(from: Int, to: Int, randSeed: Int): Int {
@@ -95,5 +108,4 @@ class RandList {
         }
         return true
     }
-
 }
