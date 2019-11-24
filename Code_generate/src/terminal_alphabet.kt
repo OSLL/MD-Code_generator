@@ -6,7 +6,6 @@ val BOOL = "bool"
 val INT = "int"
 val INT_POINTER = "$INT*"
 val FLOAT = "float"
-val SIZE_T = "size_t"
 val UNSIGNED_INT = "unsigned int"
 val MAIN = "main"
 val ARITHMETIC_OPERATIONS: List<String> = listOf("+", "-", "*", "/")
@@ -18,7 +17,6 @@ val MULTIPLICATION = "*"
 val LOGICAL_NEGATION = "!"
 val LOGICAL_AND = "&&"
 val LOGICAL_OR = "||"
-val LOGICAL_OPERATIONS: List<String> = listOf("!", "&&", "||")
 val RELATIONAL_OPERATIONS: List<String> = listOf("<", ">", "<=", ">=", "==", "!=")
 val LESS_THAN = "<"
 val LESS_EQUAL_THAN = "<="
@@ -38,6 +36,7 @@ val UNDERSCORE = "_"
 val SEMICOLON = ";"
 val COLON = ":"
 val QUOTES = "\""
+val AMPERSAND = "&"
 val END_OF_LINE = "$SEMICOLON$CARRIAGE_RETURN"
 val LIBRARY: List<String> = listOf("stdio.h", "stdbool.h")
 val INCLUDE: List<String> = listOf("#include <", ">")

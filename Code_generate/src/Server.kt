@@ -1,5 +1,6 @@
 package com.example
 
+import io.ktor.application.ApplicationCall
 import io.ktor.http.content.*
 import io.ktor.application.call
 import io.ktor.html.respondHtml
@@ -10,6 +11,7 @@ import io.ktor.routing.get
 import io.ktor.routing.routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
+import io.ktor.util.pipeline.PipelineContext
 import kotlinx.html.*
 import java.io.File
 import java.lang.Integer.parseInt
@@ -75,45 +77,21 @@ class Server {
 
                     if (checkData(task, rand_seed)) {
                         val args_: MutableList<String> = mutableListOf()
-                        var parameters = ProgramParameters()
                         if (dataNotCorrect(task, variables_num, statements_num, arguments_num, printf_num, redefinition_var, operations, if_num, switch_num, case_num, while_num, do_while_num, for_num, nesting_level))
                             call.respondText("$TEXT_$TEXT")
                         else {
                             args_.addAll(returnArgs_(task, rand_seed, variables_num, statements_num, arguments_num, printf_num, redefinition_var, operations, if_num, switch_num, case_num, while_num, do_while_num, for_num, nesting_level))
-                            parameters = ProgramParameters(args_)
-
-                            var v_number = ""
-                            var number = 0
-                            var count = 15
-
-                            var generator = Generator(parameters)
-                            generator.programGenerate()
-
-                            if (!generator.runtime()) {
-                                for (i in (TEMPLATE.length)..(rand_seed.toString().length - 1))
-                                    v_number = "$v_number${rand_seed.toString()[i]}"
-                                number = parseInt(v_number)
-                            }
-
-                            while (!generator.runtime() && count != 0) {
-                                count--
-                                number++
-                                rand_seed = "$TEMPLATE${number}"
-                                args_[1] = rand_seed.toString()
-//                            println(args_)
-
-                                parameters = ProgramParameters(args_)
-                                generator = Generator(parameters)
-                                generator.programGenerate()
-                                if (generator.runtime())
-                                    return@get call.respondRedirect(newData("/get_source", task, rand_seed, variables_num, statements_num, arguments_num, printf_num, redefinition_var, operations, if_num, switch_num, case_num, while_num, do_while_num, for_num, nesting_level), permanent = false)
-                            }
-
-                            if (generator.runtime()) {
+                            val rand_seed_ = execation(args_, rand_seed)
+                            if (rand_seed_ == rand_seed) {
                                 val func = readFile("program.c")
                                 call.respondText("$func")
                             }
-                            else call.respondText("$TEXT___$TEXT")
+
+                            if (rand_seed_ == "")
+                                call.respondText("$TEXT___$TEXT")
+
+                            if (rand_seed_ != rand_seed && rand_seed_ != "")
+                                return@get call.respondRedirect(newData("/get_source", task, rand_seed_, variables_num, statements_num, arguments_num, printf_num, redefinition_var, operations, if_num, switch_num, case_num, while_num, do_while_num, for_num, nesting_level), permanent = false)
                         }
                     }
                     else call.respondText("$TEXT_$TEXT")
@@ -137,41 +115,12 @@ class Server {
 
                     if (checkData(task, rand_seed)) {
                         val args_: MutableList<String> = mutableListOf()
-                        var parameters = ProgramParameters()
                         if (dataNotCorrect(task, variables_num, statements_num, arguments_num, printf_num, redefinition_var, operations, if_num, switch_num, case_num, while_num, do_while_num, for_num, nesting_level))
                             call.respondText("$TEXT_$TEXT")
                         else {
                             args_.addAll(returnArgs_(task, rand_seed, variables_num, statements_num, arguments_num, printf_num, redefinition_var, operations, if_num, switch_num, case_num, while_num, do_while_num, for_num, nesting_level))
-                            parameters = ProgramParameters(args_)
-
-                            var v_number = ""
-                            var number = 0
-                            var count = 15
-
-                            var generator = Generator(parameters)
-                            generator.programGenerate()
-
-                            if (!generator.runtime()) {
-                                for (i in (TEMPLATE.length)..(rand_seed.toString().length - 1))
-                                    v_number = "$v_number${rand_seed.toString()[i]}"
-                                number = parseInt(v_number)
-                            }
-
-                            while (!generator.runtime() && count != 0) {
-                                count--
-                                number++
-                                rand_seed = "$TEMPLATE${number}"
-                                args_[1] = rand_seed.toString()
-//                            println(args_)
-
-                                parameters = ProgramParameters(args_)
-                                generator = Generator(parameters)
-                                generator.programGenerate()
-                                if (generator.runtime())
-                                    return@get call.respondRedirect(newData("/get_image", task, rand_seed, variables_num, statements_num, arguments_num, printf_num, redefinition_var, operations, if_num, switch_num, case_num, while_num, do_while_num, for_num, nesting_level), permanent = false)
-                            }
-
-                            if (generator.runtime()) {
+                            val rand_seed_ = execation(args_, rand_seed)
+                            if (rand_seed_ == rand_seed) {
                                 Image(readFile("program.c"))
                                 call.respondHtml {
                                     body {
@@ -181,7 +130,12 @@ class Server {
                                     }
                                 }
                             }
-                            else call.respondText("$TEXT___$TEXT")
+
+                            if (rand_seed_ == "")
+                                call.respondText("$TEXT___$TEXT")
+
+                            if (rand_seed_ != rand_seed && rand_seed_ != "")
+                                return@get call.respondRedirect(newData("/get_image", task, rand_seed_, variables_num, statements_num, arguments_num, printf_num, redefinition_var, operations, if_num, switch_num, case_num, while_num, do_while_num, for_num, nesting_level), permanent = false)
                         }
                     }
                     else call.respondText("$TEXT_$TEXT")
@@ -331,5 +285,37 @@ class Server {
         if (for_num.toString() != "null")           str = "$str&for_num=${for_num.toString()}"
         if (nesting_level.toString() != "null")     str = "$str&nesting_level=${nesting_level.toString()}"
         return str
+    }
+
+    fun execation(args_: MutableList<String>, rand_seed: String?): String {
+        val parameters = ProgramParameters(args_)
+        var generator = Generator(parameters)
+        generator.programGenerate()
+
+        var v_number = ""
+        var number = 0
+        var count = 15
+
+        if (generator.runtime()) return rand_seed.toString()
+
+        if (!generator.runtime()) {
+            for (i in (TEMPLATE.length)..(rand_seed.toString().length - 1))
+                v_number = "$v_number${rand_seed.toString()[i]}"
+            number = parseInt(v_number)
+        }
+
+        while (!generator.runtime() && count != 0) {
+            count--
+            number++
+            val rand_seed_ = "$TEMPLATE${number}"
+            args_[1] = rand_seed_
+//            println("$number, $rand_seed_, $args_")
+
+            val parameters = ProgramParameters(args_)
+            generator = Generator(parameters)
+            generator.programGenerate()
+            if (generator.runtime()) return rand_seed_
+        }
+        return ""
     }
 }
