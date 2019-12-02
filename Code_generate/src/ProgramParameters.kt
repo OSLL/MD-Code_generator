@@ -103,6 +103,10 @@ class ProgramParameters {
                 if (statements_num < 1) statements_num = 1
                 printf_num = parseInt(args[5])
             }
+            10 -> {
+                arguments_num = parseInt(args[3])
+                printf_num = parseInt(args[4])
+            }
         }
 
         if (arguments_num < 1) arguments_num = 1

@@ -52,9 +52,17 @@ class Generator {
 
     fun programGenerate(): MutableList<String> {
         program.getProgram().addAll(Include(0))
-        if (parameters.getTask_() != 1 && parameters.getTask_() != 8 && parameters.getTask_() != 9)
+        if (parameters.getTask_() != 1 && parameters.getTask_() != 8 && parameters.getTask_() != 9 && parameters.getTask_() != 10)
             program.getProgram().addAll(Include(1))
         program.getProgram().add(CARRIAGE_RETURN)
+
+        if (parameters.getTask_() == 10) {
+            program.arithmetic_conversion_count = randList_.randListIntPop(randList_.variableIdList)
+            program.arithmetic_conversion_correctness = randList_.randListBoolPop(randList_.listBool) || randList_.randListBoolPop(randList_.listBool)
+            program.getProgram().addAll(arithmeticConversion(program.arithmetic_conversion_count))
+            program.getProgram().add(CARRIAGE_RETURN)
+        }
+
         program.getProgram().addAll(Main())
 
         var file = File("program.c")
@@ -228,6 +236,31 @@ class Generator {
 //                while (parameters.getPrintfNum() > program.getCounterPrintf())
 //                    program_.addAll(Printf(returnPointerVariable(program)))
             }
+            10 -> { //arithmetic operating block
+                do {
+                    program_.addAll(Init(program.getProgram()))
+                    program_.add(ARITHMETIC_CONVERSION)
+                    program_.add(ROUND_BRACKET)
+
+                    val variableList: MutableSet<String> = mutableSetOf()
+
+                    for (i in 0..(program.arithmetic_conversion_count - 1)) {
+                        if (program.arithmetic_conversion_correctness) program_.add(AMPERSAND)
+                        val variable = returnIntVariable(program)
+                        variableList.add(variable)
+                        program_.add(variable)
+                        program_.add(COMMA)
+                    }
+                    if (program.arithmetic_conversion_correctness) program_.add(AMPERSAND)
+                    val variable = returnIntVariable(program)
+                    variableList.add(variable)
+                    program_.add(variable)
+
+                    program_.add(ROUND_BRACKET_)
+                    program_.add(END_OF_LINE)
+                    program_.addAll(Printf(variableList))
+                } while (parameters.getPrintfNum() - program.getCounterPrintf() > 0)
+            }
         }
         return program_
     }
@@ -317,7 +350,10 @@ class Generator {
             if (argNum > 2) {
                 var a: String
                 if (visibleVar.getVariableInt().size != 0 && randList_.randListBoolPop(randList_.listBool))
-                    a = visibleVar.getVariableIntIndex(intVariableIndex(visibleVar))
+                    if (parameters.getTask_() == 10 && program.arithmetic_conversion_correctness)
+                        a = "$MULTIPLICATION${visibleVar.getVariableIntIndex(intVariableIndex(visibleVar))}"
+                    else
+                        a = visibleVar.getVariableIntIndex(intVariableIndex(visibleVar))
                 else
                     a = "${randList_.randListIntPop(randList_.listInt)}"
                 val b = randList_.randListIntPop(randList_.listInt)
@@ -537,6 +573,7 @@ class Generator {
                 for (i in program.getCounterVariables()..(program.getCounterVariables() + j - 1)) {
                     var index_ = randList_.randListIntPop(randList_.listCondition)
                     if (parameters.getTask_() == 3) index_ = 1
+                    if (parameters.getTask_() == 10) index_ = 1
                     val visibleVar = findVisibleVar(prog)
                     val visibleVar_ = findVisibleVar(program_)
                     visibleVar.getVariableBool().addAll(visibleVar_.getVariableBool())
@@ -654,6 +691,29 @@ class Generator {
         }
         return program_
     }
+
+    fun Printf(variable: MutableSet<String>): MutableList<String> {
+        val program_: MutableList<String> = mutableListOf()
+        if (variable.size != 0) {
+            program_.add("$PRINTF$ROUND_BRACKET$QUOTES$SQUARE_BRACKET")
+            for (i in 0..(variable.size - 2)) {
+                program_.add("%i$COMMA ")
+            }
+            program_.add("")
+            program_.add("%i$SQUARE_BRACKET_$PRINT_CARRIAGE_RETURN$QUOTES$COMMA ")
+            for (i in 0..(variable.size - 2)) {
+                program_.add(variable.elementAt(i))
+                program_.add(COMMA)
+                program_.add(" ")
+            }
+            program_.add(variable.elementAt(variable.size - 1))
+
+            program_.add("$ROUND_BRACKET_$END_OF_LINE")
+            program.incrementCounterPrintf()
+        }
+        return program_
+    }
+
 
     fun Printf(task: Int, varChange: MutableList<String>): MutableList<String> {
         val program_: MutableList<String> = mutableListOf()
@@ -1462,6 +1522,68 @@ class Generator {
         program_.add("${randList_.randListIntPop(randList_.listInt)}")
         program_.add(END_OF_LINE)
         program.incrementCounterTerm()
+        return program_
+    }
+
+    fun arithmeticConversion(value: Int): MutableList<String> {
+        val new_func : Program = Program()
+        val program_: MutableList<String> = mutableListOf()
+        program_.add(VOID)
+        program_.add(" ")
+        program_.add(ARITHMETIC_CONVERSION)
+        program_.add(ROUND_BRACKET)
+
+        for (i in 0..(value - 1)) {
+            if (program.arithmetic_conversion_correctness) program_.add(INT_POINTER)
+            else program_.add(INT)
+            program_.add(" ")
+            program_.add("${IDENTIFIER[i]}")
+            program_.add(COMMA)
+            new_func.getVariableInt().add(IDENTIFIER[i])
+            new_func.incrementCounterVariables()
+        }
+        if (program.arithmetic_conversion_correctness) program_.add(INT_POINTER)
+        else program_.add(INT)
+        program_.add(" ")
+        program_.add("${IDENTIFIER[value]}")
+        new_func.getVariableInt().add(IDENTIFIER[value])
+        new_func.incrementCounterVariables()
+
+        program_.add(ROUND_BRACKET_)
+        program_.add(BRACE)
+        program_.add(CARRIAGE_RETURN)
+
+//        val value_ = randList_.randListIntPop(randList_.listInt)
+        for (i in 0..value) {
+            if (program.arithmetic_conversion_correctness) program_.add(MULTIPLICATION)
+            program_.add(IDENTIFIER[i])
+            program_.add(EQUALLY)
+
+            if (parameters.getArgumentsNum() > 2 && randList_.randListBoolPop(randList_.listBool))
+                program_.addAll(InitModOperation(parameters.getArgumentsNum(), new_func))
+            else {
+//                program_.addAll(addFloatOrInt(new_func))
+                if (new_func.getVariableInt().size != 0 && randList_.randListBoolPop(randList_.listBool)) {
+                    if (program.arithmetic_conversion_correctness) program_.add(MULTIPLICATION)
+                    program_.add(new_func.getVariableIntIndex(intVariableIndex(new_func)))
+                }
+                else {
+                    if (randList_.randListBoolPop(randList_.listBool))
+                        program_.add("${randList_.randListIntPop(randList_.listInt)}")
+                    else
+                        program_.add("${randList_.randListFloatPop(randList_.listFloat)}")
+                }
+
+                if (parameters.getArgumentsNum() > 1 && randList_.randListBoolPop(randList_.listBool))
+                    program_.addAll(InitAddition(parameters.getArgumentsNum(), new_func))
+            }
+            program_.add(END_OF_LINE)
+        }
+
+        program_.add(CARRIAGE_RETURN)
+        program_.add(BRACE_)
+        program_.add(CARRIAGE_RETURN)
+
         return program_
     }
 }

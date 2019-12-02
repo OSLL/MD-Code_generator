@@ -19,6 +19,8 @@ class Program {
     var counter_switch = 0
     var counter_case = 0
     var counter_printf = 0
+    var arithmetic_conversion_count = 0
+    var arithmetic_conversion_correctness = true
 
     internal val program_: MutableList<String> = mutableListOf()
 
