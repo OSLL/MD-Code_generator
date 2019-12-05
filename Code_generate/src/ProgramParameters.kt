@@ -110,6 +110,7 @@ class ProgramParameters {
         }
 
         if (arguments_num < 1) arguments_num = 1
+        if (arguments_num > 10) arguments_num = 10
         if (printf_num == 0) printf_num = 1
         if (task == 8)
             if (printf_num < 2) printf_num = 2
