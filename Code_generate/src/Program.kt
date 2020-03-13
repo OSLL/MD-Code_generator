@@ -9,7 +9,6 @@ class Program {
     internal val pointer_variable: MutableSet<String> = mutableSetOf()
     internal val array_variable: MutableSet<String> = mutableSetOf()
 
-    var counter_variables = 0
     var counter_terms = 0
     var counter_if = 0
     var counter_else = 0
@@ -75,12 +74,7 @@ class Program {
     }
 
     internal fun getCounterVariables(): Int {
-//        return counter_variables
         return variable_uns_int.size + variable_bool.size + variable_float.size + variable_int.size + variable_size_t.size + pointer_variable.size
-    }
-
-    internal fun incrementCounterVariables() {
-        counter_variables++
     }
 
     internal fun getCounterTerm(): Int {

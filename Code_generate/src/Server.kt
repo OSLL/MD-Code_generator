@@ -18,7 +18,7 @@ val NUMBER_TASKS = 11
 val TEXT = "Введите в адресную строку входные данные для задания\n" +
         "Используйте URL код для символов: + - %2b и & - %26\n" +
         "Например: \n" +
-        "/get_source?task=1&rand_seed=variant_2&variables_num=6&statements_num=7&arguments_num=13&printf_num=3&redefinition_var=1&operations=|,%26,*,%2b\n" +
+        "/get_source?task=1&rand_seed=variant_2&variables_num=6&statements_num=7&arguments_num=7&printf_num=3&redefinition_var=1&operations=|,%26,*,%2b\n" +
         "/get_source?task=2&rand_seed=variant_1&variables_num=4&arguments_num=4&if_num=6&nesting_level=4\n" +
         "/get_source?task=3&rand_seed=variant_7&variables_num=8&arguments_num=7&switch_num=7&case_num=6&nesting_level=3\n" +
         "/get_source?task=4&rand_seed=variant_13&variables_num=6&arguments_num=4&while_num=7&nesting_level=3\n" +
@@ -27,10 +27,10 @@ val TEXT = "Введите в адресную строку входные да�
         "/get_source?task=7&rand_seed=variant_10&variables_num=10&arguments_num=5&if_num=2&switch_num=3&case_num=3&while_num=2&do_while_num=1&for_num=2&nesting_level=3\n" +
         "/get_source?task=8&rand_seed=variant_3&variables_num=6&statements_num=7&arguments_num=5&printf_num=7\n" +
         "/get_source?task=9&rand_seed=variant_0&variables_num=3&statements_num=7&arguments_num=4&printf_num=5\n" +
-        "/get_source?task=10&rand_seed=variant_2&variables_num=6&arguments_num=13&printf_num=3\n\n\n" +
+        "/get_source?task=10&rand_seed=variant_2&variables_num=6&arguments_num=3&printf_num=3\n\n\n" +
 
         "или: \n" +
-        "/get_image?task=1&rand_seed=variant_2&variables_num=6&statements_num=7&arguments_num=13&printf_num=3&redefinition_var=1&operations=|,%26,*,%2b\n" +
+        "/get_image?task=1&rand_seed=variant_2&variables_num=6&statements_num=7&arguments_num=7&printf_num=3&redefinition_var=1&operations=|,%26,*,%2b\n" +
         "/get_image?task=2&rand_seed=variant_1&variables_num=4&arguments_num=4&if_num=6&nesting_level=4\n" +
         "/get_image?task=3&rand_seed=variant_7&variables_num=8&arguments_num=7&switch_num=7&case_num=6&nesting_level=3\n" +
         "/get_image?task=4&rand_seed=variant_13&variables_num=6&arguments_num=4&while_num=7&nesting_level=3\n" +
@@ -39,7 +39,7 @@ val TEXT = "Введите в адресную строку входные да�
         "/get_image?task=7&rand_seed=variant_10&variables_num=10&arguments_num=5&if_num=2&switch_num=3&case_num=3&while_num=2&do_while_num=1&for_num=2&nesting_level=3\n" +
         "/get_image?task=8&rand_seed=variant_3&variables_num=6&statements_num=7&arguments_num=5&printf_num=7\n" +
         "/get_image?task=9&rand_seed=variant_0&variables_num=3&statements_num=7&arguments_num=4&printf_num=5\n" +
-        "/get_image?task=10&rand_seed=variant_2&variables_num=6&arguments_num=13&printf_num=3\n"
+        "/get_image?task=10&rand_seed=variant_2&variables_num=6&arguments_num=3&printf_num=3\n"
 
 val TEXT_ = "Ошибка ввода. Попробуйте снова.\n\n"
 val TEXT__ = "Задача пока находится в разработке, попробуйте другой тип задач.\n\n"
@@ -193,7 +193,7 @@ class Server {
             6 -> return (variables_num.toString() == "null" || arguments_num.toString() == "null" || for_num.toString() == "null" || nesting_level.toString() == "null")
             7 -> return (!(variables_num.toString() != "null" && arguments_num.toString() != "null" && nesting_level.toString() != "null" && (if_num.toString() != "null" || (switch_num.toString() != "null" && case_num.toString() != "null") || while_num.toString() != "null" || do_while_num.toString() != "null" || for_num != "null")))
             8 -> return (variables_num.toString() == "null" || statements_num.toString() == "null" || arguments_num.toString() == "null" || printf_num.toString() == "null")
-            9 -> return (variables_num.toString() == "null" || statements_num.toString() == "null" || arguments_num.toString() == "null" || printf_num.toString() == "null")
+            9 -> return (variables_num.toString() == "null" || statements_num.toString() == "null" || printf_num.toString() == "null")
             10 -> return (variables_num.toString() == "null" || arguments_num.toString() == "null" || printf_num.toString() == "null")
         }
         return true
