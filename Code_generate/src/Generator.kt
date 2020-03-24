@@ -78,7 +78,7 @@ class Generator {
         is_.readLine()
         process.destroy()
         Thread.sleep(1000)
-//        if (process.exitValue() == 0)
+        if (process.exitValue() == 0)
             return true
         return false
     }

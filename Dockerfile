@@ -9,9 +9,6 @@ RUN bash -c 'source /root/.sdkman/bin/sdkman-init.sh && sdk install kotlin'
 RUN apt -y install clang-format
 RUN apt-get clean
 
-#RUN kotlin -version
-# Insert here all other commands
-
 ADD ./Code_generate /server
 WORKDIR /server
 RUN chmod +x ./gradlew
