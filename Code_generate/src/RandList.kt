@@ -3,7 +3,7 @@ package com.example
 import java.util.*
 
 class RandList {
-    var rand_seed = 0
+    var parameters: ProgramParameters = ProgramParameters()
     var variableIdList: MutableList<Int> = mutableListOf()
     var listBool: MutableList<Int> = mutableListOf()
     var listInt: MutableList<Int> = mutableListOf()
@@ -14,8 +14,8 @@ class RandList {
     var indexVariableList: MutableList<Int> = mutableListOf()
     var listArraySize: MutableList<Int> = mutableListOf()
 
-    constructor(parameters: ProgramParameters, size: Int) {
-        rand_seed = parameters.getRandSeed()
+    constructor(parameters_: ProgramParameters, size: Int) {
+        parameters = parameters_
         variableIdList = randListInt(Random(parameters.getRandSeed().toLong()), 0, parameters.getVariablesNum(), size * 10)
         listBool = randListInt(Random(parameters.getRandSeed().toLong()), 0, 2, size * 6)
         listInt = randListInt(Random(parameters.getRandSeed().toLong()), 1, MAX_VALUE, size)
@@ -52,33 +52,29 @@ class RandList {
 
     //возвращает первое число из списка int и удаляет его Int
     fun randListIntPop(randList: MutableList<Int>) : Int {
-        if (!randList.isEmpty()) {
-            val index = randList.first()
-            randList.remove(index)
-            return index
-        }
-        return 1
+        if (randList.isEmpty())
+            randList.addAll(randListInt(Random(parameters.getRandSeed().toLong()), 1, MAX_VALUE, 100))
+        val index = randList.first()
+        randList.remove(index)
+        return index
     }
 
     //возвращает первое число из списка float и удаляет его
     fun randListFloatPop(randList: MutableList<Float>) : Float {
-        if (!randList.isEmpty()) {
-            val value = randList.first()
-            randList.remove(value)
-            return value
-        }
-        return 1F
+        if (randList.isEmpty())
+            randList.addAll(randListFloat(Random(parameters.getRandSeed().toLong()), 1, MAX_VALUE, parameters.getVariablesNum() * 5))
+        val value = randList.first()
+        randList.remove(value)
+        return value
     }
 
     //возвращает первое число из списка и удаляет его Boolean
     fun randListBoolPop(randListBool: MutableList<Int>) : Boolean {
-        if (!randListBool.isEmpty()) {
-            val flag = randListBool.first()
-            randListBool.remove(randListBool.first())
-            if (flag == 1)
-                return true
-            return false
-        }
-        return true
+        if (randListBool.isEmpty())
+            randListBool.addAll(randListInt(Random(parameters.getRandSeed().toLong()), 0, 2, 100))
+        val flag = randListBool.first()
+        randListBool.remove(randListBool.first())
+        if (flag == 1) return true
+        return false
     }
 }
