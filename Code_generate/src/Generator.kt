@@ -253,8 +253,8 @@ class Generator {
                 program_.addAll(Init(program_))
                 while (parameters.getStatementsNum() - program.getCounterTerm() > 0)
                     program_.addAll(pointerTerm())
-//                while (parameters.getPrintfNum() > program.getCounterPrintf())
-//                    program_.addAll(Printf(returnPointerVariable(program)))
+                while (parameters.getPrintfNum() > program.getCounterPrintf())
+                    program_.addAll(Printf(pointerVar(returnPointerVariable(program))))
             }
             10 -> { //function add block
                 do {
@@ -536,11 +536,12 @@ class Generator {
                 while (i < parameters.getVariablesNum() * 2) {
                     program_.add(INT)
                     program_.add(" ")
-                    val size = randList_.randListIntPop(randList_.listArraySize) //parameters.getArraySize() - 2
-                    println(size)
+                    var size = randList_.randListIntPop(randList_.listArraySize) //parameters.getArraySize() - 2
+                    while (size > parameters.getArraySize())
+                        size = randList_.randListIntPop(randList_.listArraySize)
                     program_.add(IDENTIFIER[i])
                     program_.add(SQUARE_BRACKET)
-//                    program_.add(size.toString())
+                    program_.add(size.toString())
                     program_.add(SQUARE_BRACKET_)
                     program_.add(EQUALLY)
 
@@ -1540,7 +1541,7 @@ class Generator {
         var i_ = 0
         for (j in 0..variable.length - 1) {
             if (variable[j].toString() == AMPERSAND) i = j + 1
-            if (variable[j].toString() == BRACE_) i_ = j - 1
+            if (variable[j].toString() == SQUARE_BRACKET) i_ = j - 1
         }
         for (k in i..i_)
             variable_ = "$variable_${variable[k]}"
@@ -1548,26 +1549,32 @@ class Generator {
     }
 
     fun arrayIndex(variable: String): Int {
-//        println(variable)
         var size = ""
         var i = 0
         var i_ = 0
         for (j in 0..variable.length - 1) {
-//            println(variable[j])
             if (variable[j].toString() == SQUARE_BRACKET) i = j + 1
             if (variable[j].toString() == SQUARE_BRACKET_) i_ = j - 1
-//            println(i)
-//            println(i_)
         }
-        for (k in i..i_) {
+        for (k in i..i_)
             size = "$size${variable[k]}"
-//            println(variable[k])
+        return parseInt(size)
+    }
+
+    fun arraySize(variable: String): Int {
+        var size = ""
+        var i = 0
+        var i_ = 0
+        for (j in 0..variable.length - 1) {
+            if (variable[j].toString() == SQUARE_BRACKET) i = j + 1
+            if (variable[j].toString() == SQUARE_BRACKET_) i_ = j - 1
         }
+        for (k in i..i_)
+            size = "$size${variable[k]}"
         return parseInt(size)
     }
 
     fun checkCorreсtArrayPointer(index: Int, newIndex: Int, size: Int, operator: String): Boolean {
-        println("CHECH CORRECT")
         if (operator == SUBTRACTION)
             if (index - newIndex > -1) return true
         if (operator == ADDITION)
@@ -1577,20 +1584,44 @@ class Generator {
 
     fun pointerTerm(): MutableList<String> {
         val program_: MutableList<String> = mutableListOf()
-        val variable = returnPointerVariable(program)
-        program_.add(pointerVar(variable))
+        val pointer = returnPointerVariable(program)
+        program_.add(pointerVar(pointer))
 
-        val carIndex = arrayIndex(variable)
-        var number = randList_.randListIntPop(randList_.listInt)
+        val carIndex = arrayIndex(pointer)
+        val carArray = arrayVar(pointer)
+        var carArraySize = 0
+        for (i in 0..program.getArrayVariable().size - 1)
+            if (program.getArrayVariableIndex(i).contains(carArray))
+                carArraySize = arrayIndex(program.getArrayVariableIndex(i))
         var operator = AdditionOrSubtractionOperation()
-        while (!checkCorreсtArrayPointer(carIndex, number, 5, operator))
-            operator = AdditionOrSubtractionOperation()
+        var number = randList_.randListIntPop(randList_.listInt)
+
+        var i = 0
+        while (i < 30 && !checkCorreсtArrayPointer(carIndex, number, carArraySize, operator)) {
+            number = randList_.randListIntPop(randList_.listInt)
+            i++
+        }
+
+        if (i == 30) {
+            if (operator == ADDITION) operator = SUBTRACTION
+            else operator = ADDITION
+            while (!checkCorreсtArrayPointer(carIndex, number, carArraySize, operator))
+                number = randList_.randListIntPop(randList_.listInt)
+        }
+
         program_.add(operator)
         program_.add(EQUALLY)
         program_.add(number.toString())
         program_.add(END_OF_LINE)
-        program.getPointerVariable().remove(variable)
-        program.getPointerVariable().add("$MULTIPLICATION${pointerVar(variable)}$EQUALLY$AMPERSAND${arrayVar(variable)}$SQUARE_BRACKET$carIndex$SQUARE_BRACKET_")
+        program.getPointerVariable().remove(pointer)
+        var newIndex = 0
+        if (operator == ADDITION) newIndex = carIndex + number
+        if (operator == SUBTRACTION) newIndex = carIndex - number
+
+        program.getPointerVariable().add("$MULTIPLICATION${pointerVar(pointer)}$EQUALLY$AMPERSAND$carArray$SQUARE_BRACKET$newIndex$SQUARE_BRACKET_")
+        program.incrementCounterTerm()
+        if (program.getCounterPrintf() < parameters.getPrintfNum() && program.getCounterTerm() % (parameters.getStatementsNum() / (parameters.getPrintfNum() - program.getCounterPrintf())) == 0)
+            program_.addAll(Printf(pointerVar(returnPointerVariable(program))))
         return program_
     }
 
