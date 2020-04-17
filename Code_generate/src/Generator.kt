@@ -258,7 +258,8 @@ class Generator {
             }
             10 -> { //function add block
                 do {
-                    program_.addAll(Init(program.getProgram()))
+                    if (parameters.getVariablesNum() - program.getVariableInt().size != 0)
+                        program_.addAll(Init(program.getProgram()))
                     program_.add(ARITHMETIC_CONVERSION)
                     program_.add(ROUND_BRACKET)
 
@@ -280,6 +281,8 @@ class Generator {
                     program_.add(END_OF_LINE)
                     program_.addAll(Printf(variableList))
                 } while (parameters.getPrintfNum() - program.getCounterPrintf() > 0)
+                if (parameters.getVariablesNum() - program.getVariableInt().size != 0)
+                    program_.addAll(Init(program.getProgram()))
             }
         }
         return program_
@@ -589,6 +592,7 @@ class Generator {
                 for (i in program.getCounterVariables()..(program.getCounterVariables() + j - 1)) {
                     var index_ = randList_.randListIntPop(randList_.listCondition)
                     if (parameters.getTask_() == 3) index_ = 1
+                    if (parameters.getTask_() == 6) index_ = 1
                     if (parameters.getTask_() == 10) index_ = 1
                     val visibleVar = findVisibleVar(prog)
                     val visibleVar_ = findVisibleVar(program_)
