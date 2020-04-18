@@ -73,7 +73,7 @@ class Generator {
     }
 
     fun runtime() : Boolean {
-        val process: Process = Runtime.getRuntime().exec("./run.sh")
+        val process: Process = Runtime.getRuntime().exec("./run.sh 2>&1")
         val is_ = BufferedReader(InputStreamReader(process.getInputStream()))
         is_.readLine()
         process.destroy()
