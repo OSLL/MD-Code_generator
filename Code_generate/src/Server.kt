@@ -10,36 +10,42 @@ import io.ktor.routing.get
 import io.ktor.routing.routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
-import kotlinx.html.*
+import kotlinx.html.body
+import kotlinx.html.p
+import kotlinx.html.img
 import java.io.File
 import java.lang.Integer.parseInt
+
+val PATH_SOURCE = "/get_source"
+val PATH_IMAGE = "/get_image"
+val PATH_ANSWER = "/check_answer"
 
 val NUMBER_TASKS = 11
 val TEXT = "Введите в адресную строку входные данные для задания\n" +
         "Используйте URL код для символов: + - %2b и & - %26\n" +
         "Например: \n" +
-        "/get_source?task=1&rand_seed=variant_2&variables_num=6&statements_num=7&arguments_num=7&printf_num=3&redefinition_var=1&operations=|,%26,*,%2b\n" +
-        "/get_source?task=2&rand_seed=variant_1&variables_num=4&arguments_num=4&if_num=6&nesting_level=4\n" +
-        "/get_source?task=3&rand_seed=variant_7&variables_num=8&arguments_num=7&switch_num=7&case_num=6&nesting_level=3\n" +
-        "/get_source?task=4&rand_seed=variant_13&variables_num=6&arguments_num=4&while_num=7&nesting_level=3\n" +
-        "/get_source?task=5&rand_seed=variant_1&variables_num=4&arguments_num=3&do_while_num=4&nesting_level=3\n" +
-        "/get_source?task=6&rand_seed=variant_18&variables_num=6&arguments_num=3&for_num=5&nesting_level=3\n" +
-        "/get_source?task=7&rand_seed=variant_10&variables_num=10&arguments_num=5&if_num=2&switch_num=3&case_num=3&while_num=2&do_while_num=1&for_num=2&nesting_level=3\n" +
-        "/get_source?task=8&rand_seed=variant_3&variables_num=6&statements_num=7&arguments_num=5&printf_num=7\n" +
-        "/get_source?task=9&rand_seed=variant_0&variables_num=3&statements_num=7&arguments_num=4&printf_num=5\n" +
-        "/get_source?task=10&rand_seed=variant_2&variables_num=6&arguments_num=3&printf_num=3\n\n\n" +
+        "$PATH_SOURCE?task=1&rand_seed=variant_2&variables_num=6&statements_num=7&arguments_num=7&printf_num=3&redefinition_var=1&operations=|,%26,*,%2b\n" +
+        "$PATH_SOURCE?task=2&rand_seed=variant_1&variables_num=4&arguments_num=4&if_num=6&nesting_level=4\n" +
+        "$PATH_SOURCE?task=3&rand_seed=variant_7&variables_num=8&arguments_num=7&switch_num=7&case_num=6&nesting_level=3\n" +
+        "$PATH_SOURCE?task=4&rand_seed=variant_13&variables_num=6&arguments_num=4&while_num=7&nesting_level=3\n" +
+        "$PATH_SOURCE?task=5&rand_seed=variant_1&variables_num=4&arguments_num=3&do_while_num=4&nesting_level=3\n" +
+        "$PATH_SOURCE?task=6&rand_seed=variant_18&variables_num=6&arguments_num=3&for_num=5&nesting_level=3\n" +
+        "$PATH_SOURCE?task=7&rand_seed=variant_10&variables_num=10&arguments_num=5&if_num=2&switch_num=3&case_num=3&while_num=2&do_while_num=1&for_num=2&nesting_level=3\n" +
+//        "$PATH_SOURCE?task=8&rand_seed=variant_3&variables_num=6&statements_num=7&arguments_num=5&printf_num=7\n" +
+        "$PATH_SOURCE?task=9&rand_seed=variant_0&variables_num=3&statements_num=7&arguments_num=4&printf_num=5\n" +
+        "$PATH_SOURCE?task=10&rand_seed=variant_2&variables_num=6&arguments_num=3&printf_num=3\n\n\n" +
 
         "или: \n" +
-        "/get_image?task=1&rand_seed=variant_2&variables_num=6&statements_num=7&arguments_num=7&printf_num=3&redefinition_var=1&operations=|,%26,*,%2b\n" +
-        "/get_image?task=2&rand_seed=variant_1&variables_num=4&arguments_num=4&if_num=6&nesting_level=4\n" +
-        "/get_image?task=3&rand_seed=variant_7&variables_num=8&arguments_num=7&switch_num=7&case_num=6&nesting_level=3\n" +
-        "/get_image?task=4&rand_seed=variant_13&variables_num=6&arguments_num=4&while_num=7&nesting_level=3\n" +
-        "/get_image?task=5&rand_seed=variant_1&variables_num=4&arguments_num=3&do_while_num=4&nesting_level=3\n" +
-        "/get_image?task=6&rand_seed=variant_18&variables_num=6&arguments_num=3&for_num=5&nesting_level=3\n" +
-        "/get_image?task=7&rand_seed=variant_10&variables_num=10&arguments_num=5&if_num=2&switch_num=3&case_num=3&while_num=2&do_while_num=1&for_num=2&nesting_level=3\n" +
-        "/get_image?task=8&rand_seed=variant_3&variables_num=6&statements_num=7&arguments_num=5&printf_num=7\n" +
-        "/get_image?task=9&rand_seed=variant_0&variables_num=3&statements_num=7&arguments_num=4&printf_num=5\n" +
-        "/get_image?task=10&rand_seed=variant_2&variables_num=6&arguments_num=3&printf_num=3\n"
+        "$PATH_IMAGE?task=1&rand_seed=variant_2&variables_num=6&statements_num=7&arguments_num=7&printf_num=3&redefinition_var=1&operations=|,%26,*,%2b\n" +
+        "$PATH_IMAGE?task=2&rand_seed=variant_1&variables_num=4&arguments_num=4&if_num=6&nesting_level=4\n" +
+        "$PATH_IMAGE?task=3&rand_seed=variant_7&variables_num=8&arguments_num=7&switch_num=7&case_num=6&nesting_level=3\n" +
+        "$PATH_IMAGE?task=4&rand_seed=variant_13&variables_num=6&arguments_num=4&while_num=7&nesting_level=3\n" +
+        "$PATH_IMAGE?task=5&rand_seed=variant_1&variables_num=4&arguments_num=3&do_while_num=4&nesting_level=3\n" +
+        "$PATH_IMAGE?task=6&rand_seed=variant_18&variables_num=6&arguments_num=3&for_num=5&nesting_level=3\n" +
+        "$PATH_IMAGE?task=7&rand_seed=variant_10&variables_num=10&arguments_num=5&if_num=2&switch_num=3&case_num=3&while_num=2&do_while_num=1&for_num=2&nesting_level=3\n" +
+//        "$PATH_IMAGE?task=8&rand_seed=variant_3&variables_num=6&statements_num=7&arguments_num=5&printf_num=7\n" +
+        "$PATH_IMAGE?task=9&rand_seed=variant_0&variables_num=3&statements_num=7&arguments_num=4&printf_num=5\n" +
+        "$PATH_IMAGE?task=10&rand_seed=variant_2&variables_num=6&arguments_num=3&printf_num=3\n"
 
 val TEXT_ = "Ошибка ввода. Попробуйте снова.\n\n"
 val TEXT__ = "Задача пока находится в разработке, попробуйте другой тип задач.\n\n"
@@ -54,12 +60,12 @@ class Server {
                     file("saved.png")
                     default("index.html")
                 }
-
                 get("/") {
                     call.respondText("$TEXT")
                 }
-                get("/get_source") {
-                    val task: String? = call.request.queryParameters["task"]
+                get(PATH_SOURCE) {
+                    val path = PATH_SOURCE
+                    var task: String? = call.request.queryParameters["task"]
                     var rand_seed: String? = call.request.queryParameters["rand_seed"]
                     val variables_num: String? = call.request.queryParameters["variables_num"]
                     val statements_num: String? = call.request.queryParameters["statements_num"]
@@ -81,22 +87,20 @@ class Server {
                             call.respondText("$TEXT_$TEXT")
                         else {
                             args_.addAll(returnArgs_(task, rand_seed, variables_num, statements_num, arguments_num, printf_num, redefinition_var, operations, if_num, switch_num, case_num, while_num, do_while_num, for_num, nesting_level))
-                            val rand_seed_ = execation(args_, rand_seed)
-                            if (rand_seed_ == rand_seed) {
+                            val new_str = execation(args_, path)
+                            val str_ = dataToStr(path, task, rand_seed, variables_num, statements_num, arguments_num, printf_num, redefinition_var, operations, if_num, switch_num, case_num, while_num, do_while_num, for_num, nesting_level)
+                            if (new_str == "") call.respondText("$TEXT___$TEXT")
+                            if (new_str != "" && new_str != str_) return@get call.respondRedirect(new_str, permanent = false)
+                            if (new_str == str_) {
                                 val func = readFile("program.c")
                                 call.respondText("$func")
                             }
-
-                            if (rand_seed_ == "")
-                                call.respondText("$TEXT___$TEXT")
-
-                            if (rand_seed_ != rand_seed && rand_seed_ != "")
-                                return@get call.respondRedirect(newData("/get_source", task, rand_seed_, variables_num, statements_num, arguments_num, printf_num, redefinition_var, operations, if_num, switch_num, case_num, while_num, do_while_num, for_num, nesting_level), permanent = false)
                         }
                     }
                     else call.respondText("$TEXT_$TEXT")
                 }
-                get("/get_image") {
+                get(PATH_IMAGE) {
+                    val path = PATH_IMAGE
                     val task: String? = call.request.queryParameters["task"]
                     var rand_seed: String? = call.request.queryParameters["rand_seed"]
                     val variables_num: String? = call.request.queryParameters["variables_num"]
@@ -119,28 +123,25 @@ class Server {
                             call.respondText("$TEXT_$TEXT")
                         else {
                             args_.addAll(returnArgs_(task, rand_seed, variables_num, statements_num, arguments_num, printf_num, redefinition_var, operations, if_num, switch_num, case_num, while_num, do_while_num, for_num, nesting_level))
-                            val rand_seed_ = execation(args_, rand_seed)
-                            if (rand_seed_ == rand_seed) {
+                            val new_str = execation(args_, path)
+                            val str_ = dataToStr(path, task, rand_seed, variables_num, statements_num, arguments_num, printf_num, redefinition_var, operations, if_num, switch_num, case_num, while_num, do_while_num, for_num, nesting_level)
+                            if (new_str == "") call.respondText("$TEXT___$TEXT")
+                            if (new_str != "" && new_str != str_) return@get call.respondRedirect(new_str, permanent = false)
+                            if (new_str == str_) {
                                 Image(readFile("program.c"))
                                 call.respondHtml {
                                     body {
-                                        p {
-                                            img(src = "../saved.png", alt = "qwe")
-                                        }
+                                        p { img(src = "../saved.png", alt = "qwe") }
                                     }
                                 }
                             }
-
-                            if (rand_seed_ == "")
-                                call.respondText("$TEXT___$TEXT")
-
-                            if (rand_seed_ != rand_seed && rand_seed_ != "")
-                                return@get call.respondRedirect(newData("/get_image", task, rand_seed_, variables_num, statements_num, arguments_num, printf_num, redefinition_var, operations, if_num, switch_num, case_num, while_num, do_while_num, for_num, nesting_level), permanent = false)
                         }
                     }
                     else call.respondText("$TEXT_$TEXT")
                 }
-                get("/check_answer") {
+                // ДОПИСАТЬ
+                get(PATH_ANSWER) {
+                    val path = PATH_ANSWER
                     val task: String? = call.request.queryParameters["task"]
                     val rand_seed: String? = call.request.queryParameters["rand_seed"]
                     val variables_num: String? = call.request.queryParameters["variables_num"]
@@ -240,7 +241,6 @@ class Server {
             }
             7 -> {
                 args_.add(arguments_num.toString())
-                args_.add(nesting_level.toString())
                 if (if_num.toString() != "null") args_.add(if_num.toString())
                 else args_.add("0")
                 if (switch_num.toString() != "null") args_.add(switch_num.toString())
@@ -253,6 +253,7 @@ class Server {
                 else args_.add("0")
                 if (for_num.toString() != "null") args_.add(for_num.toString())
                 else args_.add("0")
+                args_.add(nesting_level.toString())
             }
             8 -> {
                 args_.add(statements_num.toString())
@@ -272,7 +273,7 @@ class Server {
         return args_
     }
 
-    fun newData(str_: String, task: String?, rand_seed: String?, variables_num: String?, statements_num: String?, arguments_num: String?, printf_num: String?, redefinition_var: String?, operations: String?, if_num: String?, switch_num: String?, case_num: String?, while_num: String?, do_while_num: String?, for_num: String?, nesting_level: String?): String {
+    fun dataToStr(str_: String, task: String?, rand_seed: String?, variables_num: String?, statements_num: String?, arguments_num: String?, printf_num: String?, redefinition_var: String?, operations: String?, if_num: String?, switch_num: String?, case_num: String?, while_num: String?, do_while_num: String?, for_num: String?, nesting_level: String?): String {
         var str = "${str_}"
         if (task.toString() != "null")              str = "$str?task=${task.toString()}"
         if (rand_seed.toString() != "null")         str = "$str&rand_seed=${rand_seed.toString()}"
@@ -281,7 +282,17 @@ class Server {
         if (arguments_num.toString() != "null")     str = "$str&arguments_num=${arguments_num.toString()}"
         if (printf_num.toString() != "null")        str = "$str&printf_num=${printf_num.toString()}"
         if (redefinition_var.toString() != "null")  str = "$str&redefinition_var=${redefinition_var.toString()}"
-        if (operations.toString() != "null")        str = "$str&operations=${operations.toString()}"
+        if (operations.toString() != "null") {
+            val args_: MutableList<String> = mutableListOf()
+            args_.addAll(operations.toString().split(','))
+            str = "$str&operations="
+            for (i in 0..args_.size - 1) {
+                if (args_[i] == AMPERSAND) str = "$str%26"
+                if (args_[i] == ADDITION) str = "$str%2b"
+                if (args_[i] != AMPERSAND && args_[i] != ADDITION) str = "$str${args_[i]}"
+                if (i != args_.size - 1) str = "$str,"
+            }
+        }
         if (if_num.toString() != "null")            str = "$str&if_num=${if_num.toString()}"
         if (switch_num.toString() != "null")        str = "$str&switch_num=${switch_num.toString()}"
         if (case_num.toString() != "null")          str = "$str&case_num=${case_num.toString()}"
@@ -292,7 +303,37 @@ class Server {
         return str
     }
 
-    fun execation(args_: MutableList<String>, rand_seed: String?): String {
+    fun parametersToStr(str_: String, parameters_: ProgramParameters): String {
+        var new_str = "$str_?task=${parameters_.task}&rand_seed=${parameters_.rand_seed_}"
+        when (parameters_.task) {
+            1 -> {
+                new_str = "$new_str&variables_num=${parameters_.variables_num}&statements_num=${parameters_.statements_num}&arguments_num=${parameters_.arguments_num}&printf_num=${parameters_.printf_num}"
+                if (parameters_.redefiniton_var) new_str = "$new_str&redefinition_var=1"
+                else new_str = "$new_str&redefinition_var=0"
+                var operations_ = ""
+                for (i: Int in 0..parameters_.OPERATIONS_TYPE.size - 1) {
+                    if (parameters_.OPERATIONS_TYPE[i] == AMPERSAND) operations_ = "$operations_%26"
+                    if (parameters_.OPERATIONS_TYPE[i] == ADDITION) operations_ = "$operations_%2b"
+                    if (parameters_.OPERATIONS_TYPE[i] != AMPERSAND && parameters_.OPERATIONS_TYPE[i] != ADDITION) operations_ = "$operations_${parameters_.OPERATIONS_TYPE[i]}"
+                    if (i != parameters_.OPERATIONS_TYPE.size - 1) operations_ = "$operations_,"
+                }
+                new_str = "$new_str&operations=${operations_}"
+            }
+            2 -> new_str = "$new_str&variables_num=${parameters_.variables_num}&arguments_num=${parameters_.arguments_num}&if_num=${parameters_.if_num}&nesting_level=${parameters_.nesting_level}"
+            3 -> new_str = "$new_str&variables_num=${parameters_.variables_num}&arguments_num=${parameters_.arguments_num}&switch_num=${parameters_.switch_num}&case_num=${parameters_.case_num}&nesting_level=${parameters_.nesting_level}"
+            4 -> new_str = "$new_str&variables_num=${parameters_.variables_num}&arguments_num=${parameters_.arguments_num}&while_num=${parameters_.while_num}&nesting_level=${parameters_.nesting_level}"
+            5 -> new_str = "$new_str&variables_num=${parameters_.variables_num}&arguments_num=${parameters_.arguments_num}&do_while_num=${parameters_.do_while_num}&nesting_level=${parameters_.nesting_level}"
+            6 -> new_str = "$new_str&variables_num=${parameters_.variables_num}&arguments_num=${parameters_.arguments_num}&for_num=${parameters_.for_num}&nesting_level=${parameters_.nesting_level}"
+            7 -> new_str = "$new_str&variables_num=${parameters_.variables_num}&arguments_num=${parameters_.arguments_num}&if_num=${parameters_.if_num}&switch_num=${parameters_.switch_num}&case_num=${parameters_.case_num}&while_num=${parameters_.while_num}&do_while_num=${parameters_.do_while_num}&for_num=${parameters_.for_num}&nesting_level=${parameters_.nesting_level}"
+            8 -> new_str = "$new_str&variables_num=${parameters_.variables_num}&statements_num=${parameters_.statements_num}&arguments_num=${parameters_.arguments_num}&printf_num=${parameters_.printf_num}"
+            9 -> new_str = "$new_str&variables_num=${parameters_.variables_num}&statements_num=${parameters_.statements_num}&arguments_num=${parameters_.arguments_num}&printf_num=${parameters_.printf_num}"
+            10 -> new_str = "$new_str&variables_num=${parameters_.variables_num}&arguments_num=${parameters_.arguments_num}&printf_num=${parameters_.printf_num}"
+        }
+        return new_str
+    }
+
+    fun execation(args_: MutableList<String>, str_: String): String {
+        var rand_seed = args_[1]
         val parameters = ProgramParameters(args_)
         var generator = Generator(parameters)
         generator.programGenerate()
@@ -301,11 +342,11 @@ class Server {
         var number = 0
         var count = 15
 
-        if (generator.runtime()) return rand_seed.toString()
+        if (generator.runtime()) return parametersToStr(str_, parameters)
 
         if (!generator.runtime()) {
-            for (i in (TEMPLATE.length)..(rand_seed.toString().length - 1))
-                v_number = "$v_number${rand_seed.toString()[i]}"
+            for (i in (TEMPLATE.length)..(rand_seed.length - 1))
+                v_number = "$v_number${rand_seed[i]}"
             number = parseInt(v_number)
         }
 
@@ -314,12 +355,11 @@ class Server {
             number++
             val rand_seed_ = "$TEMPLATE${number}"
             args_[1] = rand_seed_
-//            println("$number, $rand_seed_, $args_")
 
             val parameters = ProgramParameters(args_)
             generator = Generator(parameters)
             generator.programGenerate()
-            if (generator.runtime()) return rand_seed_
+            if (generator.runtime()) return parametersToStr(str_, parameters)
         }
         return ""
     }

@@ -5,6 +5,7 @@ import java.lang.Integer.parseInt
 class ProgramParameters {
     var task = 0
     var rand_seed = 0
+    var rand_seed_ = "0"
     var variables_num = 0
     var statements_num = 0
     var arguments_num = 0
@@ -15,7 +16,7 @@ class ProgramParameters {
     var while_num = 0
     var do_while_num = 0
     var for_num = 0
-    var redefiniton_var = true
+    var redefiniton_var = false
     val OPERATIONS_TYPE: MutableList<String> = mutableListOf()
     var nesting_level = 0
     var array_num = 0
@@ -26,6 +27,7 @@ class ProgramParameters {
     constructor(args: MutableList<String>) {
         task = parseInt(args[0])
         rand_seed = args[1].hashCode()
+        rand_seed_ = args[1]
         variables_num = parseInt(args[2])
 
         when (task) {
@@ -128,7 +130,6 @@ class ProgramParameters {
                     if (for_num > 10) for_num = 10
                     printf_num += for_num
                 }
-//                printf_num = if_num + switch_num * case_num + while_num + do_while_num + for_num
                 nesting_level = parseInt(args[10])
                 if (printf_num == 1) nesting_level = 0
                 if (nesting_level > printf_num - 1) nesting_level = printf_num - 1
