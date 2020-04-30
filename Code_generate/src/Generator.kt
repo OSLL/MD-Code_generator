@@ -102,6 +102,40 @@ class Generator {
         return program_
     }
 
+    fun Term_(): MutableList<String> {
+        val program_: MutableList<String> = mutableListOf()
+        var variable: String
+        var variable_: String
+        if (randList_.randListBoolPop(randList_.listBool) || program.getPointerToPointerVariable().isEmpty()) {
+            variable = IDENTIFIER[randList_.randListIntPop(randList_.variableIdList)]
+            while (!program.getPointerVariable().contains(variable))
+                variable = IDENTIFIER[randList_.randListIntPop(randList_.variableIdList)]
+            variable = "$variable"
+            if (randList_.randListBoolPop(randList_.listBool)) {
+                variable = "$MULTIPLICATION$variable"
+                variable_ = "${randList_.randListIntPop(randList_.listInt)}"
+            }
+            else variable_ = "$AMPERSAND${returnIntVariable(program)}"
+        }
+        else {
+            variable = IDENTIFIER[randList_.randListIntPop(randList_.variableIdList)]
+            while (!program.getPointerToPointerVariable().contains(variable))
+                variable = IDENTIFIER[randList_.randListIntPop(randList_.variableIdList)]
+            variable = "$MULTIPLICATION$variable"
+            if (randList_.randListBoolPop(randList_.listBool))  {
+                variable = "$MULTIPLICATION$variable"
+                variable_ = "${randList_.randListIntPop(randList_.listInt)}"
+            }
+            else variable_ = "$AMPERSAND${returnPointerVariable(program)}"
+        }
+        program_.add(variable)
+        program_.add(EQUALLY)
+        program_.add(variable_)
+        program_.add(END_OF_LINE)
+        program.incrementCounterTerm()
+        return program_
+    }
+
     fun TermAddition(argNum: Int, visibleVar: Program): MutableList<String> {
         val program_: MutableList<String> = mutableListOf()
 
@@ -115,10 +149,10 @@ class Generator {
             }
             if (parameters.getTask_() == 8) {
                 var op_index = randList_.randListIntPop(randList_.operationIdList)
-                while (op_index >= parameters.OPERATIONS_TYPE.size)
+                while (op_index >= ARITHMETIC_OPERATIONS.size)
                     op_index = randList_.randListIntPop(randList_.operationIdList)
                 operation = ARITHMETIC_OPERATIONS[op_index]
-                }
+            }
             if (operation != BITWISE_OPERATIONS[0] && operation != BITWISE_OPERATIONS[1] && operation != DIV && operation != MOD) {
                 program_.add(operation)
                 val flag = randList_.randListBoolPop(randList_.listBool)
@@ -245,9 +279,9 @@ class Generator {
             8 -> {
                 program_.addAll(Init(program_))
                 while (parameters.getStatementsNum() - program.getCounterTerm() > 0)
-                    program_.addAll(Term(program))
-                while (parameters.getPrintfNum() > program.getCounterPrintf())
-                    program_.addAll(Printf(returnPointerVariable(program)))
+                    program_.addAll(Term_())
+//                while (parameters.getPrintfNum() > program.getCounterPrintf())
+//                    program_.addAll(Printf(returnPointerVariable(program)))
             }
             9 -> {
                 program_.addAll(Init(program_))
@@ -499,12 +533,13 @@ class Generator {
                 for (i in 0..(parameters.getVariablesNum() - 1)) {
                     val visibleVar = findVisibleVar(prog)
                     val visibleVar_ = findVisibleVar(program_)
-                    visibleVar.getVariableBool().addAll(visibleVar_.getVariableBool())
                     visibleVar.getVariableInt().addAll(visibleVar_.getVariableInt())
-                    visibleVar.getVariableFloat().addAll(visibleVar_.getVariableFloat())
 
-                    val boolean_ = randList_.randListBoolPop(randList_.listBool)
-                    if (i == 0 || (boolean_ && i != (parameters.getVariablesNum() - 1))) {
+                    var index_ = randList_.randListIntPop(randList_.listCondition)
+                    if (program.getVariableInt().isEmpty()) index_ = 0
+                    while (program.getPointerVariable().isEmpty() && index_ == 2) index_ = randList_.randListIntPop(randList_.listCondition)
+                    if (i == parameters.getVariablesNum() - 1) index_ = 1
+                    if (program.getVariableInt().isEmpty() || index_ == 0) { //add INT
                         program_.add(INT)
                         program.getVariableInt().add(IDENTIFIER[i])
                         program_.add(" ")
@@ -520,7 +555,7 @@ class Generator {
                         }
                         program_.add(END_OF_LINE)
                     }
-                    else {
+                    if (!program.getVariableInt().isEmpty() && index_ == 1) { //add INT *
                         program_.add(INT_POINTER)
                         program_.add(" ")
                         program_.add(IDENTIFIER[i])
@@ -531,6 +566,20 @@ class Generator {
                         program_.add(END_OF_LINE)
 
                         program_.addAll(Printf(IDENTIFIER[i]))
+                    }
+                    if (!program.getPointerVariable().isEmpty() && index_ == 2) { // add INT **
+                        program_.add(INT_POINTER)
+                        program_.add(MULTIPLICATION)
+                        program_.add(" ")
+                        program_.add(IDENTIFIER[i])
+                        program_.add(EQUALLY)
+                        program_.add(AMPERSAND)
+
+                        program_.add(returnPointerVariable(program))
+                        program.getPointerToPointerVariable().add(IDENTIFIER[i])
+                        program_.add(END_OF_LINE)
+
+                        program_.addAll(Printf("$MULTIPLICATION${IDENTIFIER[i]}"))
                     }
                 }
             }

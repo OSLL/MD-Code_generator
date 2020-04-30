@@ -31,7 +31,7 @@ val TEXT = "Введите в адресную строку входные да�
         "$PATH_SOURCE?task=5&rand_seed=variant_1&variables_num=4&arguments_num=3&do_while_num=4&nesting_level=3\n" +
         "$PATH_SOURCE?task=6&rand_seed=variant_18&variables_num=6&arguments_num=3&for_num=5&nesting_level=3\n" +
         "$PATH_SOURCE?task=7&rand_seed=variant_10&variables_num=10&arguments_num=5&if_num=2&switch_num=3&case_num=3&while_num=2&do_while_num=1&for_num=2&nesting_level=3\n" +
-//        "$PATH_SOURCE?task=8&rand_seed=variant_3&variables_num=6&statements_num=7&arguments_num=5&printf_num=7\n" +
+        "$PATH_SOURCE?task=8&rand_seed=variant_3&variables_num=6&statements_num=7&arguments_num=5&printf_num=7\n" +
         "$PATH_SOURCE?task=9&rand_seed=variant_0&variables_num=3&statements_num=7&arguments_num=4&printf_num=5\n" +
         "$PATH_SOURCE?task=10&rand_seed=variant_2&variables_num=6&arguments_num=3&printf_num=3\n\n\n" +
 
@@ -43,7 +43,7 @@ val TEXT = "Введите в адресную строку входные да�
         "$PATH_IMAGE?task=5&rand_seed=variant_1&variables_num=4&arguments_num=3&do_while_num=4&nesting_level=3\n" +
         "$PATH_IMAGE?task=6&rand_seed=variant_18&variables_num=6&arguments_num=3&for_num=5&nesting_level=3\n" +
         "$PATH_IMAGE?task=7&rand_seed=variant_10&variables_num=10&arguments_num=5&if_num=2&switch_num=3&case_num=3&while_num=2&do_while_num=1&for_num=2&nesting_level=3\n" +
-//        "$PATH_IMAGE?task=8&rand_seed=variant_3&variables_num=6&statements_num=7&arguments_num=5&printf_num=7\n" +
+        "$PATH_IMAGE?task=8&rand_seed=variant_3&variables_num=6&statements_num=7&arguments_num=5&printf_num=7\n" +
         "$PATH_IMAGE?task=9&rand_seed=variant_0&variables_num=3&statements_num=7&arguments_num=4&printf_num=5\n" +
         "$PATH_IMAGE?task=10&rand_seed=variant_2&variables_num=6&arguments_num=3&printf_num=3\n"
 
@@ -91,10 +91,7 @@ class Server {
                             val str_ = dataToStr(path, task, rand_seed, variables_num, statements_num, arguments_num, printf_num, redefinition_var, operations, if_num, switch_num, case_num, while_num, do_while_num, for_num, nesting_level)
                             if (new_str == "") call.respondText("$TEXT___$TEXT")
                             if (new_str != "" && new_str != str_) return@get call.respondRedirect(new_str, permanent = false)
-                            if (new_str == str_) {
-                                val func = readFile("program.c")
-                                call.respondText("$func")
-                            }
+                            if (new_str == str_) call.respondText("${readFile("program.c")}")
                         }
                     }
                     else call.respondText("$TEXT_$TEXT")
@@ -139,7 +136,6 @@ class Server {
                     }
                     else call.respondText("$TEXT_$TEXT")
                 }
-                // ДОПИСАТЬ
                 get(PATH_ANSWER) {
                     val path = PATH_ANSWER
                     val task: String? = call.request.queryParameters["task"]
@@ -160,16 +156,32 @@ class Server {
                     val answer: String? = call.request.queryParameters["answer"]
 
                     if (checkData(task, rand_seed, answer)) {
+                        val args_: MutableList<String> = mutableListOf()
                         if (dataNotCorrect(task, variables_num, statements_num, arguments_num, printf_num, redefinition_var, operations, if_num, switch_num, case_num, while_num, do_while_num, for_num, nesting_level))
                             call.respondText("$TEXT_$TEXT")
-
-                        var result = readFile("program_result.txt")
-                        result = result.replace(CARRIAGE_RETURN, "")
-                        var code : HttpStatusCode
-                        if (result == answer) code = HttpStatusCode.OK
-                        else code = HttpStatusCode.MultipleChoices
-                        call.response.status(code)
-                        call.respondText("${code.value}\n\nresult:\n$result\n\nanswer:\n$answer")
+                        else {
+                            args_.addAll(returnArgs_(task, rand_seed, variables_num, statements_num, arguments_num, printf_num, redefinition_var, operations, if_num, switch_num, case_num, while_num, do_while_num, for_num, nesting_level))
+                            var new_str = execation(args_, path)
+                            var str_ = dataToStr(path, task, rand_seed, variables_num, statements_num, arguments_num, printf_num, redefinition_var, operations, if_num, switch_num, case_num, while_num, do_while_num, for_num, nesting_level)
+                            new_str = "$new_str&answer=${answer.toString()}"
+                            str_ = "$str_&answer=${answer.toString()}"
+                            if (new_str == "") call.respondText("$TEXT___$TEXT")
+                            if (new_str != "" && new_str != str_) return@get call.respondRedirect(new_str, permanent = false)
+                            if (new_str == str_) {
+                                val answer_ = answer.toString().replace("\\s+".toRegex(), " ")
+                                val result = readFile("program_result.txt").replace(CARRIAGE_RETURN, "")
+                                var solution = ""
+                                if (result == answer_) {
+                                    call.response.status(HttpStatusCode.OK)
+                                    solution = "Correct solution"
+                                }
+                                else {
+                                    call.response.status(HttpStatusCode.MultipleChoices)
+                                    solution = "Incorrect solution"
+                                }
+                                call.respondText("$solution\n\ncorrect solution:\n$result\n\nstudent solution:\n$answer_")
+                            }
+                        }
                     }
                     else call.respondText("$TEXT_$TEXT")
                 }

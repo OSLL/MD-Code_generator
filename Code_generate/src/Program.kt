@@ -2,11 +2,11 @@ package com.example
 
 class Program {
     internal val variable_uns_int: MutableSet<String> = mutableSetOf()
-    internal val variable_size_t: MutableSet<String> = mutableSetOf()
     internal val variable_float: MutableSet<String> = mutableSetOf()
     internal val variable_int: MutableSet<String> = mutableSetOf()
     internal val variable_bool: MutableSet<String> = mutableSetOf()
     internal val pointer_variable: MutableSet<String> = mutableSetOf()
+    internal val pointer_to_pointer_variable: MutableSet<String> = mutableSetOf()
     internal val array_variable: MutableSet<String> = mutableSetOf()
 
     var counter_terms = 0
@@ -65,6 +65,14 @@ class Program {
         return pointer_variable.elementAt(index)
     }
 
+    fun getPointerToPointerVariable(): MutableSet <String> {
+        return pointer_to_pointer_variable
+    }
+
+    fun getPointerToPointerVariableIndex(index: Int): String {
+        return pointer_to_pointer_variable.elementAt(index)
+    }
+
     fun getArrayVariable(): MutableSet <String> {
         return array_variable
     }
@@ -74,7 +82,7 @@ class Program {
     }
 
     internal fun getCounterVariables(): Int {
-        return variable_uns_int.size + variable_bool.size + variable_float.size + variable_int.size + variable_size_t.size + pointer_variable.size
+        return variable_uns_int.size + variable_bool.size + variable_float.size + variable_int.size + pointer_variable.size + pointer_to_pointer_variable.size + array_variable.size
     }
 
     internal fun getCounterTerm(): Int {
