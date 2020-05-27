@@ -5,6 +5,12 @@ import java.io.File
 import java.io.InputStreamReader
 import java.lang.Integer.parseInt
 
+val FILENAME = "program"
+val PROGRAM_FORMAT = "c"
+//val FILENAME = "Main"
+//val PROGRAM_FORMAT = "java"
+val PROGRAM = "$FILENAME$DOT$PROGRAM_FORMAT"
+
 class Generator {
     var program: Program = Program()
     var parameters: ProgramParameters = ProgramParameters()
@@ -29,10 +35,13 @@ class Generator {
 
     fun Main(): MutableList<String> {
         val program_: MutableList<String> = mutableListOf()
+//        program_.add("public static ")
         program_.add(INT)
+//        program_.add(VOID)
         program_.add(" ")
         program_.add(MAIN)
         program_.add(ROUND_BRACKET)
+//        program_.add("String[] args")
         program_.add(ROUND_BRACKET_)
         program_.add(BRACE)
         program_.add(CARRIAGE_RETURN)
@@ -64,9 +73,11 @@ class Generator {
             program.getProgram().add(CARRIAGE_RETURN)
         }
 
+//        program.getProgram().add("public class Main {")
         program.getProgram().addAll(Main())
+//        program.getProgram().add("}")
 
-        var file = File("program.c")
+        var file = File(PROGRAM)
         file.writeText(program.getProgram().joinToString(""))
 
         return program.getProgram()
@@ -133,6 +144,13 @@ class Generator {
         program_.add(variable_)
         program_.add(END_OF_LINE)
         program.incrementCounterTerm()
+
+        if (parameters.getPrintfNum() - program.getCounterPrintf() > 1)
+            if (program.getCounterTerm() / (parameters.getStatementsNum() / parameters.getPrintfNum()) != 1 && program.getCounterTerm() % (parameters.getStatementsNum() / parameters.getPrintfNum()) == 0) {
+                if (randList_.randListBoolPop(randList_.listBool) && !program.getPointerToPointerVariable().isEmpty())
+                    program_.addAll(Printf("$MULTIPLICATION${returnPointerToPointerVariable(program)}"))
+                else program_.addAll(Printf(returnPointerVariable(program)))
+            }
         return program_
     }
 
@@ -255,10 +273,13 @@ class Generator {
                 } while (parameters.getIfNum() - program.getCounterIf() > 0)
             }
             3 -> { //switch block
+                program_.addAll(Init(program_))
                 do {
                     program_.addAll(Switch(parameters.getNestingLevel(), program_))
                 }
                 while (parameters.getSwitchNum() - program.getCounterSwitch() > 0)
+                while (parameters.getVariablesNum() - program.getCounterVariables() > 0)
+                    program_.addAll(Init(program_))
             }
             4 -> { //while block
                 do {
@@ -278,10 +299,12 @@ class Generator {
             7 -> program_.addAll(itemSelection_(parameters.getNestingLevel(), program_))
             8 -> {
                 program_.addAll(Init(program_))
-                while (parameters.getStatementsNum() - program.getCounterTerm() > 0)
+                while (parameters.getStatementsNum() - program.getCounterTerm() > 0) {
                     program_.addAll(Term_())
-//                while (parameters.getPrintfNum() > program.getCounterPrintf())
-//                    program_.addAll(Printf(returnPointerVariable(program)))
+                }
+                if (randList_.randListBoolPop(randList_.listBool) && !program.getPointerToPointerVariable().isEmpty())
+                    program_.addAll(Printf("$MULTIPLICATION${returnPointerToPointerVariable(program)}"))
+                else program_.addAll(Printf(returnPointerVariable(program)))
             }
             9 -> {
                 program_.addAll(Init(program_))
@@ -386,6 +409,15 @@ class Generator {
         if (visibleVar.getPointerVariable().size == 1) index = 0
         else
             while (index > visibleVar.getPointerVariable().size - 1)
+                index = randList_.randListIntPop(randList_.variableIdList)
+        return index
+    }
+
+    fun pointerToPointerVariableIndex(visibleVar: Program): Int {
+        var index = randList_.randListIntPop(randList_.variableIdList)
+        if (visibleVar.getPointerToPointerVariable().size == 1) index = 0
+        else
+            while (index > visibleVar.getPointerToPointerVariable().size - 1)
                 index = randList_.randListIntPop(randList_.variableIdList)
         return index
     }
@@ -565,7 +597,8 @@ class Generator {
                         program.getPointerVariable().add(IDENTIFIER[i])
                         program_.add(END_OF_LINE)
 
-                        program_.addAll(Printf(IDENTIFIER[i]))
+                        if (randList_.randListBoolPop(randList_.listBool))
+                            program_.addAll(Printf(IDENTIFIER[i]))
                     }
                     if (!program.getPointerVariable().isEmpty() && index_ == 2) { // add INT **
                         program_.add(INT_POINTER)
@@ -579,7 +612,8 @@ class Generator {
                         program.getPointerToPointerVariable().add(IDENTIFIER[i])
                         program_.add(END_OF_LINE)
 
-                        program_.addAll(Printf("$MULTIPLICATION${IDENTIFIER[i]}"))
+                        if (randList_.randListBoolPop(randList_.listBool))
+                            program_.addAll(Printf("$MULTIPLICATION${IDENTIFIER[i]}"))
                     }
                 }
             }
@@ -751,10 +785,14 @@ class Generator {
     fun Printf(visibleVar: Program): MutableList<String> {
         val program_: MutableList<String> = mutableListOf()
         if (visibleVar.getVariableUnsInt().size != 0) {
+//            program_.add("System.out.println$ROUND_BRACKET$QUOTES$SQUARE_BRACKET$QUOTES+")
+
             program_.add("$PRINTF$ROUND_BRACKET$QUOTES$SQUARE_BRACKET")
             program_.add("%u$SQUARE_BRACKET_$PRINT_CARRIAGE_RETURN$QUOTES$COMMA ")
             program_.add(visibleVar.getVariableUnsIntIndex(unsignedIntVariableIndex(visibleVar)))
             program.incrementCounterPrintf()
+
+//            program_.add("+$QUOTES$SQUARE_BRACKET_$QUOTES")
             program_.add("$ROUND_BRACKET_$END_OF_LINE")
         }
         return program_
@@ -888,6 +926,15 @@ class Generator {
             variable = visibleVar.getPointerVariableIndex(0)
         else
             variable = visibleVar.getPointerVariableIndex(pointerVariableIndex(visibleVar))
+        return variable
+    }
+
+    fun returnPointerToPointerVariable(visibleVar: Program): String {
+        val variable: String
+        if (visibleVar.getPointerToPointerVariable().size == 1)
+            variable = visibleVar.getPointerToPointerVariableIndex(0)
+        else
+            variable = visibleVar.getPointerToPointerVariableIndex(pointerToPointerVariableIndex(visibleVar))
         return variable
     }
 
@@ -1673,8 +1720,9 @@ class Generator {
 
         program.getPointerVariable().add("$MULTIPLICATION${pointerVar(pointer)}$EQUALLY$AMPERSAND$carArray$SQUARE_BRACKET$newIndex$SQUARE_BRACKET_")
         program.incrementCounterTerm()
-        if (program.getCounterPrintf() < parameters.getPrintfNum() && program.getCounterTerm() % (parameters.getStatementsNum() / (parameters.getPrintfNum() - program.getCounterPrintf())) == 0)
-            program_.addAll(Printf(pointerVar(returnPointerVariable(program))))
+        if ((parameters.getPrintfNum() - program.getCounterPrintf()) != 0 && parameters.getStatementsNum() / (parameters.getPrintfNum() - program.getCounterPrintf()) != 0)
+            if (program.getCounterPrintf() < parameters.getPrintfNum() && program.getCounterTerm() % (parameters.getStatementsNum() / (parameters.getPrintfNum() - program.getCounterPrintf())) == 0)
+                program_.addAll(Printf(pointerVar(returnPointerVariable(program))))
         return program_
     }
 

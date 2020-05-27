@@ -5,6 +5,9 @@ import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO
 
+val IMAGE_FORMAT = "png"
+val IMAGE = "$FILENAME$DOT$IMAGE_FORMAT"
+
 class Image {
     constructor(text: String) {
         var count = 0
@@ -36,7 +39,7 @@ class Image {
         }
         g.drawString(BRACE_, w, h)
 
-        val outputfile = File("saved.png");
-        ImageIO.write(image, "png", outputfile);
+        val outputfile = File(IMAGE);
+        ImageIO.write(image, IMAGE_FORMAT, outputfile);
     }
 }
