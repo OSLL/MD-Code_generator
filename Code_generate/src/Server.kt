@@ -178,13 +178,15 @@ class Server {
                                 val answer_ = answer.toString().replace("\\s+".toRegex(), " ")
                                 val result = readFile("program_result.txt").replace(CARRIAGE_RETURN, "")
                                 var solution = ""
+                                val math = checkAnswer_(stringParser(result), stringParser(answer_))
+
                                 if (result == answer_) {
                                     call.response.status(HttpStatusCode.OK)
-                                    solution = "Correct solution"
+                                    solution = "Correct solution: $math% math"
                                 }
                                 else {
                                     call.response.status(HttpStatusCode.MultipleChoices)
-                                    solution = "Incorrect solution"
+                                    solution = "Incorrect solution: $math% math"
                                 }
                                 call.respondText("$solution\n\ncorrect solution:\n$result\n\nstudent solution:\n$answer_")
                             }
@@ -385,5 +387,47 @@ class Server {
             if (generator.runtime()) return parametersToStr(str_, parameters)
         }
         return ""
+    }
+
+    fun stringParser(line: String): MutableList<String> {
+        var list: MutableList<String> = mutableListOf()
+        var item = ""
+        line.forEach{
+            item = "$item$it"
+            if (it == ']') {
+                list.add(item)
+                item = ""
+            }
+        }
+        return list
+    }
+
+    fun checkAnswer_(result_: MutableList<String>, answer_: MutableList<String>): Int {
+        if (result_.size == 0) {
+            if (answer_.size == 0) return 100
+            return 0
+        }
+        else {
+            if (result_.size > answer_.size) return checkAnswer(result_, answer_)
+            return checkAnswer(answer_, result_)
+        }
+    }
+
+    fun checkAnswer(result_: MutableList<String>, answer_: MutableList<String>): Int {
+        var count = 0
+        var i = 0
+        while (i < result_.size && !answer_.isEmpty()) {
+            var j = 0
+            while (i < result_.size && j < answer_.size && !answer_.isEmpty()) {
+                if (result_[i] == answer_[j]) {
+                    count++
+                    answer_.remove(answer_[j])
+                    i++
+                }
+                else j++
+            }
+            i++
+        }
+        return count * 100 / result_.size
     }
 }
