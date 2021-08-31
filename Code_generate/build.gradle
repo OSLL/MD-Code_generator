@@ -26,7 +26,7 @@ repositories {
     mavenLocal()
     jcenter()
     maven { url 'https://kotlin.bintray.com/ktor' }
-    maven { url 'https://kotlin.bintray.com/kotlin-js-wrappers' }
+    maven { url 'https://mvnrepository.com/artifact/org.jetbrains/kotlin-css-jvm' }
 }
 
 dependencies {
@@ -35,7 +35,7 @@ dependencies {
     compile "ch.qos.logback:logback-classic:$logback_version"
     compile "io.ktor:ktor-server-core:$ktor_version"
     compile "io.ktor:ktor-html-builder:$ktor_version"
-    compile "org.jetbrains:kotlin-css-jvm:1.0.0-pre.31-kotlin-1.2.41"
+    compile "org.jetbrains:kotlin-css-jvm:1.0.0-pre.110-kotlin-1.3.72"
     compile "io.ktor:ktor-client-core:$ktor_version"
     compile "io.ktor:ktor-client-core-jvm:$ktor_version"
     compile "io.ktor:ktor-client-apache:$ktor_version"
