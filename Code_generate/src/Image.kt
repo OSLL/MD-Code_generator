@@ -5,41 +5,39 @@ import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO
 
-val IMAGE_FORMAT = "png"
+const val IMAGE_FORMAT = "png"
 val IMAGE = "$FILENAME$DOT$IMAGE_FORMAT"
 
-class Image {
-    constructor(text: String) {
-        var count = 0
-        for (i in 0..(text.length - 1))
-            if (text[i].toString() == CARRIAGE_RETURN) count++
-        count++
+class Image(text: String) {
+    init {
+        val count = text.count { it.toString() == CARRIAGE_RETURN } + 1
 
-        var width = 400
-        var height = count * 17
+        val imageWidth = 400
+        val imageHeight = count * 17
 
-        var image = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
-        val g = image.createGraphics()
-        g.background = Color.WHITE
-        g.clearRect(0, 0, width, height)
-        g.color = Color.BLACK
-        var h = 10
-        var w = 7
+        val image = BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB)
+        val imageBuffer = image.createGraphics()
 
-        val string = mutableListOf<String>()
-        for (i in 0..(text.length - 1)) {
-            if (text[i].toString() != CARRIAGE_RETURN)
-                string.add(text[i].toString())
-            if (text[i].toString() == CARRIAGE_RETURN) {
-                string.add(text[i].toString())
-                g.drawString(string.joinToString(""), w, h)
-                string.clear()
-                h += 17
+        imageBuffer.background = Color.WHITE
+        imageBuffer.clearRect(0, 0, imageWidth, imageHeight)
+        imageBuffer.color = Color.BLACK
+
+        val currentX = 7
+        var currentY = 10
+
+        val stringBuffer = StringBuilder()
+        text.forEach {
+            stringBuffer.append(it)
+
+            if (it.toString() == CARRIAGE_RETURN) {
+                imageBuffer.drawString(stringBuffer.toString(), currentX, currentY)
+                stringBuffer.clear()
+                currentY += 17
             }
         }
-        g.drawString(BRACE_, w, h)
 
-        val outputfile = File(IMAGE);
-        ImageIO.write(image, IMAGE_FORMAT, outputfile);
+        imageBuffer.drawString(BRACE_, currentX, currentY)
+        val outputfile = File(IMAGE)
+        ImageIO.write(image, IMAGE_FORMAT, outputfile)
     }
 }
