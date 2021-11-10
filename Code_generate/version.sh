@@ -6,4 +6,4 @@ echo "{
 \"commit\":  \"$COMMIT\",
 \"date\":    \"$DATE\",
 \"version\": \"$VERSION\"
-}" > version_info.txt
+}" > version_info.json

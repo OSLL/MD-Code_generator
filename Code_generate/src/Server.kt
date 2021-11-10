@@ -67,7 +67,7 @@ fun Application.congigureServer() {
             call.respondText("$TEXT")
         }
         get("/version") {
-            val versionInfoString = readFile("version_info.txt")
+            val versionInfoString = readFile("version_info.json")
             val versionInfo = Json.decodeFromString<VersionInfo>(versionInfoString)
             call.respondHtml {
                 body {
