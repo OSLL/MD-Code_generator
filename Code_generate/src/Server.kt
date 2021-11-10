@@ -1,15 +1,16 @@
 package com.example
 
 import io.ktor.application.*
+import io.ktor.features.*
+import io.ktor.html.*
+import io.ktor.http.*
 import io.ktor.http.content.*
-import io.ktor.html.respondHtml
-import io.ktor.http.HttpStatusCode
 import io.ktor.response.*
-import io.ktor.routing.get
-import io.ktor.routing.routing
+import io.ktor.routing.*
+import io.ktor.serialization.*
 import kotlinx.html.body
-import kotlinx.html.p
 import kotlinx.html.img
+import kotlinx.html.p
 import kotlinx.serialization.Serializable
 import java.io.File
 import java.lang.Integer.parseInt
@@ -57,6 +58,9 @@ data class AnswerResponse(val correctnessPercentage: Int, val message: String)
 
 fun Application.congigureServer() {
     routing {
+        install(ContentNegotiation) {
+            json()
+        }
         static("") {
             file(IMAGE)
             default("index.html")
