@@ -1,18 +1,17 @@
 package com.example
 
 import io.ktor.application.*
+import io.ktor.html.*
+import io.ktor.http.*
 import io.ktor.http.content.*
-import io.ktor.html.respondHtml
-import io.ktor.http.HttpStatusCode
 import io.ktor.response.*
-import io.ktor.routing.get
-import io.ktor.routing.routing
-import kotlinx.html.body
-import kotlinx.html.p
-import kotlinx.html.img
+import io.ktor.routing.*
+import kotlinx.html.*
 import kotlinx.serialization.Serializable
 import java.io.File
 import java.lang.Integer.parseInt
+import java.time.LocalDateTime
+import java.util.concurrent.TimeUnit
 
 const val PATH_SOURCE = "/get_source"
 const val PATH_IMAGE = "/get_image"
@@ -55,6 +54,15 @@ const val ALT_TEXT = "There should be an image, but something went wrong. Please
 @Serializable
 data class AnswerResponse(val correctnessPercentage: Int, val message: String)
 
+fun getShellCommandResult(args: List<String>): String {
+    val process = ProcessBuilder(args).start()
+    val output = process.inputStream.bufferedReader().use {
+        it.readText()
+    }
+    process.waitFor(2, TimeUnit.SECONDS)
+    return output
+}
+
 fun Application.congigureServer() {
     routing {
         static("") {
@@ -63,6 +71,29 @@ fun Application.congigureServer() {
         }
         get("/") {
             call.respondText("$TEXT")
+        }
+        get("/version") {
+            val commit = getShellCommandResult(listOf("git", "rev-parse", "HEAD"))
+            val date = LocalDateTime.now().toString()
+            val version = getShellCommandResult(listOf("git", "describe", "--abbrev=0", "--tags"))
+            call.respondHtml {
+                body {
+                    table {
+                        tr {
+                            td { +"Commit" }
+                            td { +commit }
+                        }
+                        tr {
+                            td { +"Date" }
+                            td { +date }
+                        }
+                        tr {
+                            td { +"Version" }
+                            td { +version }
+                        }
+                    }
+                }
+            }
         }
         get(PATH_SOURCE) {
             val path = PATH_SOURCE
