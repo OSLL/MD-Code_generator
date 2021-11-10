@@ -8,10 +8,10 @@ import io.ktor.response.*
 import io.ktor.routing.*
 import kotlinx.html.*
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import java.io.File
 import java.lang.Integer.parseInt
-import java.time.LocalDateTime
-import java.util.concurrent.TimeUnit
 
 const val PATH_SOURCE = "/get_source"
 const val PATH_IMAGE = "/get_image"
@@ -54,14 +54,8 @@ const val ALT_TEXT = "There should be an image, but something went wrong. Please
 @Serializable
 data class AnswerResponse(val correctnessPercentage: Int, val message: String)
 
-fun getShellCommandResult(args: List<String>): String {
-    val process = ProcessBuilder(args).start()
-    val output = process.inputStream.bufferedReader().use {
-        it.readText()
-    }
-    process.waitFor(2, TimeUnit.SECONDS)
-    return output
-}
+@Serializable
+data class VersionInfo(val commit: String, val date: String, val version: String)
 
 fun Application.congigureServer() {
     routing {
@@ -73,23 +67,22 @@ fun Application.congigureServer() {
             call.respondText("$TEXT")
         }
         get("/version") {
-            val commit = getShellCommandResult(listOf("git", "rev-parse", "HEAD"))
-            val date = LocalDateTime.now().toString()
-            val version = getShellCommandResult(listOf("git", "describe", "--abbrev=0", "--tags"))
+            val versionInfoString = readFile("version_info.txt")
+            val versionInfo = Json.decodeFromString<VersionInfo>(versionInfoString)
             call.respondHtml {
                 body {
                     table {
                         tr {
                             td { +"Commit" }
-                            td { +commit }
+                            td { +versionInfo.commit }
                         }
                         tr {
                             td { +"Date" }
-                            td { +date }
+                            td { +versionInfo.date }
                         }
                         tr {
                             td { +"Version" }
-                            td { +version }
+                            td { +versionInfo.version }
                         }
                     }
                 }
