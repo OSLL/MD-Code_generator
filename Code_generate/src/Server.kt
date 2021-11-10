@@ -1,22 +1,25 @@
 package com.example
 
 import io.ktor.application.*
+import io.ktor.html.*
+import io.ktor.http.*
 import io.ktor.http.content.*
-import io.ktor.html.respondHtml
-import io.ktor.http.HttpStatusCode
 import io.ktor.response.*
-import io.ktor.routing.get
-import io.ktor.routing.routing
+import io.ktor.routing.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.html.body
-import kotlinx.html.p
 import kotlinx.html.img
+import kotlinx.html.p
 import kotlinx.serialization.Serializable
 import java.io.File
 import java.lang.Integer.parseInt
+import javax.imageio.ImageIO
 
 const val PATH_SOURCE = "/get_source"
 const val PATH_IMAGE = "/get_image"
 const val PATH_ANSWER = "/check_answer"
+const val PATH_IMAGE_BYTES_PNG = "/get_image_bytes_png"
 
 const val NUMBER_TASKS = 11
 const val TEXT = "Введите в адресную строку входные данные для задания\n" +
@@ -247,6 +250,105 @@ fun Application.congigureServer() {
                         call.respondHtml {
                             body {
                                 p { img(src = "../$IMAGE", alt = ALT_TEXT) }
+                            }
+                        }
+                    }
+                }
+            } else call.respondText("$INPUT_ERROR_TEXT$TEXT")
+        }
+        get(PATH_IMAGE_BYTES_PNG) {
+            val path = PATH_IMAGE_BYTES_PNG
+            val task: String? = call.request.queryParameters["task"]
+            var rand_seed: String? = call.request.queryParameters["rand_seed"]
+            val variables_num: String? = call.request.queryParameters["variables_num"]
+            val statements_num: String? = call.request.queryParameters["statements_num"]
+            val arguments_num: String? = call.request.queryParameters["arguments_num"]
+            val printf_num: String? = call.request.queryParameters["printf_num"]
+            val redefinition_var: String? = call.request.queryParameters["redefinition_var"]
+            val operations: String? = call.request.queryParameters["operations"]
+            val if_num: String? = call.request.queryParameters["if_num"]
+            val switch_num: String? = call.request.queryParameters["switch_num"]
+            val case_num: String? = call.request.queryParameters["case_num"]
+            val while_num: String? = call.request.queryParameters["while_num"]
+            val do_while_num: String? = call.request.queryParameters["do_while_num"]
+            val for_num: String? = call.request.queryParameters["for_num"]
+            val nesting_level: String? = call.request.queryParameters["nesting_level"]
+            val arrays_num: String? = call.request.queryParameters["arrays_num"]
+            val array_size: String? = call.request.queryParameters["array_size"]
+
+            if (checkData(task, rand_seed)) {
+                val args_: MutableList<String> = mutableListOf()
+                if (dataNotCorrect(
+                        task,
+                        variables_num,
+                        statements_num,
+                        arguments_num,
+                        printf_num,
+                        redefinition_var,
+                        operations,
+                        if_num,
+                        switch_num,
+                        case_num,
+                        while_num,
+                        do_while_num,
+                        for_num,
+                        nesting_level,
+                        arrays_num,
+                        array_size
+                    )
+                )
+                    call.respondText("$INPUT_ERROR_TEXT$TEXT")
+                else {
+                    args_.addAll(
+                        returnArgs_(
+                            task,
+                            rand_seed,
+                            variables_num,
+                            statements_num,
+                            arguments_num,
+                            printf_num,
+                            redefinition_var,
+                            operations,
+                            if_num,
+                            switch_num,
+                            case_num,
+                            while_num,
+                            do_while_num,
+                            for_num,
+                            nesting_level,
+                            arrays_num,
+                            array_size
+                        )
+                    )
+                    val new_str = execation(args_, path)
+                    val str_ = dataToStr(
+                        path,
+                        task,
+                        rand_seed,
+                        variables_num,
+                        statements_num,
+                        arguments_num,
+                        printf_num,
+                        redefinition_var,
+                        operations,
+                        if_num,
+                        switch_num,
+                        case_num,
+                        while_num,
+                        do_while_num,
+                        for_num,
+                        nesting_level,
+                        arrays_num,
+                        array_size
+                    )
+                    if (new_str == "") call.respondText("$TEXT___$TEXT")
+                    if (new_str != "" && new_str != str_) return@get call.respondRedirect(new_str, permanent = false)
+                    if (new_str == str_) {
+                        val image = createImage(readFile(PROGRAM))
+                        call.respondOutputStream {
+                            withContext(Dispatchers.IO) {
+                                @Suppress("BlockingMethodInNonBlockingContext")
+                                ImageIO.write(image, IMAGE_FORMAT, this@respondOutputStream)
                             }
                         }
                     }
