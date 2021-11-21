@@ -4,7 +4,7 @@ import java.io.FileInputStream
 import java.util.Properties
 
 object ConfigProvider {
-    private val configFile = FileInputStream("Code_generate/resources/config.properties")
+    private val configFile = FileInputStream("resources/config.properties")
     private val appProps = Properties()
 
     init {
