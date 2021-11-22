@@ -6,7 +6,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 fun main(args: Array<String>) {
-    val log: Logger = LoggerFactory.getLogger("configLogger")
+    val log: Logger = LoggerFactory.getLogger("jsonLogger")
     io.ktor.server.jetty.EngineMain.main(args)
 }
 
