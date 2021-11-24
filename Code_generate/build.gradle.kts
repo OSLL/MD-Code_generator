@@ -23,6 +23,11 @@ kotlin.sourceSets["main"].kotlin.srcDir("src")
 sourceSets["main"].resources.srcDir("resources")
 
 dependencies {
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.1")
+
+    implementation("org.litote.kmongo:kmongo-coroutine-serialization:4.4.0")
+    implementation("org.litote.kmongo:kmongo-id:4.4.0")
+
     implementation("io.ktor:ktor-server-core:$ktor_version")
     implementation("io.ktor:ktor-server-host-common:$ktor_version")
     implementation("org.jetbrains.kotlinx:kotlinx-html-jvm:0.7.3")
