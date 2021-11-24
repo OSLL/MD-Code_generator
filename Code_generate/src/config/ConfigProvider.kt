@@ -20,4 +20,6 @@ object ConfigProvider {
 
     val adminPassword: String by lazy { appProps.getProperty("admin.password") }
     val adminUser: String by lazy { appProps.getProperty("admin.user") }
+
+    val logsPath: String by lazy { appProps.getProperty(("logs.path"))}
 }
