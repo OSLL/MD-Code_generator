@@ -373,7 +373,7 @@ fun Application.congigureServer() {
         }
 
         get(PATH_LOGS) {
-            val file = File(ConfigProvider.debugUrl)
+            val file = File(ConfigProvider.logsPath)
             val data: String = file.readText()
             call.respondText(data)
         }
