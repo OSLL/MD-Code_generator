@@ -5,7 +5,7 @@ cd Code_generate
 
 # preparation
 # bash ./scripts/version.sh  # not integrated
-bash ./scripts/setup_apache_config.sh code-generator.cub-it.org.conf ssl
+# bash ./scripts/setup_apache_config.sh code-generator.cub-it.org.conf ssl
 
 cd -
 

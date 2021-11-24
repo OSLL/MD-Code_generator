@@ -13,7 +13,7 @@
     </appender>
 
     <appender name="json" class="ch.qos.logback.core.FileAppender">
-        <file>version.json</file>
+        <file>logs.json</file>
         <append>true</append>
         <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
             <layout class="ch.qos.logback.contrib.json.classic.JsonLayout">
@@ -29,7 +29,7 @@
     </root>
     <logger name="org.eclipse.jetty" level="INFO"/>
     <logger name="io.netty" level="INFO"/>
-    <logger name="jsonLogger" level="INFO">
+    <logger name="jsonLogger" level="TRACE">
         <appender-ref ref="json"/>
     </logger>
 </configuration>
