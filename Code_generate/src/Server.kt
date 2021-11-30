@@ -4,22 +4,16 @@ import com.example.config.ConfigProvider
 import io.ktor.application.*
 import io.ktor.html.*
 import io.ktor.http.*
-import io.ktor.features.*
-import io.ktor.html.*
-import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import io.ktor.routing.*
-import io.ktor.serialization.*
 import kotlinx.html.body
 import kotlinx.html.img
 import kotlinx.html.p
 import kotlinx.serialization.Serializable
 import java.io.File
-import java.io.FileInputStream
 import java.lang.Integer.parseInt
 import javax.imageio.ImageIO
 
@@ -69,9 +63,7 @@ data class AnswerResponse(val correctnessPercentage: Int, val message: String)
 
 fun Application.configureServer() {
     routing {
-        install(ContentNegotiation) {
-            json()
-        }
+
         static("") {
             file(IMAGE)
             default("index.html")

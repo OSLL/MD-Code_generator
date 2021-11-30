@@ -1,5 +1,6 @@
 package com.example.dao
 
+import com.example.config.ConfigProvider
 import com.mongodb.ConnectionString
 import io.ktor.http.*
 import org.litote.kmongo.coroutine.CoroutineDatabase
@@ -9,18 +10,17 @@ import org.litote.kmongo.reactivestreams.KMongo
 typealias MongoDB = CoroutineDatabase
 
 suspend fun createMongoDB(): MongoDB {
-    val host = System.getenv("MONGODB_HOST") ?: "localhost"
-    val port = System.getenv("MONGODB_PORT")?.toInt() ?: 27017
-    val database = System.getenv("MONGODB_DATABASE") ?: "code-generator"
     return KMongo.createClient(
         connectionString = ConnectionString(
             URLBuilder(
                 protocol = URLProtocol.createOrDefault("mongodb"),
-                host,
-                port
+                host = ConfigProvider.dbHost,
+                port = ConfigProvider.dbPort,
+                user = ConfigProvider.dbUser,
+                password = ConfigProvider.dbPassword,
             ).buildString()
         )
-    ).coroutine.getDatabase(database).prepareDatabase()
+    ).coroutine.getDatabase(ConfigProvider.dbName).prepareDatabase()
 }
 
 private suspend fun MongoDB.prepareDatabase() = apply {
