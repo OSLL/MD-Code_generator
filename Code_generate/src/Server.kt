@@ -16,6 +16,7 @@ import java.lang.Integer.parseInt
 const val PATH_SOURCE = "/get_source"
 const val PATH_IMAGE = "/get_image"
 const val PATH_ANSWER = "/check_answer"
+const val PATH_VERSION = "/version"
 
 const val NUMBER_TASKS = 11
 const val TEXT = "Введите в адресную строку входные данные для задания\n" +
@@ -66,7 +67,7 @@ fun Application.congigureServer() {
         get("/") {
             call.respondText("$TEXT")
         }
-        get("/version") {
+        get(PATH_VERSION) {
             val versionInfoString = readFile("version_info.json")
             val versionInfo = Json.decodeFromString<VersionInfo>(versionInfoString)
             call.respondHtml {
