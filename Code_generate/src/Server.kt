@@ -58,7 +58,7 @@ const val ALT_TEXT = "There should be an image, but something went wrong. Please
 @Serializable
 data class AnswerResponse(val correctnessPercentage: Int, val message: String)
 
-fun Application.congigureServer() {
+fun Application.configureServer() {
     routing {
         static("") {
             file(IMAGE)
@@ -131,7 +131,7 @@ fun Application.congigureServer() {
                             array_size
                         )
                     )
-                    val new_str = execation(args_, path)
+                    val new_str = execution(args_, path)
                     val str_ = dataToStr(
                         path,
                         task,
@@ -222,7 +222,7 @@ fun Application.congigureServer() {
                             array_size
                         )
                     )
-                    val new_str = execation(args_, path)
+                    val new_str = execution(args_, path)
                     val str_ = dataToStr(
                         path,
                         task,
@@ -320,7 +320,7 @@ fun Application.congigureServer() {
                             array_size
                         )
                     )
-                    val new_str = execation(args_, path)
+                    val new_str = execution(args_, path)
                     val str_ = dataToStr(
                         path,
                         task,
@@ -422,7 +422,7 @@ fun Application.congigureServer() {
                     array_size
                 )
             )
-            var new_str = execation(args_, path)
+            var new_str = execution(args_, path)
             var str_ = dataToStr(
                 path,
                 task,
@@ -692,7 +692,7 @@ fun parametersToStr(str_: String, parameters_: ProgramParameters): String {
     return new_str
 }
 
-fun execation(args_: MutableList<String>, str_: String): String {
+fun execution(args_: MutableList<String>, str_: String): String {
     var rand_seed = args_[1]
     val parameters = ProgramParameters(args_)
     var generator = Generator(parameters)

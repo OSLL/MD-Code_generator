@@ -8,7 +8,7 @@ import org.litote.kmongo.reactivestreams.KMongo
 
 typealias MongoDB = CoroutineDatabase
 
-suspend fun createMongoDBConnection(): MongoDB {
+suspend fun createMongoDB(): MongoDB {
     val host = System.getenv("MONGODB_HOST") ?: "localhost"
     val port = System.getenv("MONGODB_PORT")?.toInt() ?: 27017
     val database = System.getenv("MONGODB_DATABASE") ?: "code-generator"

@@ -38,7 +38,7 @@ data class GenerationParameters(
     @SerialName("array_size")
     val arraySize: Int? = null
 ) {
-    fun toProgramParameters(): ProgramParameters {
+    fun toArgsArray(): MutableList<String> {
         val args = mutableListOf<String>()
         args.add(task.toString())
         args.add(randSeed)
@@ -85,7 +85,10 @@ data class GenerationParameters(
         operations?.let {
             args.addAll(it)
         }
+        return args
+    }
 
-        return ProgramParameters(args)
+    fun toProgramParameters(): ProgramParameters {
+        return ProgramParameters(this.toArgsArray())
     }
 }
