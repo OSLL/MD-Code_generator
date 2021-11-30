@@ -1,22 +1,34 @@
 package com.example
 
+import com.example.config.ConfigProvider
 import io.ktor.application.*
+import io.ktor.html.*
+import io.ktor.http.*
+import io.ktor.features.*
 import io.ktor.html.*
 import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import kotlinx.html.*
+import io.ktor.routing.*
+import io.ktor.serialization.*
+import kotlinx.html.body
+import kotlinx.html.img
+import kotlinx.html.p
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import java.io.File
+import java.io.FileInputStream
 import java.lang.Integer.parseInt
+
 
 const val PATH_SOURCE = "/get_source"
 const val PATH_IMAGE = "/get_image"
 const val PATH_ANSWER = "/check_answer"
 const val PATH_VERSION = "/version"
+const val PATH_LOGS = "/logs_info"
 
 const val NUMBER_TASKS = 11
 const val TEXT = "Введите в адресную строку входные данные для задания\n" +
@@ -60,10 +72,14 @@ data class VersionInfo(val commit: String, val date: String, val version: String
 
 fun Application.congigureServer() {
     routing {
+        install(ContentNegotiation) {
+            json()
+        }
         static("") {
             file(IMAGE)
             default("index.html")
         }
+
         get("/") {
             call.respondText("$TEXT")
         }
@@ -89,6 +105,7 @@ fun Application.congigureServer() {
                 }
             }
         }
+
         get(PATH_SOURCE) {
             val path = PATH_SOURCE
             var task: String? = call.request.queryParameters["task"]
@@ -180,6 +197,7 @@ fun Application.congigureServer() {
                 }
             } else call.respondText("$INPUT_ERROR_TEXT$TEXT")
         }
+
         get(PATH_IMAGE) {
             val path = PATH_IMAGE
             val task: String? = call.request.queryParameters["task"]
@@ -278,6 +296,7 @@ fun Application.congigureServer() {
                 }
             } else call.respondText("$INPUT_ERROR_TEXT$TEXT")
         }
+
         get(PATH_ANSWER) {
             val path = PATH_ANSWER
             val task: String? = call.request.queryParameters["task"]
@@ -383,7 +402,12 @@ fun Application.congigureServer() {
                 }
                 call.respond(response)
             }
+        }
 
+        get(PATH_LOGS) {
+            val file = File(ConfigProvider.logsPath)
+            val data: String = file.readText()
+            call.respondText(data)
         }
     }
 }
