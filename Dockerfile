@@ -7,7 +7,7 @@ RUN bash -c 'curl -s https://get.sdkman.io | sh'
 RUN bash -c 'source /root/.sdkman/bin/sdkman-init.sh && sdk install kotlin'
 
 RUN apt update
-RUN apt -y install gcc
+RUN apt -y install gcc git
 
 RUN apt -y install clang-format
 RUN apt-get clean

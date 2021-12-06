@@ -13,6 +13,7 @@ fun main(args: Array<String>) {
     io.ktor.server.jetty.EngineMain.main(args)
 }
 
+@Suppress("unused")
 fun Application.module(testing: Boolean = false) {
     install(CallLogging)
     congigureServer()

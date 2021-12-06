@@ -2,17 +2,23 @@ package com.example
 
 import com.example.config.ConfigProvider
 import io.ktor.application.*
+import io.ktor.html.*
+import io.ktor.http.*
 import io.ktor.features.*
 import io.ktor.html.*
 import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.response.*
 import io.ktor.routing.*
+import kotlinx.html.*
+import io.ktor.routing.*
 import io.ktor.serialization.*
 import kotlinx.html.body
 import kotlinx.html.img
 import kotlinx.html.p
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import java.io.File
 import java.io.FileInputStream
 import java.lang.Integer.parseInt
@@ -21,6 +27,7 @@ import java.lang.Integer.parseInt
 const val PATH_SOURCE = "/get_source"
 const val PATH_IMAGE = "/get_image"
 const val PATH_ANSWER = "/check_answer"
+const val PATH_VERSION = "/version"
 const val PATH_LOGS = "/logs_info"
 
 const val NUMBER_TASKS = 11
@@ -60,6 +67,9 @@ const val ALT_TEXT = "There should be an image, but something went wrong. Please
 @Serializable
 data class AnswerResponse(val correctnessPercentage: Int, val message: String)
 
+@Serializable
+data class VersionInfo(val commit: String, val date: String, val version: String)
+
 fun Application.congigureServer() {
     routing {
         install(ContentNegotiation) {
@@ -72,6 +82,28 @@ fun Application.congigureServer() {
 
         get("/") {
             call.respondText("$TEXT")
+        }
+        get(PATH_VERSION) {
+            val versionInfoString = readFile("version_info.json")
+            val versionInfo = Json.decodeFromString<VersionInfo>(versionInfoString)
+            call.respondHtml {
+                body {
+                    table {
+                        tr {
+                            td { +"Commit" }
+                            td { +versionInfo.commit }
+                        }
+                        tr {
+                            td { +"Date" }
+                            td { +versionInfo.date }
+                        }
+                        tr {
+                            td { +"Version" }
+                            td { +versionInfo.version }
+                        }
+                    }
+                }
+            }
         }
 
         get(PATH_SOURCE) {
