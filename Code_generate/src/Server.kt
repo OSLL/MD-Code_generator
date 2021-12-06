@@ -12,7 +12,10 @@ import kotlinx.coroutines.withContext
 import kotlinx.html.body
 import kotlinx.html.img
 import kotlinx.html.p
+import kotlinx.html.*
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import java.io.File
 import java.lang.Integer.parseInt
 import javax.imageio.ImageIO
@@ -21,6 +24,7 @@ import javax.imageio.ImageIO
 const val PATH_SOURCE = "/get_source"
 const val PATH_IMAGE = "/get_image"
 const val PATH_ANSWER = "/check_answer"
+const val PATH_VERSION = "/version"
 const val PATH_IMAGE_BYTES_PNG = "/get_image_bytes_png"
 const val PATH_LOGS = "/logs_info"
 
@@ -60,10 +64,11 @@ const val ALT_TEXT = "There should be an image, but something went wrong. Please
 
 @Serializable
 data class AnswerResponse(val correctnessPercentage: Int, val message: String)
+@Serializable
+data class VersionInfo(val commit: String, val date: String, val version: String)
 
 fun Application.configureServer() {
     routing {
-
         static("") {
             file(IMAGE)
             default("index.html")
@@ -71,6 +76,28 @@ fun Application.configureServer() {
 
         get("/") {
             call.respondText("$TEXT")
+        }
+        get(PATH_VERSION) {
+            val versionInfoString = readFile("version_info.json")
+            val versionInfo = Json.decodeFromString<VersionInfo>(versionInfoString)
+            call.respondHtml {
+                body {
+                    table {
+                        tr {
+                            td { +"Commit" }
+                            td { +versionInfo.commit }
+                        }
+                        tr {
+                            td { +"Date" }
+                            td { +versionInfo.date }
+                        }
+                        tr {
+                            td { +"Version" }
+                            td { +versionInfo.version }
+                        }
+                    }
+                }
+            }
         }
 
         get(PATH_SOURCE) {
