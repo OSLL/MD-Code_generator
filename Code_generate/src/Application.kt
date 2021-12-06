@@ -3,6 +3,7 @@ package com.example
 import com.example.config.ConfigProvider
 import io.ktor.application.*
 import io.ktor.features.*
+import io.ktor.serialization.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -16,5 +17,8 @@ fun main(args: Array<String>) {
 @Suppress("unused")
 fun Application.module(testing: Boolean = false) {
     install(CallLogging)
+    install(ContentNegotiation) {
+        json()
+    }
     congigureServer()
 }
