@@ -4,26 +4,16 @@ import com.example.config.ConfigProvider
 import io.ktor.application.*
 import io.ktor.html.*
 import io.ktor.http.*
-import io.ktor.features.*
-import io.ktor.html.*
-import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import io.ktor.routing.*
 import kotlinx.html.*
-import io.ktor.routing.*
-import io.ktor.serialization.*
-import kotlinx.html.body
-import kotlinx.html.img
-import kotlinx.html.p
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import java.io.File
-import java.io.FileInputStream
 import java.lang.Integer.parseInt
 import javax.imageio.ImageIO
 
@@ -77,9 +67,6 @@ data class VersionInfo(val commit: String, val date: String, val version: String
 
 fun Application.congigureServer() {
     routing {
-        install(ContentNegotiation) {
-            json()
-        }
         static("") {
             file(IMAGE)
             default("index.html")
