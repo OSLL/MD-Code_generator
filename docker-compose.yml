@@ -1,4 +1,4 @@
-version: '2'
+version: '3'
 
 services:
   web:
@@ -6,3 +6,13 @@ services:
     restart: always
     ports:
       - "8100:8080"
+    depends_on:
+      - mongodb
+  mongodb:
+    image: mongo:5.0.4
+    restart: always
+    volumes:
+      - database-data:/data/db
+
+volumes:
+  database-data:

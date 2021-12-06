@@ -16,5 +16,5 @@ ADD ./Code_generate /server
 WORKDIR /server
 RUN chmod +x ./run.sh
 RUN chmod +x ./gradlew
-RUN ./gradlew jar
-CMD ./gradlew run
+RUN ./gradlew --no-daemon jar
+CMD ./gradlew --no-daemon run
