@@ -34,7 +34,6 @@ dependencies {
     implementation("io.ktor:ktor-client-core:$ktor_version")
     implementation("io.ktor:ktor-client-apache:$ktor_version")
     implementation("io.ktor:ktor-client-serialization:$ktor_version")
-    implementation("io.ktor:ktor-client-core-jvm:$ktor_version")
     testImplementation("io.ktor:ktor-server-tests:$ktor_version")
     testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlin_version")
 }
