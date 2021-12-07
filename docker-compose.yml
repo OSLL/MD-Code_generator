@@ -12,7 +12,4 @@ services:
     image: mongo:5.0.4
     restart: always
     volumes:
-      - database-data:/data/db
-
-volumes:
-  database-data:
+      - code-generator-db:/data/db
