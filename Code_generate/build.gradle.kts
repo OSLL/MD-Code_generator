@@ -5,8 +5,8 @@ val slf4j_version: String by project
 
 plugins {
     application
-    kotlin("jvm") version "1.5.31"
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.5.31"
+    kotlin("jvm") version "1.6.0"
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.6.0"
 }
 
 group = "com.example"
@@ -24,10 +24,15 @@ kotlin.sourceSets["main"].kotlin.srcDir("src")
 sourceSets["main"].resources.srcDir("resources")
 
 dependencies {
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.1")
+
+    implementation("org.litote.kmongo:kmongo-coroutine-serialization:4.4.0")
+    implementation("org.litote.kmongo:kmongo-id:4.4.0")
+
     implementation("io.ktor:ktor-server-core:$ktor_version")
     implementation("io.ktor:ktor-server-host-common:$ktor_version")
     implementation("org.jetbrains.kotlinx:kotlinx-html-jvm:0.7.3")
-    implementation("org.jetbrains.kotlin-wrappers:kotlin-css-jvm:1.0.0-pre.261-kotlin-1.5.31")
+    implementation("org.jetbrains.kotlin-wrappers:kotlin-css-jvm:1.0.0-pre.272-kotlin-1.6.0")
     implementation("io.ktor:ktor-html-builder:$ktor_version")
     implementation("io.ktor:ktor-serialization:$ktor_version")
     implementation("io.ktor:ktor-server-jetty:$ktor_version")
