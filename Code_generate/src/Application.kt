@@ -4,6 +4,7 @@ import com.example.config.ConfigProvider
 import com.example.dao.createMongoDB
 import io.ktor.application.*
 import io.ktor.features.*
+import io.ktor.serialization.*
 import kotlinx.coroutines.runBlocking
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -25,7 +26,7 @@ private val mongoDB by lazy {
 fun Application.module(testing: Boolean = false) {
     install(CallLogging)
     install(ContentNegotiation) {
-        jsonParser
+        json(jsonParser)
     }
     configureServer()
     configureExceptions()
