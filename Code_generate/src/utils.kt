@@ -11,6 +11,7 @@ fun parseGenerationParameters(queryParameters: Map<String, List<String>>) = buil
     for (entry in queryParameters) {
         val value = entry.value[0]
         when (entry.key) {
+            "answer" -> {}
             "operations" -> {
                 put(entry.key, JsonArray(entry.value[0].split(',').map { JsonPrimitive(it) }))
             }
