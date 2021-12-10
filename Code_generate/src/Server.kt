@@ -9,9 +9,6 @@ import io.ktor.response.*
 import io.ktor.routing.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlinx.html.body
-import kotlinx.html.img
-import kotlinx.html.p
 import kotlinx.html.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
@@ -64,6 +61,7 @@ const val ALT_TEXT = "There should be an image, but something went wrong. Please
 
 @Serializable
 data class AnswerResponse(val correctnessPercentage: Int, val message: String)
+
 @Serializable
 data class VersionInfo(val commit: String, val date: String, val version: String)
 
