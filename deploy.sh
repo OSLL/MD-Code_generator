@@ -10,7 +10,7 @@ cd Code_generate
 cd -
 
 docker-compose down --rmi local
-docker-compose build
+docker-compose build --no-cache
 docker-compose up -d
 
 sleep 20
