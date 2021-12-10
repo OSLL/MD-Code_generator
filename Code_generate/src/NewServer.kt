@@ -105,8 +105,7 @@ fun Application.configureNewServer(database: MongoDB) {
             val path = PATH_ANSWER
             val params = parseGenerationParameters(call.request.queryParameters.toMap())
             validateParameters(params)
-            val answer = call.request.queryParameters["answer"]?.replace("\\s+".toRegex(), " ")
-                ?: throw ParametersParseError("Excepted answer parameter")
+            val answer = call.request.queryParameters["answer"] ?: throw ParametersParseError("Excepted answer parameter")
             val result = databaseBackend.getAnswer(params) ?: try {
                 programRunMutex.withLock {
                     val generationResult = tryGenerateImage(params, path)
