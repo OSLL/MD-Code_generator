@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory
 fun main(args: Array<String>) {
     val log: Logger = LoggerFactory.getLogger("jsonLogger")
     log.info("debugUrl = ${ConfigProvider.debugUrl}")
-//    log.info("dbUrl = ${ConfigProvider.dbHost}")
     io.ktor.server.jetty.EngineMain.main(args)
 }
 

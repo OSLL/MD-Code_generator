@@ -1,8 +1,10 @@
 package com.example
 
 import com.example.dao.MongoDB
+import com.example.dao.StatisticsOps
 import com.example.dao.VariantsOps
 import io.ktor.application.*
+import io.ktor.html.*
 import io.ktor.http.*
 import io.ktor.response.*
 import io.ktor.routing.*
@@ -11,7 +13,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import kotlinx.html.*
 import java.io.ByteArrayOutputStream
+import java.time.Instant
+import java.time.ZoneId
 import javax.imageio.ImageIO
 
 private val programRunMutex = Mutex()
@@ -46,6 +51,7 @@ private suspend fun tryGenerateImage(params: GenerationParameters, path: String)
 
 fun Application.configureNewServer(database: MongoDB) {
     val databaseBackend = VariantsOps(database)
+    val statisticsCollection = StatisticsOps(database)
 
 
     routing {
@@ -101,6 +107,7 @@ fun Application.configureNewServer(database: MongoDB) {
                 call.respondRedirect(e.newParametersString, permanent = false)
             }
         }
+
         get("/new$PATH_ANSWER") {
             val path = PATH_ANSWER
             val params = parseGenerationParameters(call.request.queryParameters.toMap())
@@ -122,7 +129,12 @@ fun Application.configureNewServer(database: MongoDB) {
             } catch (e: GenerationParametersChanged) {
                 return@get call.respondRedirect(e.newParametersString, permanent = false)
             }
-            val math = checkAnswer_(stringParser(result), stringParser(answer))
+            val parsedAnswer = stringParser(answer)
+            val parsedResult = stringParser(result)
+            val math = checkAnswer_(parsedResult, parsedAnswer)
+
+            statisticsCollection.addAttempt(params, parsedAnswer, parsedResult, math)
+
             val response = if (result == answer) {
                 call.response.status(HttpStatusCode.OK)
                 AnswerResponse(math, "Correct solution: $math% correctness")
@@ -133,5 +145,37 @@ fun Application.configureNewServer(database: MongoDB) {
             call.respond(response)
         }
 
+        get("new$PATH_STATISTICS") {
+            val statistics = statisticsCollection.getList()
+
+            call.respondHtml {
+                body {
+                    table {
+                        tr {
+                            th { +"Answer id" }
+                            th { +"Task parameters" }
+                            th { +"Time" }
+                            th { +"User answer" }
+                            th { +"Right answer" }
+                            th { +"Correctness" }
+                        }
+                        statistics.forEach { statistics ->
+                            tr {
+                                td { +"${statistics.id}" }
+                                td { +"${statistics.parameters}" }
+                                td { +Instant.ofEpochSecond(statistics.timestamp / 1000)
+                                    .atZone(ZoneId.systemDefault())
+                                    .toLocalDateTime()
+                                    .toString()
+                                }
+                                td { +"${statistics.usersAnswer}" }
+                                td { +"${statistics.rightAnswer}" }
+                                td { +"${statistics.correctness}"}
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
