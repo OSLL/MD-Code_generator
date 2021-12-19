@@ -21,6 +21,7 @@ import javax.imageio.ImageIO
 const val PATH_SOURCE = "/get_source"
 const val PATH_IMAGE = "/get_image"
 const val PATH_ANSWER = "/check_answer"
+const val PATH_EXPORT_TABLE = "/solutions_table"
 const val PATH_VERSION = "/version"
 const val PATH_IMAGE_BYTES_PNG = "/get_image_bytes_png"
 const val PATH_LOGS = "/logs_info"
