@@ -3,6 +3,7 @@ version: '3'
 services:
   web:
     build: .
+    image: 'code-generator_image'
     restart: always
     ports:
       - "8100:8080"
