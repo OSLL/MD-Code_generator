@@ -151,7 +151,9 @@ fun Application.configureNewServer(database: MongoDB) {
             call.respondHtml {
                 body {
                     table {
+                        style="border: solid; border-width: 1px; border-collapse: collapse;"
                         tr {
+                            style = "border:solid; border-width: 1px;"
                             th { +"Answer id" }
                             th { +"Task parameters" }
                             th { +"Time" }
@@ -161,6 +163,7 @@ fun Application.configureNewServer(database: MongoDB) {
                         }
                         statistics.forEach { statistics ->
                             tr {
+                                style = "border:solid; border-width: 1px;"
                                 td { +"${statistics.id}" }
                                 td { +"${statistics.parameters}" }
                                 td { +Instant.ofEpochSecond(statistics.timestamp / 1000)
