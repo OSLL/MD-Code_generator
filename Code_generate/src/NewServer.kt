@@ -15,8 +15,11 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.html.*
 import java.io.ByteArrayOutputStream
+import java.io.File
 import java.time.Instant
 import java.time.ZoneId
+import java.text.SimpleDateFormat
+import java.util.*
 import javax.imageio.ImageIO
 
 private val programRunMutex = Mutex()
@@ -180,5 +183,40 @@ fun Application.configureNewServer(database: MongoDB) {
                 }
             }
         }
+        get("/new$PATH_EXPORT_TABLE") {
+            val date = Calendar.getInstance().time
+            val formatter = SimpleDateFormat.getDateTimeInstance()
+            val formattedDate = formatter.format(date)
+
+            val answersFileName = "answers_table_${formattedDate}.csv"
+
+            val data = databaseBackend.collection.find().toList()
+
+            val csv = buildString {
+                append("Task id,Answer\r\n")
+                for (str in data) {
+                    val answers = str.answer
+                        .replace(" ", "")
+                        .replace("]", "")
+                        .replace("[","")
+                        .split("\n")
+
+                    append("${str.id},")
+                    // answers are seperated by empty fields (,,)
+                    for (i in answers.indices) {
+                        when(i) {
+                            answers.size - 1 -> append("${answers[i]}\r\n")
+                            else -> append("${answers[i]},,")
+                        }
+                    }
+                }
+            }
+            val file = File(answersFileName)
+            file.writeText(csv)
+
+            call.response.header("Content-Disposition", "attachment; filename=\"${file.name}\"")
+            call.respondFile(file)
+        }
+
     }
 }
