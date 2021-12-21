@@ -25,5 +25,7 @@ suspend fun createMongoDB(): MongoDB {
 
 private suspend fun MongoDB.prepareDatabase() = apply {
     val variantsCollection = getCollection<Variants>()
+    val statisticsCollection = getCollection<Statistics>()
+
     variantsCollection.ensureUniqueIndex(Variants::parameters)
 }

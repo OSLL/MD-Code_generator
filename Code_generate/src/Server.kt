@@ -24,6 +24,7 @@ const val PATH_ANSWER = "/check_answer"
 const val PATH_VERSION = "/version"
 const val PATH_IMAGE_BYTES_PNG = "/get_image_bytes_png"
 const val PATH_LOGS = "/logs_info"
+const val PATH_STATISTICS = "/statistics"
 
 const val NUMBER_TASKS = 11
 const val TEXT = "Введите в адресную строку входные данные для задания\n" +
