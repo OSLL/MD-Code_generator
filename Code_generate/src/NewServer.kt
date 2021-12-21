@@ -131,7 +131,7 @@ fun Application.configureNewServer(database: MongoDB) {
             }
             val parsedAnswer = stringParser(answer)
             val parsedResult = stringParser(result)
-            val math = checkAnswer_(parsedResult, parsedAnswer)
+            val math = checkAnswer_(parsedResult.toMutableList(), parsedAnswer.toMutableList())
 
             statisticsCollection.addAttempt(params, parsedAnswer, parsedResult, math)
 
